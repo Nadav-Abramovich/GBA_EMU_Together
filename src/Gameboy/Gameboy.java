@@ -9,7 +9,7 @@ public class Gameboy {
 
     private void _load_rom() {
         try {
-            byte[] temp =  Files.readAllBytes(Paths.get("ROMS/BootWorld.gb"));
+            byte[] temp = Files.readAllBytes(Paths.get("ROMS/BootWorld.gb"));
             System.arraycopy(temp, 0, _memory, 0, temp.length);
             System.out.println("[INFO] Successfuly loaded boot ROM!");
         } catch (java.io.IOException exception) {
@@ -21,7 +21,8 @@ public class Gameboy {
         _load_rom();
         this.cpu = new CPU(_memory);
     }
-    public void tick(){
+
+    public void tick() {
         cpu.tick();
     }
 }

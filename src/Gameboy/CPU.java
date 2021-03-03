@@ -25,14 +25,10 @@ public class CPU {
 
         // For all inheritors of CPUActions
         xors.cpu_reference = this;
+        Stack.cpu_reference = this;
+        Memory.cpu_reference = this;
     }
 
-    private void _ld_sp_d16() {
-        byte lowerByte = memory[PC + 1];
-        byte upperByte = memory[PC + 2];
-        SP = (char) (upperByte << 8 | lowerByte);
-        PC += 3;
-    }
 
     public void tick() {
         char opcode = (char)(memory[PC] & 255);
@@ -41,16 +37,10 @@ public class CPU {
         if(function != null) {
             function.run();
         }
-
-        else {
-            switch (opcode) {
-                case (0x31):
-                    System.out.println("_ld_sp_d16");
-                    _ld_sp_d16();
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + (int) (memory[PC] & 255));
-            }
+        function = Stack.SUPPORTED_ACTIONS.getOrDefault(opcode, null);
+        if (function != null) {
+            function.run();
+            executed_opcode = true;
         }
     }
 }

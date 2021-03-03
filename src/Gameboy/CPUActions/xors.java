@@ -20,9 +20,10 @@ public class xors extends CPUActions {
         }
     };
 
+
     public static void xorA() {
         System.out.println("XorA");
-        cpu_reference.AF = (char)0;
+        cpu_reference.AF = (char) 0;
         cpu_reference.PC++;
         cpu_reference.AF |= 128;
     }
@@ -42,34 +43,49 @@ public class xors extends CPUActions {
         System.out.println("XorC");
         cpu_reference.BC = (char) ((cpu_reference.BC >> 8) << 8);
         cpu_reference.PC++;
-        // TODO: Zero flag
+
+        // Make the ZERO flag the only turned on flag
+        cpu_reference.xor_flags();
+        cpu_reference.turn_on_zero_flag();
     }
 
     public static void xorD() {
         System.out.println("XorD");
         cpu_reference.DE = (char) (255 & cpu_reference.DE);
         cpu_reference.PC++;
-        // TODO: Zero flag
+
+        // Make the ZERO flag the only turned on flag
+        cpu_reference.xor_flags();
+        cpu_reference.turn_on_zero_flag();
     }
 
     public static void xorE() {
         System.out.println("XorE");
         cpu_reference.DE = (char) ((cpu_reference.BC >> 8) << 8);
         cpu_reference.PC++;
-        // TODO: Zero flag
+
+        // Make the ZERO flag the only turned on flag
+        cpu_reference.xor_flags();
+        cpu_reference.turn_on_zero_flag();
     }
 
     public static void xorH() {
         System.out.println("XorH");
         cpu_reference.HL = (char) (255 & cpu_reference.HL);
         cpu_reference.PC++;
-        // TODO: Zero flag
+
+        // Make the ZERO flag the only turned on flag
+        cpu_reference.xor_flags();
+        cpu_reference.turn_on_zero_flag();
     }
 
-    public static void xorL(){
+    public static void xorL() {
         System.out.println("XorL");
-        cpu_reference.HL = (char)((cpu_reference.BC >> 8) << 8);
+        cpu_reference.HL = (char) ((cpu_reference.BC >> 8) << 8);
         cpu_reference.PC++;
-        // TODO: Zero flag
+
+        // Make the ZERO flag the only turned on flag
+        cpu_reference.xor_flags();
+        cpu_reference.turn_on_zero_flag();
     }
 }
