@@ -7,7 +7,7 @@ import java.util.Map;
 // We suppress this warning because it is loaded dynamically
 // and therefore Intellij doesn't recognize its usage.
 @SuppressWarnings("unused")
-public class Xors implements CPUActions {
+public class Xors implements CPUInstructions {
     private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
@@ -30,14 +30,14 @@ public class Xors implements CPUActions {
     }
 
     private void xorA() {
-        System.out.println("XorA");
+        System.out.println("_xor_a");
         cpu.AF = (char) 0;
         cpu.PC++;
         cpu.AF |= 128;
     }
 
     private void xorB() {
-        System.out.println("XorB");
+        System.out.println("_xor_b");
         cpu.BC = (char) (255 & cpu.BC);
         cpu.PC++;
 
@@ -48,7 +48,7 @@ public class Xors implements CPUActions {
 
 
     private void xorC() {
-        System.out.println("XorC");
+        System.out.println("_xor_c");
         cpu.BC = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
 
@@ -58,7 +58,7 @@ public class Xors implements CPUActions {
     }
 
     private void xorD() {
-        System.out.println("XorD");
+        System.out.println("_xor_d");
         cpu.DE = (char) (255 & cpu.DE);
         cpu.PC++;
 
@@ -68,7 +68,7 @@ public class Xors implements CPUActions {
     }
 
     private void xorE() {
-        System.out.println("XorE");
+        System.out.println("_xor_e");
         cpu.DE = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
 
@@ -78,7 +78,7 @@ public class Xors implements CPUActions {
     }
 
     private void xorH() {
-        System.out.println("XorH");
+        System.out.println("_xor_h");
         cpu.HL = (char) (255 & cpu.HL);
         cpu.PC++;
 
@@ -88,7 +88,7 @@ public class Xors implements CPUActions {
     }
 
     private void xorL() {
-        System.out.println("XorL");
+        System.out.println("_xor_l");
         cpu.HL = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
 
