@@ -6,14 +6,14 @@ import Gameboy.CPU;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Xors implements CPUInstructions {
-    @OpcodeBinding(opcode = 0xAF)
+    @Opcode(opcode = 0xAF)
     public static void xorA(CPU cpu) {
         cpu.AF = (char) 0;
         cpu.PC++;
         cpu.AF |= 128;
     }
 
-    @OpcodeBinding(opcode = 0xA8)
+    @Opcode(opcode = 0xA8)
     public static void xorB(CPU cpu) {
         cpu.BC = (char) (255 & cpu.BC);
         cpu.PC++;
@@ -23,7 +23,7 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    @OpcodeBinding(opcode = 0xA9)
+    @Opcode(opcode = 0xA9)
     public static void xorC(CPU cpu) {
         cpu.BC = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
@@ -33,7 +33,7 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    @OpcodeBinding(opcode = 0xAA)
+    @Opcode(opcode = 0xAA)
     public static void xorD(CPU cpu) {
         cpu.DE = (char) (255 & cpu.DE);
         cpu.PC++;
@@ -43,7 +43,7 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    @OpcodeBinding(opcode = 0xAB)
+    @Opcode(opcode = 0xAB)
     public static void xorE(CPU cpu) {
         cpu.DE = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
@@ -53,7 +53,7 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    @OpcodeBinding(opcode = 0xAC)
+    @Opcode(opcode = 0xAC)
     public static void xorH(CPU cpu) {
         cpu.HL = (char) (255 & cpu.HL);
         cpu.PC++;
@@ -63,7 +63,7 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    @OpcodeBinding(opcode = 0xAD)
+    @Opcode(opcode = 0xAD)
     public static void xorL(CPU cpu) {
         cpu.HL = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;

@@ -1,7 +1,7 @@
 package Gameboy;
 
 import Gameboy.CPUActions.CPUInstructions;
-import Gameboy.CPUActions.OpcodeBinding;
+import Gameboy.CPUActions.Opcode;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,7 +29,7 @@ public class CPU {
         for (Class<? extends CPUInstructions> aClass : classes) {
             Method[] functions = aClass.getDeclaredMethods();
             for (Method method : functions) {
-                OpcodeBinding annotation = method.getAnnotation(OpcodeBinding.class);
+                Opcode annotation = method.getAnnotation(Opcode.class);
                 supported_actions.put(annotation.opcode(), method);
             }
         }
