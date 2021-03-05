@@ -17,12 +17,12 @@ public class Gameboy {
         }
     }
 
-    public Gameboy() {
+    public Gameboy() throws NoSuchFieldException, IllegalAccessException {
         _load_rom();
         this.cpu = new CPU(_memory);
     }
 
-    public void tick() {
+    public void tick() throws NoSuchFieldException, IllegalAccessException {
         cpu.tick();
     }
 }

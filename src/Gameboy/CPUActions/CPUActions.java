@@ -1,8 +1,9 @@
 package Gameboy.CPUActions;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class CPUActions {
-    public static Map<Character, String> SUPPORTED_ACTIONS = new HashMap<Character, String>();
+public abstract class CPUActions {
+    public static Map<Character, Runnable> SUPPORTED_ACTIONS;
+
+    public abstract Map<Character, Runnable> get_supported_actions();
 }

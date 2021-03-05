@@ -16,11 +16,18 @@ public class Memory extends CPUActions {
         }
     };
 
+    public Map<Character, Runnable> get_supported_actions() {
+        return SUPPORTED_ACTIONS;
+    }
+
+    public Memory(CPU cpu) {
+        cpu_reference = cpu;
+    }
 
     public static void ld_hl_d16() {
         System.out.println("_ld_hl_d16");
-        int lowerByte = cpu_reference.memory[cpu_reference.PC + 1]&255;
-        int upperByte = cpu_reference.memory[cpu_reference.PC + 2]&255;
+        int lowerByte = cpu_reference.memory[cpu_reference.PC + 1] & 255;
+        int upperByte = cpu_reference.memory[cpu_reference.PC + 2] & 255;
         cpu_reference.HL = (char) (upperByte << 8 | lowerByte);
         cpu_reference.PC += 3;
     }

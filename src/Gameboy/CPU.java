@@ -1,16 +1,18 @@
 package Gameboy;
+
+import Gameboy.CPUActions.CPUActions;
+import Gameboy.CPUActions.Memory;
+import Gameboy.CPUActions.Stack;
 import Gameboy.CPUActions.xors;
 
-
 public class CPU {
-    byte[] memory;
+    public byte[] memory;
     public char AF = 0;
     public char BC = 0;
     public char DE = 0;
     public char HL = 0;
     public char SP = 0;
     public char PC = 0;
-
 
     public void xor_flags() {
         AF = (char) ((AF >> 8) << 8);
@@ -20,27 +22,31 @@ public class CPU {
         AF |= 128;
     }
 
+    public CPUActions[] supported_actions = new CPUActions[]{
+            new xors(this),
+            new Stack(this),
+            new Memory(this)
+    };
+
     public CPU(byte[] memory) {
         this.memory = memory;
-
-        // For all inheritors of CPUActions
-        xors.cpu_reference = this;
-        Stack.cpu_reference = this;
-        Memory.cpu_reference = this;
     }
 
 
     public void tick() {
-        char opcode = (char)(memory[PC] & 255);
-
-        Runnable function = xors.SUPPORTED_ACTIONS.getOrDefault(opcode, null);
-        if(function != null) {
-            function.run();
+        char opcode = (char) (memory[PC] & 255);
+        boolean executed_opcode = false;
+        for (CPUActions action : supported_actions) {
+            Runnable function = action.get_supported_actions().getOrDefault(opcode, null);
+            if (function != null) {
+                function.run();
+                executed_opcode = true;
+                break;
+            }
         }
-        function = Stack.SUPPORTED_ACTIONS.getOrDefault(opcode, null);
-        if (function != null) {
-            function.run();
-            executed_opcode = true;
+        if (!executed_opcode) {
+            System.out.println("Failed to execute " + (int) opcode);
+            int t = 1 / 0;
         }
     }
 }

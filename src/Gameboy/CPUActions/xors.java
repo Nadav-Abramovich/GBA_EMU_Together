@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class xors extends CPUActions {
-    public static CPU cpu_reference = null;
+    private static CPU cpu_reference = null;
 
     public static Map<Character, Runnable> SUPPORTED_ACTIONS = new HashMap<>() {
         {
@@ -20,6 +20,13 @@ public class xors extends CPUActions {
         }
     };
 
+    public Map<Character, Runnable> get_supported_actions() {
+        return SUPPORTED_ACTIONS;
+    }
+
+    public xors(CPU cpu) {
+        cpu_reference = cpu;
+    }
 
     public static void xorA() {
         System.out.println("XorA");
