@@ -13,8 +13,8 @@ import java.util.Set;
 public class CPU {
     public static final String CPU_INSTRUCTIONS_PACKAGE_PATH = "gameboy.cpu_instructions";
     public static final String EXECUTED_OPCODE_MSG_FORMAT = "[Debug] 0x%s: %s%n";
-    public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "Failed to execute %s%n";
-    public static final String OPCODE_NOT_IMPLEMENTED_MSG_FORMAT = "Opcode %s is not implemented%n";
+    public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "Failed to execute opcode 0x%s%n";
+    public static final String OPCODE_NOT_IMPLEMENTED_MSG_FORMAT = "Opcode 0x%s is not implemented%n";
 
     public final byte[] memory;
     public char AF = 0;
