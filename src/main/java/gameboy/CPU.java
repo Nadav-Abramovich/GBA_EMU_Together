@@ -64,6 +64,7 @@ public class CPU {
         try {
             System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
             action.invoke(null, this);
+            this.PC += action.getAnnotation(Opcode.class).length();
         } catch (IllegalAccessException | InvocationTargetException e) {
             System.out.printf(FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT, Integer.toHexString(opcode));
             System.exit(1);
