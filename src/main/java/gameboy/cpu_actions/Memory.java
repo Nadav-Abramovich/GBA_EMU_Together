@@ -1,6 +1,6 @@
-package Gameboy.CPUActions;
+package gameboy.cpu_actions;
 
-import Gameboy.CPU;
+import gameboy.CPU;
 
 // We suppress this warning because this class and its methods are dynamically called
 // and therefore IntelliJ doesn't recognize their usage.

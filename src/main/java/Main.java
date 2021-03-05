@@ -1,4 +1,4 @@
-import Gameboy.Gameboy;
+import gameboy.Gameboy;
 
 public class Main {
 

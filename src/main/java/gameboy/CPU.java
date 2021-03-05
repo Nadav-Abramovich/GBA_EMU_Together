@@ -1,7 +1,7 @@
-package Gameboy;
+package gameboy;
 
-import Gameboy.CPUActions.CPUInstructions;
-import Gameboy.CPUActions.Opcode;
+import gameboy.cpu_actions.CPUInstructions;
+import gameboy.cpu_actions.Opcode;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,20 +11,20 @@ import java.util.Map;
 import java.util.Set;
 
 public class CPU {
-    public byte[] memory;
+    public final byte[] memory;
     public char AF = 0;
     public char BC = 0;
     public char DE = 0;
     public char HL = 0;
     public char SP = 0;
     public char PC = 0;
-    public Map<Character, Method> supported_actions = new HashMap<>();
+    public final Map<Character, Method> supported_actions = new HashMap<>();
 
     public CPU(byte[] memory) {
         this.memory = memory;
 
         // Load all inheriting classes of CPUActions and add them to our list
-        Reflections reflections = new Reflections("Gameboy.CPUActions");
+        Reflections reflections = new Reflections("gameboy.cpu_actions");
         Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
         for (Class<? extends CPUInstructions> aClass : classes) {
             Method[] functions = aClass.getDeclaredMethods();
