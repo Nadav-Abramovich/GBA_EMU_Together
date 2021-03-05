@@ -18,7 +18,6 @@ public class Memory extends CPUActions {
 
     // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
     public Memory(CPU cpu) {
-        super(cpu);
         cpu_reference = cpu;
     }
 
