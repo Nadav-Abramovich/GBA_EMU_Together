@@ -2,28 +2,12 @@ package Gameboy.CPUActions;
 
 import Gameboy.CPU;
 
-import java.util.Map;
-
-// We suppress this warning because it is loaded dynamically
-// and therefore Intellij doesn't recognize its usage.
+// We suppress this warning because this class and its methods are dynamically called
+// and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Stack implements CPUInstructions {
-    private final CPU cpu;
-
-    private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
-            Map.entry((char) 0x31, this::ld_sp_d16)
-    );
-
-    // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
-    public Stack(CPU cpu) {
-        this.cpu = cpu;
-    }
-
-    public Map<Character, Runnable> get_supported_actions() {
-        return SUPPORTED_ACTIONS;
-    }
-
-    private void ld_sp_d16() {
+    @OpcodeBinding(opcode = 0x31)
+    public static void ld_sp_d16(CPU cpu) {
         System.out.println("_ld_sp_d16");
         int lowerByte = cpu.memory[cpu.PC + 1] & 255;
         int upperByte = cpu.memory[cpu.PC + 2] & 255;

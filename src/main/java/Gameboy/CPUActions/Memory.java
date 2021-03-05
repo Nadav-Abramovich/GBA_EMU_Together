@@ -2,29 +2,12 @@ package Gameboy.CPUActions;
 
 import Gameboy.CPU;
 
-import java.util.Map;
-
-// We suppress this warning because it is loaded dynamically
-// and therefore Intellij doesn't recognize its usage.
+// We suppress this warning because this class and its methods are dynamically called
+// and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Memory implements CPUInstructions {
-    private final CPU cpu;
-
-    private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
-            Map.entry((char) 0x21, this::ld_hl_d16),
-            Map.entry((char) 0x22, this::ld_hl_plus_a),
-            Map.entry((char) 0x32, this::ld_hl_minus_a)
-    );
-
-    public Memory(CPU cpu) {
-        this.cpu = cpu;
-    }
-
-    public Map<Character, Runnable> get_supported_actions() {
-        return SUPPORTED_ACTIONS;
-    }
-
-    private void ld_hl_d16() {
+    @OpcodeBinding(opcode = 0x21)
+    public static void ld_hl_d16(CPU cpu) {
         System.out.println("_ld_hl_d16");
         int lowerByte = cpu.memory[cpu.PC + 1] & 255;
         int upperByte = cpu.memory[cpu.PC + 2] & 255;
@@ -32,7 +15,8 @@ public class Memory implements CPUInstructions {
         cpu.PC += 3;
     }
 
-    private void ld_hl_plus_a() {
+    @OpcodeBinding(opcode = 0x22)
+    public static void ld_hl_plus_a(CPU cpu) {
         System.out.println("_ld_hl_plus_a");
 
         byte A = (byte) (cpu.AF >> 8);
@@ -42,7 +26,8 @@ public class Memory implements CPUInstructions {
         cpu.PC++;
     }
 
-    private void ld_hl_minus_a() {
+    @OpcodeBinding(opcode = 0x32)
+    public static void ld_hl_minus_a(CPU cpu) {
         System.out.println("_ld_hl_minus_a");
 
         byte A = (byte) (cpu.AF >> 8);

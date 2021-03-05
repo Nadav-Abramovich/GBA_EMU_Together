@@ -1,10 +1,13 @@
 package Gameboy;
 
 import Gameboy.CPUActions.CPUInstructions;
+import Gameboy.CPUActions.OpcodeBinding;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class CPU {
@@ -15,7 +18,7 @@ public class CPU {
     public char HL = 0;
     public char SP = 0;
     public char PC = 0;
-    public LinkedList<CPUInstructions> supported_actions = new LinkedList<>();
+    public Map<Character, Method> supported_actions = new HashMap<>();
 
     public CPU(byte[] memory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         this.memory = memory;
@@ -24,8 +27,13 @@ public class CPU {
         Reflections reflections = new Reflections("Gameboy.CPUActions");
         Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
         for (Class<? extends CPUInstructions> aClass : classes) {
-            supported_actions.add(aClass.getDeclaredConstructor(CPU.class).newInstance(this));
+            Method[] functions = aClass.getDeclaredMethods();
+            for (Method method : functions) {
+                OpcodeBinding annotation = method.getAnnotation(OpcodeBinding.class);
+                supported_actions.put(annotation.opcode(), method);
+            }
         }
+
     }
 
     public void xor_flags() {
@@ -38,16 +46,15 @@ public class CPU {
 
     public void tick() {
         char opcode = (char) (memory[PC] & 255);
-        boolean executed_opcode = false;
-        for (CPUInstructions action : supported_actions) {
-            Runnable function = action.get_supported_actions().getOrDefault(opcode, null);
-            if (function != null) {
-                function.run();
-                executed_opcode = true;
-                break;
+        Method action = supported_actions.getOrDefault(opcode, null);
+        if (action != null) {
+            try {
+                action.invoke(null, this);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                System.out.println("Failed to execute " + (int) opcode);
+                System.exit(1);
             }
-        }
-        if (!executed_opcode) {
+        } else {
             System.out.println("Failed to execute " + (int) opcode);
             System.exit(1);
         }

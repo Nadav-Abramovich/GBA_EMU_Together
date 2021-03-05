@@ -2,41 +2,20 @@ package Gameboy.CPUActions;
 
 import Gameboy.CPU;
 
-import java.util.Map;
-
-// We suppress this warning because it is loaded dynamically
-// and therefore Intellij doesn't recognize its usage.
+// We suppress this warning because this class and its methods are dynamically called
+// and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Xors implements CPUInstructions {
-    private final CPU cpu;
-
-    private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
-            Map.entry((char) 0xAF, this::xorA),
-            Map.entry((char) 0xA8, this::xorB),
-            Map.entry((char) 0xA9, this::xorC),
-            Map.entry((char) 0xAA, this::xorD),
-            Map.entry((char) 0xAB, this::xorE),
-            Map.entry((char) 0xAC, this::xorH),
-            Map.entry((char) 0xAD, this::xorL)
-    );
-
-    // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
-    public Xors(CPU cpu) {
-        this.cpu = cpu;
-    }
-
-    public Map<Character, Runnable> get_supported_actions() {
-        return SUPPORTED_ACTIONS;
-    }
-
-    private void xorA() {
+    @OpcodeBinding(opcode = 0xAF)
+    public static void xorA(CPU cpu) {
         System.out.println("_xor_a");
         cpu.AF = (char) 0;
         cpu.PC++;
         cpu.AF |= 128;
     }
 
-    private void xorB() {
+    @OpcodeBinding(opcode = 0xA8)
+    public static void xorB(CPU cpu) {
         System.out.println("_xor_b");
         cpu.BC = (char) (255 & cpu.BC);
         cpu.PC++;
@@ -46,8 +25,8 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-
-    private void xorC() {
+    @OpcodeBinding(opcode = 0xA9)
+    public static void xorC(CPU cpu) {
         System.out.println("_xor_c");
         cpu.BC = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
@@ -57,7 +36,8 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    private void xorD() {
+    @OpcodeBinding(opcode = 0xAA)
+    public static void xorD(CPU cpu) {
         System.out.println("_xor_d");
         cpu.DE = (char) (255 & cpu.DE);
         cpu.PC++;
@@ -67,7 +47,8 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    private void xorE() {
+    @OpcodeBinding(opcode = 0xAB)
+    public static void xorE(CPU cpu) {
         System.out.println("_xor_e");
         cpu.DE = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
@@ -77,7 +58,8 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    private void xorH() {
+    @OpcodeBinding(opcode = 0xAC)
+    public static void xorH(CPU cpu) {
         System.out.println("_xor_h");
         cpu.HL = (char) (255 & cpu.HL);
         cpu.PC++;
@@ -87,7 +69,8 @@ public class Xors implements CPUInstructions {
         cpu.turn_on_zero_flag();
     }
 
-    private void xorL() {
+    @OpcodeBinding(opcode = 0xAD)
+    public static void xorL(CPU cpu) {
         System.out.println("_xor_l");
         cpu.HL = (char) ((cpu.BC >> 8) << 8);
         cpu.PC++;
