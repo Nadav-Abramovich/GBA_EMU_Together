@@ -4,8 +4,8 @@ import Gameboy.CPU;
 
 import java.util.Map;
 
-public class Stack extends CPUActions {
-    private CPU cpu;
+public class Stack implements CPUActions {
+    private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
             Map.entry((char) 0x31, this::ld_sp_d16)

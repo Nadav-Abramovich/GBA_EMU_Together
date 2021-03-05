@@ -4,7 +4,7 @@ import Gameboy.CPU;
 
 import java.util.Map;
 
-public class Xors extends CPUActions {
+public class Xors implements CPUActions {
     private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
