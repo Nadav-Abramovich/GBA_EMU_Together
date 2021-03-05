@@ -2,11 +2,10 @@ package Gameboy.CPUActions;
 
 import Gameboy.CPU;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Xors extends CPUActions {
-    private final CPU cpu_reference;
+    private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
         Map.entry((char) 0xAF, this::xorA),
@@ -20,7 +19,7 @@ public class Xors extends CPUActions {
 
     // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
     public Xors(CPU cpu) {
-        cpu_reference = cpu;
+        this.cpu = cpu;
     }
 
     public Map<Character, Runnable> get_supported_actions() {
@@ -29,69 +28,69 @@ public class Xors extends CPUActions {
 
     private void xorA() {
         System.out.println("XorA");
-        cpu_reference.AF = (char) 0;
-        cpu_reference.PC++;
-        cpu_reference.AF |= 128;
+        cpu.AF = (char) 0;
+        cpu.PC++;
+        cpu.AF |= 128;
     }
 
     private void xorB() {
         System.out.println("XorB");
-        cpu_reference.BC = (char) (255 & cpu_reference.BC);
-        cpu_reference.PC++;
+        cpu.BC = (char) (255 & cpu.BC);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 
 
     private void xorC() {
         System.out.println("XorC");
-        cpu_reference.BC = (char) ((cpu_reference.BC >> 8) << 8);
-        cpu_reference.PC++;
+        cpu.BC = (char) ((cpu.BC >> 8) << 8);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 
     private void xorD() {
         System.out.println("XorD");
-        cpu_reference.DE = (char) (255 & cpu_reference.DE);
-        cpu_reference.PC++;
+        cpu.DE = (char) (255 & cpu.DE);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 
     private void xorE() {
         System.out.println("XorE");
-        cpu_reference.DE = (char) ((cpu_reference.BC >> 8) << 8);
-        cpu_reference.PC++;
+        cpu.DE = (char) ((cpu.BC >> 8) << 8);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 
     private void xorH() {
         System.out.println("XorH");
-        cpu_reference.HL = (char) (255 & cpu_reference.HL);
-        cpu_reference.PC++;
+        cpu.HL = (char) (255 & cpu.HL);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 
     private void xorL() {
         System.out.println("XorL");
-        cpu_reference.HL = (char) ((cpu_reference.BC >> 8) << 8);
-        cpu_reference.PC++;
+        cpu.HL = (char) ((cpu.BC >> 8) << 8);
+        cpu.PC++;
 
         // Make the ZERO flag the only turned on flag
-        cpu_reference.xor_flags();
-        cpu_reference.turn_on_zero_flag();
+        cpu.xor_flags();
+        cpu.turn_on_zero_flag();
     }
 }
