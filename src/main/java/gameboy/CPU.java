@@ -51,6 +51,9 @@ public class CPU {
 
     private char get_opcode() {
         char opcode = (char) (memory[PC] & 255);
+
+        // NOTE: This specific instruction (0xCB) means the next instruction joins with
+        //       it and they should be treated as a single 2 byte long opcode.
         if(opcode == 0xCB) {
             opcode <<= 8;
             char sub_opcode = (char) (memory[PC + 1] & 255);
