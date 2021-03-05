@@ -1,7 +1,7 @@
 package gameboy;
 
-import gameboy.cpu_actions.CPUInstructions;
-import gameboy.cpu_actions.Opcode;
+import gameboy.cpu_instructions.CPUInstructions;
+import gameboy.cpu_instructions.Opcode;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +23,7 @@ public class CPU {
     public CPU(byte[] memory) {
         this.memory = memory;
 
-        // Load all inheriting classes of CPUActions and add them to our list
+        // Load all the opcode handling methods of classes implementing CPUInstructions and add them to our list
         Reflections reflections = new Reflections("gameboy.cpu_actions");
         Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
         for (Class<? extends CPUInstructions> aClass : classes) {

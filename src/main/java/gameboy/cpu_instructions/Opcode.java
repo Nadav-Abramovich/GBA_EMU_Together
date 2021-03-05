@@ -1,4 +1,4 @@
-package gameboy.cpu_actions;
+package gameboy.cpu_instructions;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
