@@ -15,15 +15,6 @@ public class CPU {
     public char HL = 0;
     public char SP = 0;
     public char PC = 0;
-
-    public void xor_flags() {
-        AF = (char) ((AF >> 8) << 8);
-    }
-
-    public void turn_on_zero_flag() {
-        AF |= 128;
-    }
-
     public LinkedList<CPUActions> supported_actions = new LinkedList<>();
 
     public CPU(byte[] memory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -37,6 +28,13 @@ public class CPU {
         }
     }
 
+    public void xor_flags() {
+        AF = (char) ((AF >> 8) << 8);
+    }
+
+    public void turn_on_zero_flag() {
+        AF |= 128;
+    }
 
     public void tick() {
         char opcode = (char) (memory[PC] & 255);

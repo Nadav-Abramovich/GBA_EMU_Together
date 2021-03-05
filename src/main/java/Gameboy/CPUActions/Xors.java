@@ -11,13 +11,13 @@ public class Xors implements CPUActions {
     private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
-        Map.entry((char) 0xAF, this::xorA),
-        Map.entry((char) 0xA8, this::xorB),
-        Map.entry((char) 0xA9, this::xorC),
-        Map.entry((char) 0xAA, this::xorD),
-        Map.entry((char) 0xAB, this::xorE),
-        Map.entry((char) 0xAC, this::xorH),
-        Map.entry((char) 0xAD, this::xorL)
+            Map.entry((char) 0xAF, this::xorA),
+            Map.entry((char) 0xA8, this::xorB),
+            Map.entry((char) 0xA9, this::xorC),
+            Map.entry((char) 0xAA, this::xorD),
+            Map.entry((char) 0xAB, this::xorE),
+            Map.entry((char) 0xAC, this::xorH),
+            Map.entry((char) 0xAD, this::xorL)
     );
 
     // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
