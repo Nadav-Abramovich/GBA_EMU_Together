@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class CPU {
+    public static final String CPU_INSTRUCTIONS_PACKAGE_PATH = "gameboy.cpu_instructions";
+    public static final String EXECUTED_OPCODE_MSG_FORMAT = "[Debug] 0x%s: %s%n";
+    public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "Failed to execute %s%n";
+    public static final String OPCODE_NOT_IMPLEMENTED_MSG_FORMAT = "Opcode %s is not implemented%n";
+
     public final byte[] memory;
     public char AF = 0;
     public char BC = 0;
@@ -24,7 +29,7 @@ public class CPU {
         this.memory = memory;
 
         // Load all the opcode handling methods of classes implementing CPUInstructions and add them to our list
-        Reflections reflections = new Reflections("gameboy.cpu_actions");
+        Reflections reflections = new Reflections(CPU_INSTRUCTIONS_PACKAGE_PATH);
         Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
         for (Class<? extends CPUInstructions> aClass : classes) {
             Method[] functions = aClass.getDeclaredMethods();
@@ -49,14 +54,14 @@ public class CPU {
         Method action = supported_actions.getOrDefault(opcode, null);
         if (action != null) {
             try {
-                System.out.println("[Debug] 0x" + Integer.toHexString(opcode).toUpperCase() + ": " + action.getName());
+                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
                 action.invoke(null, this);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                System.out.println("Failed to execute " + (int) opcode);
+                System.out.printf(FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
             }
         } else {
-            System.out.println("Failed to execute " + (int) opcode);
+            System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
             System.exit(1);
         }
     }
