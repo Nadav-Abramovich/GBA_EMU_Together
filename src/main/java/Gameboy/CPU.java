@@ -1,6 +1,6 @@
 package Gameboy;
 
-import Gameboy.CPUActions.CPUActions;
+import Gameboy.CPUActions.CPUInstructions;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,15 +15,15 @@ public class CPU {
     public char HL = 0;
     public char SP = 0;
     public char PC = 0;
-    public LinkedList<CPUActions> supported_actions = new LinkedList<>();
+    public LinkedList<CPUInstructions> supported_actions = new LinkedList<>();
 
     public CPU(byte[] memory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         this.memory = memory;
 
         // Load all inheriting classes of CPUActions and add them to our list :)
         Reflections reflections = new Reflections("Gameboy.CPUActions");
-        Set<Class<? extends CPUActions>> classes = reflections.getSubTypesOf(CPUActions.class);
-        for (Class<? extends CPUActions> aClass : classes) {
+        Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
+        for (Class<? extends CPUInstructions> aClass : classes) {
             supported_actions.add(aClass.getDeclaredConstructor(CPU.class).newInstance(this));
         }
     }
@@ -39,7 +39,7 @@ public class CPU {
     public void tick() {
         char opcode = (char) (memory[PC] & 255);
         boolean executed_opcode = false;
-        for (CPUActions action : supported_actions) {
+        for (CPUInstructions action : supported_actions) {
             Runnable function = action.get_supported_actions().getOrDefault(opcode, null);
             if (function != null) {
                 function.run();

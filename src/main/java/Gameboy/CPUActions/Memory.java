@@ -7,7 +7,7 @@ import java.util.Map;
 // We suppress this warning because it is loaded dynamically
 // and therefore Intellij doesn't recognize its usage.
 @SuppressWarnings("unused")
-public class Memory implements CPUActions {
+public class Memory implements CPUInstructions {
     private final CPU cpu;
 
     private final Map<Character, Runnable> SUPPORTED_ACTIONS = Map.ofEntries(
