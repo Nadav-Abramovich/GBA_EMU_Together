@@ -20,10 +20,10 @@ public class CPU {
     public char PC = 0;
     public Map<Character, Method> supported_actions = new HashMap<>();
 
-    public CPU(byte[] memory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public CPU(byte[] memory) {
         this.memory = memory;
 
-        // Load all inheriting classes of CPUActions and add them to our list :)
+        // Load all inheriting classes of CPUActions and add them to our list
         Reflections reflections = new Reflections("Gameboy.CPUActions");
         Set<Class<? extends CPUInstructions>> classes = reflections.getSubTypesOf(CPUInstructions.class);
         for (Class<? extends CPUInstructions> aClass : classes) {

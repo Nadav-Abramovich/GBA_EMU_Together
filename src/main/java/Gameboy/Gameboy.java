@@ -1,6 +1,5 @@
 package Gameboy;
 
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -8,10 +7,7 @@ public class Gameboy {
     CPU cpu;
     byte[] _memory = new byte[0xFFFF];
 
-    public Gameboy() throws IllegalAccessException,
-            NoSuchMethodException,
-            InstantiationException,
-            InvocationTargetException {
+    public Gameboy() {
         _load_rom();
         this.cpu = new CPU(_memory);
     }
