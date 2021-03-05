@@ -4,6 +4,9 @@ import Gameboy.CPU;
 
 import java.util.Map;
 
+// We suppress this warning because it is loaded dynamically
+// and therefore Intellij doesn't recognize its usage.
+@SuppressWarnings("unused")
 public class Memory implements CPUActions {
     private final CPU cpu;
 
@@ -13,7 +16,6 @@ public class Memory implements CPUActions {
             Map.entry((char) 0x32, this::ld_hl_minus_a)
     );
 
-    // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
     public Memory(CPU cpu) {
         this.cpu = cpu;
     }

@@ -4,6 +4,9 @@ import Gameboy.CPU;
 
 import java.util.Map;
 
+// We suppress this warning because it is loaded dynamically
+// and therefore Intellij doesn't recognize its usage.
+@SuppressWarnings("unused")
 public class Stack implements CPUActions {
     private final CPU cpu;
 
