@@ -49,7 +49,5 @@ public class Memory extends CPUActions {
         cpu_reference = cpu;
     }
 
-    public Map<Character, Runnable> get_supported_actions() {
-        return SUPPORTED_ACTIONS;
-    }
+    public Map<Character, Runnable> get_supported_actions() { return SUPPORTED_ACTIONS; }
 }

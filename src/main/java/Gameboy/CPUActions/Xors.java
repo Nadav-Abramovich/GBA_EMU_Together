@@ -88,12 +88,10 @@ public class Xors extends CPUActions {
         }
     };
 
-    public Map<Character, Runnable> get_supported_actions() {
-        return SUPPORTED_ACTIONS;
-    }
-
     // NOTE: This constructor is used by a dynamic factory and therefore intellij doesn't recognize its usage
     public Xors(CPU cpu) {
         cpu_reference = cpu;
     }
+
+    public Map<Character, Runnable> get_supported_actions() { return SUPPORTED_ACTIONS; }
 }
