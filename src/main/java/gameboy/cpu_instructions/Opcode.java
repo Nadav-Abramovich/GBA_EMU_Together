@@ -7,4 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Opcode {
     char opcode();
     int length();
+    boolean should_update_pc() default true;
 }
