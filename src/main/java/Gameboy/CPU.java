@@ -49,7 +49,7 @@ public class CPU {
         }
         if (!executed_opcode) {
             System.out.println("Failed to execute " + (int) opcode);
-            int t = 1 / 0;
+            System.exit(1);
         }
     }
 }
