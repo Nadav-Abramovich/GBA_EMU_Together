@@ -1,5 +1,6 @@
 package Gameboy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -17,12 +18,15 @@ public class Gameboy {
         }
     }
 
-    public Gameboy() throws NoSuchFieldException, IllegalAccessException {
+    public Gameboy() throws IllegalAccessException,
+                            NoSuchMethodException,
+                            InstantiationException,
+                            InvocationTargetException {
         _load_rom();
         this.cpu = new CPU(_memory);
     }
 
-    public void tick() throws NoSuchFieldException, IllegalAccessException {
+    public void tick() {
         cpu.tick();
     }
 }

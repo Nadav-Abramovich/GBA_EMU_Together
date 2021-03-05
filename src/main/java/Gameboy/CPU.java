@@ -1,9 +1,11 @@
 package Gameboy;
 
 import Gameboy.CPUActions.CPUActions;
-import Gameboy.CPUActions.Memory;
-import Gameboy.CPUActions.Stack;
-import Gameboy.CPUActions.xors;
+import org.reflections.Reflections;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class CPU {
     public byte[] memory;
@@ -22,14 +24,17 @@ public class CPU {
         AF |= 128;
     }
 
-    public CPUActions[] supported_actions = new CPUActions[]{
-            new xors(this),
-            new Stack(this),
-            new Memory(this)
-    };
+    public LinkedList<CPUActions> supported_actions = new LinkedList<>();
 
-    public CPU(byte[] memory) {
+    public CPU(byte[] memory) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         this.memory = memory;
+
+        // Load all inheriting classes of CPUActions and add them to our list :)
+        Reflections reflections = new Reflections("Gameboy.CPUActions");
+        Set<Class<? extends CPUActions>> classes = reflections.getSubTypesOf(CPUActions.class);
+        for (Class<? extends CPUActions> aClass : classes) {
+            supported_actions.add(aClass.getDeclaredConstructor(CPU.class).newInstance(this));
+        }
     }
 
 
