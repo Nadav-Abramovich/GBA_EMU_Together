@@ -1,5 +1,3 @@
-package com.company;
-
 import Gameboy.Gameboy;
 
 import java.lang.reflect.InvocationTargetException;
