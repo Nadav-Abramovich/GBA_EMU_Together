@@ -49,17 +49,32 @@ public class CPU {
         AF |= 128;
     }
 
-    public void tick() {
+    private char get_opcode() {
         char opcode = (char) (memory[PC] & 255);
+        if(opcode == 0xCB) {
+            opcode <<= 8;
+            char sub_opcode = (char) (memory[PC + 1] & 255);
+            opcode |= sub_opcode;
+        }
+
+        return opcode;
+    }
+
+    private void execute_action(Method action, char opcode){
+        try {
+            System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
+            action.invoke(null, this);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            System.out.printf(FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT, Integer.toHexString(opcode));
+            System.exit(1);
+        }
+    }
+
+    public void tick() {
+        char opcode = get_opcode();
         Method action = supported_actions.getOrDefault(opcode, null);
         if (action != null) {
-            try {
-                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
-                action.invoke(null, this);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                System.out.printf(FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT, Integer.toHexString(opcode));
-                System.exit(1);
-            }
+            execute_action(action, opcode);
         } else {
             System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
             System.exit(1);
