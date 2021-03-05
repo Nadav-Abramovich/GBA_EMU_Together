@@ -49,6 +49,7 @@ public class CPU {
         Method action = supported_actions.getOrDefault(opcode, null);
         if (action != null) {
             try {
+                System.out.println("[Debug] 0x" + Integer.toHexString(opcode).toUpperCase() + ": " + action.getName());
                 action.invoke(null, this);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 System.out.println("Failed to execute " + (int) opcode);
