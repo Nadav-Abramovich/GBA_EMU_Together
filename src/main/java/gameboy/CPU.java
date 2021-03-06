@@ -35,7 +35,7 @@ public class CPU {
             Method[] functions = aClass.getDeclaredMethods();
             for (Method method : functions) {
                 Opcode annotation = method.getAnnotation(Opcode.class);
-                supported_actions.put(annotation.opcode(), method);
+                supported_actions.put(annotation.value(), method);
             }
         }
 
