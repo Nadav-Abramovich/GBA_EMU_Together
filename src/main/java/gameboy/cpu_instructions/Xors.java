@@ -65,4 +65,6 @@ public class Xors implements CPUInstructions {
         cpu.xor_flags();
         cpu.turn_on_zero_flag();
     }
+
+
 }

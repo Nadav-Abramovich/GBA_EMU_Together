@@ -54,7 +54,7 @@ public class CPU {
 
         // NOTE: This specific instruction (0xCB) means the next instruction joins with
         //       it and they should be treated as a single 2 byte long opcode.
-        if(opcode == 0xCB) {
+        if (opcode == 0xCB) {
             opcode <<= 8;
             char sub_opcode = (char) (memory[PC + 1] & 255);
             opcode |= sub_opcode;
@@ -63,12 +63,13 @@ public class CPU {
         return opcode;
     }
 
-    private void execute_action(Method action, char opcode){
+
+    private void execute_action(Method action, char opcode) {
         try {
             System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
             action.invoke(null, this);
             Opcode opcode_metadata = action.getAnnotation(Opcode.class);
-            if(opcode_metadata.should_update_pc()) {
+            if (opcode_metadata.should_update_pc()) {
                 this.PC += opcode_metadata.length();
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -87,4 +88,5 @@ public class CPU {
             System.exit(1);
         }
     }
+
 }
