@@ -5,8 +5,8 @@ import gameboy.CPU;
 // We suppress this warning because this class and its methods are dynamically called
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
-public class extendedInstructions implements CPUInstructions {
-    @Opcode(opcode = 0xCB7C, length = 2)
+public class ExtendedInstructions implements CPUInstructions {
+    @Opcode(value = 0xCB7C, length = 2)
     public static void bit7H(CPU cpu) {
         int seventhBit;
         int H = (cpu.HL >> 15);
