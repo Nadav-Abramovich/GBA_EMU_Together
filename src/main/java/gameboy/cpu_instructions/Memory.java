@@ -43,14 +43,6 @@ public class Memory implements CPUInstructions {
         cpu.HL.setValue((char) (cpu.HL.getValue() + 1));
     }
 
-    @Opcode(value = 0x31, length = 3)
-    public static void ld_sp_d16(CPU cpu) {
-        byte lowerByte = cpu.memory[cpu.PC.getValue() + 1];
-        byte higherByte = cpu.memory[cpu.PC.getValue() + 2];
-        cpu.SP.P.setValue(lowerByte);
-        cpu.SP.S.setValue(higherByte);
-    }
-
     @Opcode(value = 0x32, length = 1)
     public static void ld_hl_minus_a(CPU cpu) {
         cpu.memory[cpu.HL.getValue()] = ((byte)cpu.AF.A.getValue());

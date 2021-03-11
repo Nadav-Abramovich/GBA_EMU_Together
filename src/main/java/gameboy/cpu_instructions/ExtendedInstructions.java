@@ -7,13 +7,6 @@ import gameboy.Flags;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class ExtendedInstructions implements CPUInstructions {
-    // TODO: TEMP
-    @Opcode(value = 0x0, length = 1)
-    public static void nop(CPU cpu) {
-        int t=1;
-    }
-
-
     @Opcode(value = 0xCB11, length = 2)
     public static void rl_c(CPU cpu) {
         if((cpu.BC.C.getValue() & 128) != 0) {
