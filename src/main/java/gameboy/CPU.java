@@ -1,6 +1,5 @@
 package gameboy;
 
-import gameboy.Registers.AF;
 import gameboy.cpu_instructions.CPUInstructions;
 import gameboy.cpu_instructions.Opcode;
 import org.reflections.Reflections;
@@ -31,11 +30,11 @@ public class CPU {
     }
 
     public void turnOnFlags(byte value) {
-        AF.F.setValue((byte)(AF.F.getValue() | value));
+        AF.F.setValue((byte) (AF.F.getValue() | value));
     }
 
     public void turnOffFlags(byte value) {
-        AF.F.setValue((byte)(AF.F.getValue() & ~value));
+        AF.F.setValue((byte) (AF.F.getValue() & ~value));
     }
 
     public CPU(byte[] memory) {
@@ -84,6 +83,9 @@ public class CPU {
     }
 
     public void tick() {
+        // Temp to bypass Vblank period check
+        // TODO: implement real screen and remove this
+        memory[0xFF44] = (byte)0x90;
         char opcode = get_opcode();
         Method action = supported_actions.getOrDefault(opcode, null);
         if (action != null) {
@@ -93,5 +95,4 @@ public class CPU {
             System.exit(1);
         }
     }
-
 }

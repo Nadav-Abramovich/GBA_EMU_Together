@@ -12,5 +12,9 @@ public class RegisterPair {
     public char getValue() {
         return (char)(lower.getValue() | (higher.getValue() << 8));
     }
+
+    public void increment(int amount) {
+        this.setValue((char)(this.getValue() + amount));
+    }
 }
 

@@ -1,6 +1,6 @@
 package gameboy.Registers;
 
 public class SP extends RegisterPair {
-    public Register P = this.higher;
-    public Register C = this.lower;
+    public Register S = this.higher;
+    public Register P = this.lower;
 }
