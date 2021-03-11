@@ -8,8 +8,8 @@ import gameboy.CPU;
 public class Stack implements CPUInstructions {
     @Opcode(value = 0x31, length = 3)
     public static void ld_sp_d16(CPU cpu) {
-        int lowerByte = cpu.memory[cpu.PC + 1] & 255;
-        int upperByte = cpu.memory[cpu.PC + 2] & 255;
-        cpu.SP = (char) (upperByte << 8 | lowerByte);
+        int lowerByte = cpu.memory[cpu.PC.getValue() + 1] & 255;
+        int upperByte = cpu.memory[cpu.PC.getValue() + 2] & 255;
+        cpu.SP.setValue((char) (upperByte << 8 | lowerByte));
     }
 }

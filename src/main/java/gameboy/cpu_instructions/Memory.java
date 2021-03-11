@@ -8,25 +8,21 @@ import gameboy.CPU;
 public class Memory implements CPUInstructions {
     @Opcode(value = 0x21, length = 3)
     public static void ld_hl_d16(CPU cpu) {
-        int lowerByte = cpu.memory[cpu.PC + 1] & 255;
-        int upperByte = cpu.memory[cpu.PC + 2] & 255;
-        cpu.HL = (char) (upperByte << 8 | lowerByte);
+        byte lowerByte = cpu.memory[cpu.PC.getValue() + 1];
+        byte higherByte = cpu.memory[cpu.PC.getValue() + 2];
+        cpu.HL.L.setValue(lowerByte);
+        cpu.HL.H.setValue(higherByte);
     }
 
     @Opcode(value = 0x22, length = 1)
     public static void ld_hl_plus_a(CPU cpu) {
-        byte A = (byte) (cpu.AF >> 8);
-
-        cpu.memory[cpu.HL] = A;
-        cpu.HL++;
+        cpu.memory[cpu.HL.getValue()] = (byte)(cpu.AF.A.getValue());
+        cpu.HL.setValue((char) (cpu.HL.getValue() + 1));
     }
 
     @Opcode(value = 0x32, length = 1)
     public static void ld_hl_minus_a(CPU cpu) {
-        byte A = (byte) (cpu.AF >> 8);
-
-        cpu.memory[cpu.HL] = A;
-        cpu.HL--;
+        cpu.memory[cpu.HL.getValue()] = ((byte)cpu.AF.A.getValue());
+        cpu.HL.setValue((char) (cpu.HL.getValue() - 1));
     }
-
 }

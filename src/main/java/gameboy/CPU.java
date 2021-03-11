@@ -1,5 +1,6 @@
 package gameboy;
 
+import gameboy.Registers.AF;
 import gameboy.cpu_instructions.CPUInstructions;
 import gameboy.cpu_instructions.Opcode;
 import org.reflections.Reflections;
@@ -17,13 +18,25 @@ public class CPU {
     public static final String OPCODE_NOT_IMPLEMENTED_MSG_FORMAT = "[CRITICAL] Opcode 0x%s is not implemented%n";
 
     public final byte[] memory;
-    public char AF = 0;
-    public char BC = 0;
-    public char DE = 0;
-    public char HL = 0;
-    public char SP = 0;
-    public char PC = 0;
+    public gameboy.Registers.AF AF = new gameboy.Registers.AF();
+    public gameboy.Registers.BC BC = new gameboy.Registers.BC();
+    public gameboy.Registers.DE DE = new gameboy.Registers.DE();
+    public gameboy.Registers.HL HL = new gameboy.Registers.HL();
+    public gameboy.Registers.SP SP = new gameboy.Registers.SP();
+    public gameboy.Registers.PC PC = new gameboy.Registers.PC();
     public final Map<Character, Method> supported_actions = new HashMap<>();
+
+    public void setFlags(byte value) {
+        AF.F.setValue(value);
+    }
+
+    public void turnOnFlags(byte value) {
+        AF.F.setValue((byte)(AF.F.getValue() | value));
+    }
+
+    public void turnOffFlags(byte value) {
+        AF.F.setValue((byte)(AF.F.getValue() & ~value));
+    }
 
     public CPU(byte[] memory) {
         this.memory = memory;
@@ -41,22 +54,14 @@ public class CPU {
 
     }
 
-    public void xor_flags() {
-        AF = (char) ((AF >> 8) << 8);
-    }
-
-    public void turn_on_zero_flag() {
-        AF |= 128;
-    }
-
     private char get_opcode() {
-        char opcode = (char) (memory[PC] & 255);
+        char opcode = (char) (memory[PC.getValue()] & 255);
 
         // NOTE: This specific instruction (0xCB) means the next instruction joins with
         //       it and they should be treated as a single 2 byte long opcode.
         if (opcode == 0xCB) {
             opcode <<= 8;
-            char sub_opcode = (char) (memory[PC + 1] & 255);
+            char sub_opcode = (char) (memory[PC.getValue() + 1] & 255);
             opcode |= sub_opcode;
         }
 
@@ -70,7 +75,7 @@ public class CPU {
             action.invoke(null, this);
             Opcode opcode_metadata = action.getAnnotation(Opcode.class);
             if (opcode_metadata.should_update_pc()) {
-                this.PC += opcode_metadata.length();
+                this.PC.increment(opcode_metadata.length());
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             System.out.printf(FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT, Integer.toHexString(opcode));

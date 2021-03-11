@@ -6,14 +6,11 @@ import gameboy.CPU;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Jumps implements CPUInstructions {
-    @Opcode(value = 0x20, length = 0, should_update_pc = false)
+    @Opcode(value = 0x20, length = 2)
     public static void jr_nz(CPU cpu) {
-        boolean is_z_on = (cpu.AF & (1 << 7)) != 0;
-        byte jump_amount = cpu.memory[cpu.PC + 1];
-        if (!is_z_on) {
-            cpu.PC += jump_amount & 255;
-        } else {
-            cpu.PC += 2;
+        byte jump_amount = cpu.memory[cpu.PC.getValue() + 1];
+        if (!cpu.AF.isZeroFlagOn()) {
+            cpu.PC.increment(jump_amount);
         }
     }
 }
