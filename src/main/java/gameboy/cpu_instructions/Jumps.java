@@ -27,4 +27,11 @@ public class Jumps implements CPUInstructions {
             cpu.PC.increment(jump_amount);
         }
     }
+
+    @Opcode(value = 0xC3, length = 3, should_update_pc = false)
+    public static void jp_a16(CPU cpu) {
+        byte lower = cpu.memory[cpu.PC.getValue() + 1];
+        byte higher = cpu.memory[cpu.PC.getValue() + 2];
+        cpu.PC.setValue((char)(lower | (higher<<8)));
+    }
 }

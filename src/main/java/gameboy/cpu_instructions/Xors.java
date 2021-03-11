@@ -60,6 +60,4 @@ public class Xors implements CPUInstructions {
         // Make the ZERO flag the only turned on flag
         cpu.setFlags(Flags.ZERO);
     }
-
-
 }
