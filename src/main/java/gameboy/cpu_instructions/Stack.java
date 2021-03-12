@@ -2,6 +2,9 @@ package gameboy.cpu_instructions;
 
 import gameboy.CPU;
 
+import static gameboy.HelperFunctions.pop_from_stack_d16;
+import static gameboy.HelperFunctions.push_to_stack_d16;
+
 // We suppress this warning because this class and its methods are dynamically called
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
@@ -15,9 +18,11 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC5, length = 1)
     public static void push_bc(CPU cpu) {
-        cpu.memory[cpu.SP.getValue() - 1] = (byte)cpu.BC.B.getValue();
-        cpu.memory[cpu.SP.getValue() - 2] = (byte)cpu.BC.C.getValue();
-        cpu.SP.increment(-2);
+//        cpu.memory[cpu.SP.getValue() - 1] = (byte)cpu.BC.B.getValue();
+//        cpu.memory[cpu.SP.getValue() - 2] = (byte)cpu.BC.C.getValue();
+//        cpu.SP.increment(-2);
+
+        push_to_stack_d16(cpu, cpu.BC.getValue());
     }
 
     @Opcode(value = 0xC1, length = 1)
@@ -29,9 +34,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC9, length = 1, should_update_pc = false)
     public static void ret(CPU cpu) {
-        cpu.PC.C.setValue(cpu.memory[cpu.SP.getValue()]);
-        cpu.PC.P.setValue(cpu.memory[cpu.SP.getValue() + 1]);
-        cpu.SP.increment(2);
+        cpu.PC.setValue(pop_from_stack_d16(cpu));
     }
 
     @Opcode(value = 0xCD, length = 3, should_update_pc = false)
@@ -39,9 +42,10 @@ public class Stack implements CPUInstructions {
         char target_lower = (char)(cpu.memory[cpu.PC.getValue() + 1]&255);
         char target_higher = (char)(cpu.memory[cpu.PC.getValue() + 2]&255);
         cpu.PC.increment(3);
-        cpu.memory[cpu.SP.getValue() - 1] = (byte)cpu.PC.P.getValue();
-        cpu.memory[cpu.SP.getValue() - 2] = (byte)cpu.PC.C.getValue();
-        cpu.SP.increment(-2);
+//        cpu.memory[cpu.SP.getValue() - 1] = (byte)cpu.PC.P.getValue();
+//        cpu.memory[cpu.SP.getValue() - 2] = (byte)cpu.PC.C.getValue();
+//        cpu.SP.increment(-2);
+        push_to_stack_d16(cpu, cpu.PC.getValue());
         cpu.PC.setValue((char)((target_higher << 8) | target_lower));
     }
 }

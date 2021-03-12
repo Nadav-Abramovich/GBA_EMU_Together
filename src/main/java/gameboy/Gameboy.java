@@ -1,5 +1,7 @@
 package gameboy;
 
+import gameboy.Scrn.Screen;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -11,11 +13,13 @@ public class Gameboy {
 
     final CPU cpu;
     final byte[] _memory = new byte[0xFFFF];
+    final Screen screen;
 
     public Gameboy() {
         _load_game_rom();
         _load_boot_rom();
         this.cpu = new CPU(_memory);
+        this.screen = new Screen(cpu);
     }
 
     private void _load_boot_rom() {
@@ -41,5 +45,6 @@ public class Gameboy {
 
     public void tick() {
         cpu.tick();
+        screen.loop();
     }
 }
