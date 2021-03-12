@@ -134,10 +134,10 @@ public class Screen {
 
     private void putPixel(int x, int y, int line, int col, int color) {
         int width = 32 * 8;
-        int real_x = x * 8 - col;
+        int real_x = x * 8 - col + 8;
         byte vertical_y = cpu.memory.read_byte(0xFF42);
 
-        int real_y = width - 30 - (y * 8 + line) + vertical_y - 100;
+        int real_y = width - 30 - (y * 8 + line) + vertical_y - 100 + 16;
         if(real_y > 0&& real_x > 0) {
             screen[(real_x + real_y * width) * 4] = (byte)((color >> 16)&255);
             screen[(real_x + real_y * width) * 4 + 1] = (byte)((color >> 8)&255);
