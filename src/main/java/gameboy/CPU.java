@@ -11,12 +11,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class CPU {
+    public boolean PRINT_DEBUG_MESSAGES = false;
     public static final String CPU_INSTRUCTIONS_PACKAGE_PATH = "gameboy.cpu_instructions";
-    public static final String EXECUTED_OPCODE_MSG_FORMAT = "[DEBUG] 0x%s: %s%n";
+    public static final String EXECUTED_OPCODE_MSG_FORMAT = "[DEBUG] [0x%s] 0x%s: %s%n";
     public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "[CRITICAL] Failed to execute opcode 0x%s%n";
     public static final String OPCODE_NOT_IMPLEMENTED_MSG_FORMAT = "[CRITICAL] Opcode 0x%s is not implemented%n";
 
-    public final byte[] memory;
+    public final Memory memory;
     public gameboy.Registers.AF AF = new gameboy.Registers.AF();
     public gameboy.Registers.BC BC = new gameboy.Registers.BC();
     public gameboy.Registers.DE DE = new gameboy.Registers.DE();
@@ -24,7 +25,7 @@ public class CPU {
     public gameboy.Registers.SP SP = new gameboy.Registers.SP();
     public gameboy.Registers.PC PC = new gameboy.Registers.PC();
     public final Map<Character, Method> supported_actions = new HashMap<>();
-
+    public boolean IME = false; // Interrupt master enable
     public void setFlags(byte value) {
         AF.F.setValue(value);
     }
@@ -36,8 +37,12 @@ public class CPU {
     public void turnOffFlags(byte value) {
         AF.F.setValue((byte) (AF.F.getValue() & ~value));
     }
+    public int cycles = 0;
+    public int performed_cycles = 0;
+    public final Gameboy game_boy;
 
-    public CPU(byte[] memory) {
+    public CPU(Memory memory, Gameboy gameboy) {
+        this.game_boy = gameboy;
         this.memory = memory;
 
         // Load all the opcode handling methods of classes implementing CPUInstructions and add them to our list
@@ -54,13 +59,28 @@ public class CPU {
     }
 
     private char get_opcode() {
-        char opcode = (char) (memory[PC.getValue()] & 255);
+        if(PC.getValue() == 0x100) {
+            if(AF.getValue() != 0x01B0) {
+                System.out.printf("Bad value for AF 0x%s", Integer.toHexString(AF.getValue()));
+//                System.exit(1);
+            }
+            if (memory.read_byte(0xFF11) != (byte)0xBF) {
+                System.out.printf("Bad value for [0x%s]:0x%s", Integer.toHexString(0xFF11).toUpperCase(), Integer.toHexString(Byte.toUnsignedInt(memory.read_byte(0xFF11))).toUpperCase());
+//                System.exit(1);
+            }
+            System.out.println("Starting ROM");
+            PRINT_DEBUG_MESSAGES = true;
+        }
+        if(PC.getValue() >= 0x7FFF) {
+            System.out.println("Overflow");
+        }
+        char opcode = (char) (memory.read_byte(PC.getValue(), true) & 255);
 
         // NOTE: This specific instruction (0xCB) means the next instruction joins with
         //       it and they should be treated as a single 2 byte long opcode.
         if (opcode == 0xCB) {
             opcode <<= 8;
-            char sub_opcode = (char) (memory[PC.getValue() + 1] & 255);
+            char sub_opcode = (char) (memory.read_byte(PC.getValue() + 1) & 255);
             opcode |= sub_opcode;
         }
 
@@ -70,9 +90,13 @@ public class CPU {
 
     private void execute_action(Method action, char opcode) {
         try {
-            System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(opcode).toUpperCase(), action.getName());
+            if(PRINT_DEBUG_MESSAGES) {
+                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
+            }
+
             action.invoke(null, this);
             Opcode opcode_metadata = action.getAnnotation(Opcode.class);
+            performed_cycles += opcode_metadata.cycles();
             if (opcode_metadata.should_update_pc()) {
                 this.PC.increment(opcode_metadata.length());
             }
@@ -84,12 +108,19 @@ public class CPU {
 
     public void tick() {
         char opcode = get_opcode();
-        Method action = supported_actions.getOrDefault(opcode, null);
-        if (action != null) {
-            execute_action(action, opcode);
-        } else {
-            System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
-            System.exit(1);
+        if(cycles >= performed_cycles) {
+            Method action = supported_actions.getOrDefault(opcode, null);
+            if (action != null) {
+                //TODO: replace this with working timing..
+                if(PC.getValue() == 0x6D) {
+                    AF.A.setValue((byte)145);
+                }
+                execute_action(action, opcode);
+            } else {
+                System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
+                System.exit(1);
+            }
         }
+        cycles++;
     }
 }

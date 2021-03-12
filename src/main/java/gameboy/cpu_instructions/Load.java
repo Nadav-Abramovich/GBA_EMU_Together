@@ -6,92 +6,208 @@ import gameboy.CPU;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Load implements CPUInstructions {
-    @Opcode(value = 0x06, length = 2)
+    @Opcode(value = 0x02, length = 1, cycles = 2)
+    public static void ld_into_bc_a(CPU cpu) {
+        cpu.memory.write(cpu.BC.getValue(), (byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x08, length = 3, cycles = 5)
+    public static void ld_into_a16_sp(CPU cpu) {
+        char lower = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+        char higher = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+        cpu.memory.write((higher<<8) | lower, (byte)cpu.SP.P.getValue());
+        cpu.memory.write(((higher<<8) | lower) + 1, (byte)cpu.SP.S.getValue());
+    }
+
+    @Opcode(value = 0x12, length = 1, cycles = 2)
+    public static void ld_into_de_a(CPU cpu) {
+        cpu.memory.write(cpu.DE.getValue(), (byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x06, length = 2, cycles = 2)
     public static void ld_b_d8(CPU cpu) {
-        cpu.BC.B.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.BC.B.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x0E, length = 2)
+    @Opcode(value = 0x0E, length = 2, cycles = 2)
     public static void ld_c_d8(CPU cpu) {
-        cpu.BC.C.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.BC.C.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x16, length = 2)
+    @Opcode(value = 0x16, length = 2, cycles = 2)
     public static void ld_d_d8(CPU cpu) {
-        cpu.DE.D.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.DE.D.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x1E, length = 2)
+    @Opcode(value = 0x1A, length = 1, cycles = 2)
+    public static void ld_a_from_de(CPU cpu) {
+        char a8 = (char)(cpu.memory.read_byte(cpu.DE.getValue())&255);
+        cpu.AF.A.setValue((byte)a8);
+    }
+
+    @Opcode(value = 0x1E, length = 2, cycles = 2)
     public static void ld_e_d8(CPU cpu) {
-        cpu.DE.E.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.DE.E.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x2E, length = 2)
+    @Opcode(value = 0x26, length = 2, cycles = 2)
+    public static void ld_h_d8(CPU cpu) {
+        cpu.HL.H.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
+    }
+
+    @Opcode(value = 0x2E, length = 2, cycles = 2)
     public static void ld_l_d8(CPU cpu) {
-        cpu.HL.L.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.HL.L.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x3E, length = 2)
+    @Opcode(value = 0x36, length = 1, cycles = 3)
+    public static void ld_into_hl_d8(CPU cpu) {
+        byte d8 = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        cpu.memory.write(cpu.HL.getValue(), d8);
+    }
+
+    @Opcode(value = 0x3E, length = 2, cycles = 2)
     public static void ld_a_d8(CPU cpu) {
-        cpu.AF.A.setValue(cpu.memory[cpu.PC.getValue() + 1]);
+        cpu.AF.A.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x4F, length = 1)
+    @Opcode(value = 0x47, length = 1, cycles = 1)
+    public static void ld_b_a(CPU cpu) {
+        cpu.BC.B.setValue((byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x4F, length = 1, cycles = 1)
     public static void ld_c_a(CPU cpu) {
         cpu.BC.C.setValue((byte)cpu.AF.A.getValue());
     }
 
-    @Opcode(value = 0x57, length = 1)
+    @Opcode(value = 0x50, length = 1, cycles = 1)
+    public static void ld_d_b(CPU cpu) {
+        cpu.DE.D.setValue((byte)cpu.BC.B.getValue());
+    }
+
+    @Opcode(value = 0x52, length = 1, cycles = 1)
+    public static void ld_d_d(CPU cpu) {
+        cpu.DE.D.setValue((byte)cpu.DE.D.getValue());
+    }
+
+    @Opcode(value = 0x56, length = 1, cycles = 2)
+    public static void ld_d_from_hl(CPU cpu) {
+        char a8 = (char)(cpu.memory.read_byte(cpu.HL.getValue())&255);
+        cpu.DE.D.setValue((byte)a8);
+    }
+
+    @Opcode(value = 0x57, length = 1, cycles = 1)
     public static void ld_d_a(CPU cpu) {
         cpu.DE.D.setValue((byte)cpu.AF.A.getValue());
     }
 
-    @Opcode(value = 0x67, length = 1)
+    @Opcode(value = 0x5E, length = 1, cycles = 2)
+    public static void ld_e_from_hl(CPU cpu) {
+        char a8 = (char)(cpu.memory.read_byte(cpu.HL.getValue())&255);
+        cpu.DE.E.setValue((byte)a8);
+    }
+
+    @Opcode(value = 0x5F, length = 1, cycles = 1)
+    public static void ld_e_a(CPU cpu) {
+        cpu.DE.E.setValue((byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x60, length = 1, cycles = 1)
+    public static void ld_h_b(CPU cpu) {
+        cpu.HL.H.setValue((byte)cpu.BC.B.getValue());
+    }
+
+    @Opcode(value = 0x62, length = 1, cycles = 1)
+    public static void ld_h_d(CPU cpu) {
+        cpu.HL.H.setValue((byte)cpu.DE.D.getValue());
+    }
+
+    @Opcode(value = 0x66, length = 1, cycles = 2)
+    public static void ld_h_from_hl(CPU cpu) {
+        char a8 = (char)(cpu.memory.read_byte(cpu.HL.getValue())&255);
+        cpu.HL.H.setValue((byte)a8);
+    }
+
+    @Opcode(value = 0x67, length = 1, cycles = 1)
     public static void ld_h_a(CPU cpu) {
         cpu.HL.H.setValue((byte)cpu.AF.A.getValue());
     }
 
-    @Opcode(value = 0x77, length = 1)
-    public static void ld_into_hl_a(CPU cpu) {
-        cpu.memory[cpu.HL.getValue()] = (byte)cpu.AF.A.getValue();
+    @Opcode(value = 0x6b, length = 1, cycles = 1)
+    public static void ld_l_e(CPU cpu) {
+        cpu.HL.L.setValue((byte)cpu.DE.E.getValue());
     }
 
-    @Opcode(value = 0x78, length = 1)
+    @Opcode(value = 0x6f, length = 1, cycles = 1)
+    public static void ld_l_a(CPU cpu) {
+        cpu.HL.L.setValue((byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x77, length = 1, cycles = 2)
+    public static void ld_into_hl_a(CPU cpu) {
+        cpu.memory.write(cpu.HL.getValue(), (byte)cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0x78, length = 1, cycles = 1)
     public static void ld_a_b(CPU cpu) {
         cpu.AF.A.setValue((byte)cpu.BC.B.getValue());
     }
 
-    @Opcode(value = 0x7b, length = 1)
+    @Opcode(value = 0x79, length = 1, cycles = 1)
+    public static void ld_a_c(CPU cpu) {
+        cpu.AF.A.setValue((byte)cpu.BC.C.getValue());
+    }
+
+    @Opcode(value = 0x7a, length = 1, cycles = 1)
+    public static void ld_a_d(CPU cpu) {
+        cpu.AF.A.setValue((byte)cpu.DE.D.getValue());
+    }
+
+    @Opcode(value = 0x7b, length = 1, cycles = 1)
     public static void ld_a_e(CPU cpu) {
         cpu.AF.A.setValue((byte)cpu.DE.E.getValue());
     }
 
-    @Opcode(value = 0x7c, length = 1)
+    @Opcode(value = 0x7c, length = 1, cycles = 1)
     public static void ld_a_h(CPU cpu) {
         cpu.AF.A.setValue((byte)cpu.HL.H.getValue());
     }
 
-    @Opcode(value = 0x7d, length = 1)
+    @Opcode(value = 0x7d, length = 1, cycles = 1)
     public static void ld_a_l(CPU cpu) {
         cpu.AF.A.setValue((byte)cpu.HL.L.getValue());
     }
 
-    @Opcode(value = 0xE2, length = 1)
-    public static void ld_pointer_c_a(CPU cpu) {
-        cpu.memory[0xFF00|cpu.BC.C.getValue()] = (byte)(cpu.AF.A.getValue());
+    @Opcode(value = 0xE0, length = 2, cycles = 3)
+    public static void ld_into_a8_a(CPU cpu) {
+        int position = cpu.memory.read_byte(cpu.PC.getValue() + 1)&255;
+        cpu.memory.write(0xFF00 | position, (byte) cpu.AF.A.getValue());
+    }
+
+    @Opcode(value = 0xE2, length = 1, cycles = 2)
+    public static void ld_into_c_a(CPU cpu) {
+        cpu.memory.write(0xFF00 | cpu.BC.C.getValue(), (byte)(cpu.AF.A.getValue()));
     }
 
 
-    @Opcode(value = 0xEA, length = 3)
+    @Opcode(value = 0xEA, length = 3, cycles = 4)
     public static void ld_into_a16_a(CPU cpu) {
-        char lower = (char)(cpu.memory[cpu.PC.getValue() + 1] & 255);
-        char higher = (char)(cpu.memory[cpu.PC.getValue() + 2] & 255);
-        cpu.memory[lower | (higher<<8)] = (byte)cpu.AF.A.getValue();
+        char lower = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+        char higher = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+        cpu.memory.write((higher<<8) | lower, (byte)cpu.AF.A.getValue());
     }
 
-    @Opcode(value = 0xF0, length = 2)
+    @Opcode(value = 0xF0, length = 2, cycles = 3)
     public static void ld_a_from_a8(CPU cpu) {
-        byte a8 =  cpu.memory[cpu.PC.getValue() + 1];
-        cpu.AF.A.setValue(cpu.memory[0xFF00 | a8]);
+        char a8 = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1)&255);
+        cpu.AF.A.setValue(cpu.memory.read_byte(0xFF00 | a8));
+    }
+
+    @Opcode(value = 0xFA, length = 3, cycles = 4)
+    public static void ld_a_from_a16(CPU cpu) {
+        char lower = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+        char higher = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+        cpu.AF.A.setValue(cpu.memory.read_byte((char)(lower | (higher<<8))));
     }
 }

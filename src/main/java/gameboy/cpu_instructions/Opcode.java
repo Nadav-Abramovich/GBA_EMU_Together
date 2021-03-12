@@ -7,5 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Opcode {
     char value();
     int length();
+    int cycles();
     boolean should_update_pc() default true;
 }

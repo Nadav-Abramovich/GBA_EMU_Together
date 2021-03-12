@@ -7,7 +7,7 @@ import gameboy.Flags;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Increments implements CPUInstructions {
-    @Opcode(value = 0x04, length = 1)
+    @Opcode(value = 0x04, length = 1, cycles = 1)
     //TODO : Half carry
     public static void inc_b(CPU cpu) {
         char current_value = cpu.BC.B.getValue();
@@ -20,7 +20,7 @@ public class Increments implements CPUInstructions {
     }
 
 
-    @Opcode(value = 0x0C, length = 1)
+    @Opcode(value = 0x0C, length = 1, cycles = 1)
     //TODO : Half carry
     public static void inc_c(CPU cpu) {
         char current_value = cpu.BC.C.getValue();
@@ -32,17 +32,30 @@ public class Increments implements CPUInstructions {
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
-    @Opcode(value = 0x13, length = 1)
+    @Opcode(value = 0x13, length = 1, cycles = 1)
     public static void inc_de(CPU cpu) {
         cpu.DE.increment(1);
     }
 
-    @Opcode(value = 0x23, length = 1)
+    @Opcode(value = 0x1C, length = 1, cycles = 1)
+    //TODO : Half carry
+    public static void inc_e(CPU cpu) {
+        char current_value = cpu.DE.E.getValue();
+        current_value += 1;
+        cpu.DE.E.setValue((byte)current_value);
+        if(current_value == 0){
+            cpu.turnOnFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+
+    @Opcode(value = 0x23, length = 1, cycles = 1)
     public static void inc_hl(CPU cpu) {
         cpu.HL.increment(1);
     }
 
-    @Opcode(value = 0x24, length = 1)
+    @Opcode(value = 0x24, length = 1, cycles = 1)
     //TODO : Half carry
     public static void inc_h(CPU cpu) {
         char current_value = cpu.HL.H.getValue();
@@ -53,4 +66,29 @@ public class Increments implements CPUInstructions {
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
+
+    @Opcode(value = 0x2C, length = 1, cycles = 1)
+    //TODO : Half carry
+    public static void inc_l(CPU cpu) {
+        char current_value = cpu.HL.L.getValue();
+        current_value += 1;
+        cpu.HL.L.setValue((byte)current_value);
+        if(current_value == 0){
+            cpu.turnOnFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x3C, length = 1, cycles = 1)
+    //TODO : Half carry
+    public static void inc_a(CPU cpu) {
+        char current_value = cpu.AF.A.getValue();
+        current_value += 1;
+        cpu.AF.A.setValue((byte)current_value);
+        if(current_value == 0){
+            cpu.turnOnFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
 }

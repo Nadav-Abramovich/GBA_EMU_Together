@@ -1,4 +1,4 @@
-package gameboy.Scrn;
+package gameboy.Screen;
 
 import gameboy.CPU;
 import org.lwjgl.*;
@@ -101,20 +101,19 @@ public class Screen {
     }
 
     private char get_ly() {
-        return (char)(this.cpu.memory[0xFF44] & 255);
+        return (char)(this.cpu.memory.read_byte(0xFF44) & 255);
     }
 
     private void xor_ly() {
-        this.cpu.memory[0xFF44] = 0;
+        this.cpu.memory.write(0xFF44, (byte)143);
     }
 
     private void inc_ly() {
-        this.cpu.memory[0xFF44] = (byte)((this.cpu.memory[0xFF44] & 255) + 1);
-        System.out.println(this.cpu.memory[0xFF44]&255);
+        this.cpu.memory.write(0xFF44, (byte)((this.cpu.memory.read_byte(0xFF44) & 255) + 1));
     }
 
     public void loop() {
-        if(((this.cpu.memory[0xFF40]>>7)&1) == 1) {
+        if(((this.cpu.memory.read_byte(0xFF40)>>7)&1) == 1) {
             if(get_ly() == 144) {
                 draw_screen();
                 // Poll for window events. The key callback above will only be
@@ -124,7 +123,9 @@ public class Screen {
             if(get_ly() == 155) {
                 xor_ly();
             }
-            inc_ly();
+            if(get_ly() != 144) {
+                inc_ly();
+            }
         }
     }
 
@@ -134,7 +135,7 @@ public class Screen {
     private void putPixel(int x, int y, int line, int col, int color) {
         int width = 32 * 8;
         int real_x = x * 8 - col;
-        byte vertical_y = cpu.memory[0xFF42];
+        byte vertical_y = cpu.memory.read_byte(0xFF42);
 
         int real_y = width - 30 - (y * 8 + line) + vertical_y - 100;
         if(real_y > 0&& real_x > 0) {
@@ -165,17 +166,17 @@ public class Screen {
 
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                byte val = cpu.memory[0x9800 + y * 32 + x];
+                byte val = cpu.memory.read_byte(0x9800 + y * 32 + x);
                 if (val != 0) {
                     for (int spriteY = 0; spriteY < 8; spriteY++) {
-                        cpu.memory[0xFF44] = (byte) (y * 8 + spriteY);
+                        cpu.memory.write(0xFF44, (byte) (y * 8 + spriteY));
                         for (int spriteX = 0; spriteX < 8; spriteX++) {
                             var sprite_pointer = 0x8000 + 0x10 * val;
 
                             for (int line = 0; line < 8; line++) {
                                 for (int col = 0; col < 8; col++) {
-                                    int LOWER = (cpu.memory[sprite_pointer + line * 2] & 255) & (1 << col);
-                                    int HIGHER = (cpu.memory[sprite_pointer + line * 2 + 1] & 255) & (1 << col);
+                                    int LOWER = (cpu.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
+                                    int HIGHER = (cpu.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
                                     int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
                                     int color;
                                     if(COLOR == 0) {
