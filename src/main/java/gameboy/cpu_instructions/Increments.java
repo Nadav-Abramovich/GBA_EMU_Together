@@ -9,30 +9,32 @@ import gameboy.Flags;
 public class Increments implements CPUInstructions {
     @Opcode(value = 0x03, length = 1, cycles = 1)
     public static void inc_bc(CPU cpu) {
-        cpu.DE.increment(1);
+        cpu.BC.increment(1);
     }
 
     @Opcode(value = 0x04, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_b(CPU cpu) {
         char current_value = cpu.BC.B.getValue();
         current_value += 1;
         cpu.BC.B.setValue((byte)current_value);
-        if(current_value == 0){
-            cpu.turnOnFlags(Flags.ZERO);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
 
     @Opcode(value = 0x0C, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_c(CPU cpu) {
         char current_value = cpu.BC.C.getValue();
         current_value += 1;
         cpu.BC.C.setValue((byte)current_value);
-        if(current_value == 0){
-            cpu.turnOnFlags(Flags.ZERO);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
@@ -43,13 +45,14 @@ public class Increments implements CPUInstructions {
     }
 
     @Opcode(value = 0x1C, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_e(CPU cpu) {
         char current_value = cpu.DE.E.getValue();
         current_value += 1;
         cpu.DE.E.setValue((byte)current_value);
-        if(current_value == 0){
-            cpu.turnOnFlags(Flags.ZERO);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
@@ -61,19 +64,19 @@ public class Increments implements CPUInstructions {
     }
 
     @Opcode(value = 0x24, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_h(CPU cpu) {
         char current_value = cpu.HL.H.getValue();
         current_value += 1;
         cpu.HL.H.setValue((byte)current_value);
-        if(current_value == 0){
-            cpu.turnOnFlags(Flags.ZERO);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
     @Opcode(value = 0x2C, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_l(CPU cpu) {
         char current_value = cpu.HL.L.getValue();
         current_value += 1;
@@ -90,7 +93,7 @@ public class Increments implements CPUInstructions {
         if(current_Value == 255) {
             cpu.turnOnFlags((byte)(Flags.HALF_CARRY | Flags.ZERO));
         } else {
-            cpu.turnOffFlags((byte)(Flags.HALF_CARRY | Flags.ZERO));
+            cpu.turnOnFlags((byte)(Flags.HALF_CARRY | Flags.ZERO));
         }
         current_Value += 1;
         cpu.memory.write(cpu.HL.getValue(), (byte)(current_Value&255));
@@ -98,13 +101,14 @@ public class Increments implements CPUInstructions {
     }
 
     @Opcode(value = 0x3C, length = 1, cycles = 1)
-    //TODO : Half carry
     public static void inc_a(CPU cpu) {
         char current_value = cpu.AF.A.getValue();
         current_value += 1;
         cpu.AF.A.setValue((byte)current_value);
-        if(current_value == 0){
-            cpu.turnOnFlags(Flags.ZERO);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.ZERO | Flags.HALF_CARRY));
         }
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }

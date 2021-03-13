@@ -18,25 +18,23 @@ public class Decrements implements CPUInstructions {
 
         current_value -= 1;
         cpu.BC.B.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 
     @Opcode(value = 0x0B, length = 1, cycles = 2)
     public static void dec_bc(CPU cpu) {
-        char current_value = cpu.BC.getValue();
-        current_value -= 1;
-        cpu.BC.setValue(current_value);
+        cpu.BC.increment(-1);
     }
 
     @Opcode(value = 0x0D, length = 1, cycles = 1)
     public static void dec_c(CPU cpu) {
         char current_value = cpu.BC.C.getValue();
-        if(current_value == 0) {
+        if((current_value&255) == 0) {
             cpu.turnOnFlags(Flags.HALF_CARRY);
         } else {
             cpu.turnOffFlags(Flags.HALF_CARRY);
@@ -44,13 +42,14 @@ public class Decrements implements CPUInstructions {
 
         current_value -= 1;
         cpu.BC.C.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
+
     @Opcode(value = 0x15, length = 1, cycles = 1)
     public static void dec_d(CPU cpu) {
         char current_value = cpu.DE.D.getValue();
@@ -59,7 +58,18 @@ public class Decrements implements CPUInstructions {
         } else {
             cpu.turnOffFlags(Flags.HALF_CARRY);
         }
+
+        current_value -= 1;
+        cpu.DE.D.setValue((byte)current_value);
+        if((current_value&255) == 0){
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
+
+
     @Opcode(value = 0x1D, length = 1, cycles = 1)
     public static void dec_e(CPU cpu) {
         char current_value = cpu.DE.E.getValue();
@@ -71,12 +81,12 @@ public class Decrements implements CPUInstructions {
 
         current_value -= 1;
         cpu.DE.E.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 
     @Opcode(value = 0x2D, length = 1, cycles = 1)
@@ -90,12 +100,12 @@ public class Decrements implements CPUInstructions {
 
         current_value -= 1;
         cpu.HL.L.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 
     @Opcode(value = 0x25, length = 1, cycles = 1)
@@ -109,12 +119,12 @@ public class Decrements implements CPUInstructions {
 
         current_value -= 1;
         cpu.HL.H.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 
     @Opcode(value = 0x2B, length = 1, cycles = 2)
@@ -159,6 +169,6 @@ public class Decrements implements CPUInstructions {
         } else {
             cpu.turnOffFlags(Flags.ZERO);
         }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 }

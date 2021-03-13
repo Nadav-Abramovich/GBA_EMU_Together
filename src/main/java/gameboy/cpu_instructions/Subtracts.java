@@ -18,7 +18,7 @@ public class Subtracts implements CPUInstructions {
         }
         new_value -= cpu.BC.B.getValue()&255;
         cpu.AF.A.setValue((byte)new_value);
-        if(new_value == 0) {
+        if((new_value&255) == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -38,7 +38,7 @@ public class Subtracts implements CPUInstructions {
         }
         new_value -= cpu.HL.H.getValue()&255;
         cpu.AF.A.setValue((byte)new_value);
-        if(new_value == 0) {
+        if((new_value&255) == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);

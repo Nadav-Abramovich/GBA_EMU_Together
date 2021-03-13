@@ -29,15 +29,15 @@ public class CPU {
     public final Map<Character, Method> supported_actions = new HashMap<>();
     public boolean IME = false; // Interrupt master enable
     public void setFlags(byte value) {
-        AF.F.setValue(value);
+        AF.F.setValue((byte)(value&255));
     }
 
     public void turnOnFlags(byte value) {
-        AF.F.setValue((byte) (AF.F.getValue() | value));
+        AF.F.setValue((byte) ((AF.F.getValue() | value)&255));
     }
 
     public void turnOffFlags(byte value) {
-        AF.F.setValue((byte) (AF.F.getValue() & ~value));
+        AF.F.setValue((byte) (AF.F.getValue() & ((~value)&255)));
     }
     public int cycles = 0;
     public int performed_cycles = 0;
