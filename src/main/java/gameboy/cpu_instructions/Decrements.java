@@ -79,6 +79,25 @@ public class Decrements implements CPUInstructions {
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
+    @Opcode(value = 0x2D, length = 1, cycles = 1)
+    public static void dec_l(CPU cpu) {
+        char current_value = cpu.HL.L.getValue();
+        if(current_value == 0) {
+            cpu.turnOnFlags(Flags.HALF_CARRY);
+        } else {
+            cpu.turnOffFlags(Flags.HALF_CARRY);
+        }
+
+        current_value -= 1;
+        cpu.HL.L.setValue((byte)current_value);
+        if(current_value == 0){
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
     @Opcode(value = 0x25, length = 1, cycles = 1)
     public static void dec_h(CPU cpu) {
         char current_value = cpu.HL.H.getValue();

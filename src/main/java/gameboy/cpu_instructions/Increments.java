@@ -7,6 +7,11 @@ import gameboy.Flags;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Increments implements CPUInstructions {
+    @Opcode(value = 0x03, length = 1, cycles = 1)
+    public static void inc_bc(CPU cpu) {
+        cpu.DE.increment(1);
+    }
+
     @Opcode(value = 0x04, length = 1, cycles = 1)
     //TODO : Half carry
     public static void inc_b(CPU cpu) {
@@ -73,9 +78,22 @@ public class Increments implements CPUInstructions {
         char current_value = cpu.HL.L.getValue();
         current_value += 1;
         cpu.HL.L.setValue((byte)current_value);
-        if(current_value == 0){
+        if((current_value&255) == 0){
             cpu.turnOnFlags(Flags.ZERO);
         }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x34, length = 1, cycles = 3)
+    public static void inc_from_hl(CPU cpu) {
+        char current_Value = (char)(cpu.memory.read_byte(cpu.HL.getValue()) & 255);
+        if(current_Value == 255) {
+            cpu.turnOnFlags((byte)(Flags.HALF_CARRY | Flags.ZERO));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.HALF_CARRY | Flags.ZERO));
+        }
+        current_Value += 1;
+        cpu.memory.write(cpu.HL.getValue(), (byte)(current_Value&255));
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 

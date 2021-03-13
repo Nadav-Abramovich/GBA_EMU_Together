@@ -13,7 +13,7 @@ public class Jumps implements CPUInstructions {
     }
 
     @Opcode(value = 0x20, length = 2, cycles = 2)
-    public static void jr_nz(CPU cpu) {
+    public static void jr_nz_s8(CPU cpu) {
         byte jump_amount = cpu.memory.read_byte(cpu.PC.getValue() + 1);
         if (!cpu.AF.isZeroFlagOn()) {
             cpu.PC.increment(jump_amount);
@@ -22,11 +22,33 @@ public class Jumps implements CPUInstructions {
     }
 
     @Opcode(value = 0x28, length = 2, cycles = 2)
-    public static void jr_z(CPU cpu) {
+    public static void jr_z_s8(CPU cpu) {
         byte jump_amount = cpu.memory.read_byte(cpu.PC.getValue() + 1);
         if (cpu.AF.isZeroFlagOn()) {
             cpu.PC.increment(jump_amount);
             cpu.performed_cycles += 1;
+        }
+    }
+
+    @Opcode(value = 0x38, length = 2, cycles = 2)
+    public static void jr_c_s8(CPU cpu) {
+        byte jump_amount = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        if (cpu.AF.isCarryFlagOn()) {
+            cpu.PC.increment(jump_amount);
+            cpu.performed_cycles += 1;
+        }
+    }
+
+
+    @Opcode(value = 0xC2, length = 3, cycles = 3, should_update_pc = false)
+    public static void jp_nz_a16(CPU cpu) {
+        if(!cpu.AF.isZeroFlagOn()) {
+            char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+            char higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+            cpu.PC.setValue((char) (lower | (higher << 8)));
+            cpu.performed_cycles += 1;
+        } else {
+            cpu.PC.increment(3);
         }
     }
 

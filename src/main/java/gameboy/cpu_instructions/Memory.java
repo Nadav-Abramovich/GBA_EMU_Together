@@ -82,7 +82,7 @@ public class Memory implements CPUInstructions {
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
-    @Opcode(value = 0x82, length = 1, cycles = 2)
+    @Opcode(value = 0x82, length = 1, cycles = 1)
     public static void add_a_d(CPU cpu) {
         if(cpu.AF.A.getValue() + cpu.DE.D.getValue() >= 256) {
             cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
@@ -91,6 +91,42 @@ public class Memory implements CPUInstructions {
         }
 
         cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.DE.D.getValue()));
+        if(cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x83, length = 1, cycles = 1)
+    public static void add_a_e(CPU cpu) {
+        if(cpu.AF.A.getValue() + cpu.DE.E.getValue() >= 256) {
+            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.DE.E.getValue()));
+        if(cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x85, length = 1, cycles = 2)
+    public static void add_a_l(CPU cpu) {
+        if(cpu.AF.A.getValue() + cpu.HL.L.getValue() >= 256) {
+            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.HL.L.getValue()));
         if(cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
@@ -116,5 +152,43 @@ public class Memory implements CPUInstructions {
         }
 
         cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0xC6, length = 2, cycles = 2)
+    public static void add_a_d8(CPU cpu) {
+        int value = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        if(cpu.AF.A.getValue() + value >= 256) {
+            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + value));
+        if(cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0xD6, length = 2, cycles = 2)
+    public static void sub_d8(CPU cpu) {
+        int value = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        if(cpu.AF.A.getValue() - value >= 256) {
+            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() - value));
+        if(cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 }

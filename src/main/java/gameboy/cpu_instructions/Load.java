@@ -71,6 +71,17 @@ public class Load implements CPUInstructions {
         cpu.AF.A.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
+    @Opcode(value = 0x40, length = 1, cycles = 1)
+    public static void ld_b_b(CPU cpu) {
+        cpu.BC.B.setValue((byte)cpu.BC.B.getValue());
+    }
+
+    @Opcode(value = 0x46, length = 1, cycles = 2)
+    public static void ld_b_from_hl(CPU cpu) {
+        char d8 = (char)(cpu.memory.read_byte(cpu.HL.getValue())&255);
+        cpu.BC.B.setValue((byte)d8);
+    }
+
     @Opcode(value = 0x47, length = 1, cycles = 1)
     public static void ld_b_a(CPU cpu) {
         cpu.BC.B.setValue((byte)cpu.AF.A.getValue());

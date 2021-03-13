@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static gameboy.HelperFunctions.push_to_stack_d16;
+
 public class CPU {
-    public boolean PRINT_DEBUG_MESSAGES = false;
+    public boolean PRINT_DEBUG_MESSAGES = true;
     public static final String CPU_INSTRUCTIONS_PACKAGE_PATH = "gameboy.cpu_instructions";
     public static final String EXECUTED_OPCODE_MSG_FORMAT = "[DEBUG] [0x%s] 0x%s: %s%n";
     public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "[CRITICAL] Failed to execute opcode 0x%s%n";
@@ -60,16 +62,22 @@ public class CPU {
 
     private char get_opcode() {
         if(PC.getValue() == 0x100) {
-            if(AF.getValue() != 0x01B0) {
-                System.out.printf("Bad value for AF 0x%s", Integer.toHexString(AF.getValue()));
-//                System.exit(1);
-            }
-            if (memory.read_byte(0xFF11) != (byte)0xBF) {
-                System.out.printf("Bad value for [0x%s]:0x%s", Integer.toHexString(0xFF11).toUpperCase(), Integer.toHexString(Byte.toUnsignedInt(memory.read_byte(0xFF11))).toUpperCase());
-//                System.exit(1);
-            }
-            System.out.println("Starting ROM");
-            PRINT_DEBUG_MESSAGES = true;
+//            if(AF.getValue() != 0x01B0) {
+//                System.out.printf("Bad value for AF 0x%s", Integer.toHexString(AF.getValue()));
+////                System.exit(1);
+//            }
+//            if (memory.read_byte(0xFF11) != (byte)0xBF) {
+//                System.out.printf("Bad value for [0x%s]:0x%s", Integer.toHexString(0xFF11).toUpperCase(), Integer.toHexString(Byte.toUnsignedInt(memory.read_byte(0xFF11))).toUpperCase());
+////                System.exit(1);
+//            }
+//            System.out.println("Starting ROM");
+//            PRINT_DEBUG_MESSAGES = true;
+
+            AF.setValue((char)0x01b0);
+            BC.setValue((char)0x0013);
+            DE.setValue((char)0x00D8);
+            HL.setValue((char)0x014D);
+            SP.setValue((char)0xFFFE);
         }
         if(PC.getValue() >= 0x7FFF) {
             System.out.println("Overflow");
@@ -119,6 +127,18 @@ public class CPU {
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
+            }
+            if(IME) {
+                int interrupt_pointer = 0xFFFF;
+                byte current_interrupt_requests = memory.read_byte(interrupt_pointer);
+                // V-BLANK interrupt
+                if ((current_interrupt_requests & 1) == 1) {
+                    push_to_stack_d16(this, PC.getValue());
+                    PC.setValue((char)0x40);
+                    IME = false;
+                    current_interrupt_requests &= 254;
+                    memory.write(interrupt_pointer, current_interrupt_requests);
+                }
             }
         }
         cycles++;

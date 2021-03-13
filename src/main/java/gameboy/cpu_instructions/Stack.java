@@ -38,6 +38,21 @@ public class Stack implements CPUInstructions {
         cpu.SP.increment(2);
     }
 
+    @Opcode(value = 0xC4, length = 3, cycles = 6, should_update_pc = false)
+    public static void call_nz_a16(CPU cpu) {
+        if(!cpu.AF.isZeroFlagOn()) {
+            char target_lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+            char target_higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+
+            push_to_stack_d16(cpu, (char) (cpu.PC.getValue() + 3));
+            cpu.PC.setValue((char) ((target_higher << 8) | target_lower));
+            cpu.performed_cycles += 6;
+        } else{
+            cpu.PC.increment(3);
+            cpu.performed_cycles += 6;
+        }
+    }
+
     @Opcode(value = 0xC8, length = 1, cycles = 2, should_update_pc = false)
     public static void ret_z(CPU cpu) {
         if(cpu.AF.isZeroFlagOn()) {

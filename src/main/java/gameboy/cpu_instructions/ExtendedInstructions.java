@@ -41,14 +41,36 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOffFlags((byte)(Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 
-    @Opcode(value = 0xCB87, length = 2, cycles = 2)
-    public static void res_0_a(CPU cpu) {
-        byte new_value = (byte)cpu.AF.A.getValue();
-        cpu.AF.A.setValue((byte)(new_value & 0xFE));
+    @Opcode(value = 0xCB41, length = 2, cycles = 2)
+    public static void bit_0_c(CPU cpu) {
+        int C = (cpu.PC.C.getValue() & 1);
+
+        if (C == 1) {
+            cpu.turnOnFlags(Flags.ZERO);
+        }
+        else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB47, length = 2, cycles = 2)
+    public static void bit_0_a(CPU cpu) {
+        int A = (cpu.AF.A.getValue() & 1);
+
+        if (A == 1) {
+            cpu.turnOnFlags(Flags.ZERO);
+        }
+        else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
     @Opcode(value = 0xCB7C, length = 2, cycles = 2)
-    public static void bit_7h(CPU cpu) {
+    public static void bit_7_h(CPU cpu) {
         int H = (cpu.HL.getValue() >> 15);
 
         if (H == 0) {
@@ -61,9 +83,21 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
+    @Opcode(value = 0xCB87, length = 2, cycles = 2)
+    public static void res_0_a(CPU cpu) {
+        byte new_value = (byte)cpu.AF.A.getValue();
+        cpu.AF.A.setValue((byte)(new_value & 0xFE));
+    }
+
     @Opcode(value = 0xCBCF, length = 2, cycles = 2)
     public static void set_1_a(CPU cpu) {
         byte new_value = (byte)cpu.AF.A.getValue();
         cpu.AF.A.setValue((byte)(new_value | 0x2));
+    }
+
+    @Opcode(value = 0xCBFE, length = 2, cycles = 4)
+    public static void set_7_into_hl(CPU cpu) {
+        byte new_value = cpu.memory.read_byte(cpu.HL.getValue());
+        cpu.memory.write(cpu.HL.getValue(), (byte)(new_value | (1<<7)));
     }
 }

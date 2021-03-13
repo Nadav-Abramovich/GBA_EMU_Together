@@ -23,6 +23,9 @@ public class Memory {
     }
 
     public void write(int address, byte value) {
+        if(address == 0xFF01 || address == 0xFF02 || address == 0xFF0F) {
+            System.out.println("serial data!");
+        }
         if(address == 0xFF46) {
             System.out.println("DMA TRANSFER!");
         }
@@ -55,6 +58,10 @@ public class Memory {
         if(address == 0xFFB8 || address == 0xFFB9) {
             System.out.println("BANKING 2");
         }
+        if(address == 0xC000 || address == 0xC09F) {
+            System.out.println("TRANSFER");
+        }
+
 
         _memory[address] = value;
     }
@@ -64,7 +71,7 @@ public class Memory {
     }
 
     public byte read_byte(int address, boolean is_PC) {
-        if(address<0x7FFF) {
+        if(address <= 0x7FFF) {
             if(_memory[0xFF50] == 0 && address <= 0xFF) {
                 return boot_rom[address];
             }
