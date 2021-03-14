@@ -19,6 +19,12 @@ public class Load implements CPUInstructions {
         cpu.memory.write(((higher << 8) | lower) + 1, (byte) cpu.SP.S.getValue());
     }
 
+    @Opcode(value = 0x0A, length = 1, cycles = 8)
+    public static void ld_a_from_bc(CPU cpu) {
+        char a8 = (char) (cpu.memory.read_byte(cpu.BC.getValue()) & 255);
+        cpu.AF.A.setValue((byte) a8);
+    }
+
     @Opcode(value = 0x12, length = 1, cycles = 2)
     public static void ld_into_de_a(CPU cpu) {
         cpu.memory.write(cpu.DE.getValue(), (byte) (cpu.AF.A.getValue()));
@@ -95,6 +101,12 @@ public class Load implements CPUInstructions {
     @Opcode(value = 0x4B, length = 1, cycles = 1)
     public static void ld_c_e(CPU cpu) {
         cpu.BC.C.setValue((byte) cpu.DE.E.getValue());
+    }
+
+    @Opcode(value = 0x4E, length = 1, cycles = 8)
+    public static void ld_c_from_hl(CPU cpu) {
+        char d8 = (char) (cpu.memory.read_byte(cpu.HL.getValue()) & 255);
+        cpu.BC.C.setValue((byte) d8);
     }
 
     @Opcode(value = 0x4F, length = 1, cycles = 1)

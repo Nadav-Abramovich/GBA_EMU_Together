@@ -115,6 +115,8 @@ public class Screen {
     }
 
     public void loop() {
+        glfwMakeContextCurrent(window);
+
         if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
             if (get_ly() == 144) {
                 draw_screen();
@@ -168,11 +170,11 @@ public class Screen {
         // Background
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                byte val = cpu.memory.read_byte(0x9800 + y * 32 + x);
+                int val = cpu.memory.read_byte(0x9800 + y * 32 + x) & 255;
                 if (val != 0) {
                     for (int spriteY = 0; spriteY < 8; spriteY++) {
                         for (int spriteX = 0; spriteX < 8; spriteX++) {
-                            var sprite_pointer = 0x8000 + 0x10 * val;
+                            int sprite_pointer = 0x8000 + 0x10 * val;
 
                             for (int line = 0; line < 8; line++) {
                                 for (int col = 0; col < 8; col++) {
@@ -222,13 +224,13 @@ public class Screen {
                                     int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
                                     int color;
                                     if (COLOR == 0) {
-                                        color = Color.RED.getRGB();
+                                        color = Color.WHITE.getRGB();
                                     } else if (COLOR == 1) {
-                                        color = Color.GREEN.getRGB();
+                                        color = Color.LIGHT_GRAY.getRGB();
                                     } else if (COLOR == 2) {
-                                        color = Color.MAGENTA.getRGB();
+                                        color = Color.DARK_GRAY.getRGB();
                                     } else {
-                                        color = Color.CYAN.getRed();
+                                        color = Color.BLACK.getRGB();
                                     }
 //                                    int color = switch (COLOR) {
 //                                        case 0 -> Color.WHITE.getRGB();
@@ -263,9 +265,13 @@ public class Screen {
                             int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
                             int color;
                             if (COLOR == 0) {
-                                color = Color.BLUE.getRGB();
+                                color = Color.WHITE.getRGB();
+                            } else if (COLOR == 1) {
+                                color = Color.LIGHT_GRAY.getRGB();
+                            } else if (COLOR == 2) {
+                                color = Color.DARK_GRAY.getRGB();
                             } else {
-                                color = Color.MAGENTA.getRGB();
+                                color = Color.BLACK.getRGB();
                             }
                             putPixel(x, y, line, col, color);
                         }

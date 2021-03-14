@@ -124,6 +124,7 @@ public class CPU {
         char opcode = get_opcode();
 //         KEYS?
         memory.write(0xff81, (byte) 0x80);
+//        memory.write(0xFF44, (byte)144);
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);
 
@@ -137,12 +138,12 @@ public class CPU {
                 }
                 execute_action(action, opcode);
 
-                // TODO: Sort this out...
-                if(PC.getValue() == 0x02ef) {
-                    System.out.println(AF.F.getValue());
-                    turnOffFlags(Flags.ZERO);
-                    PC.setValue((char) 0x03ae);
-                }
+//                // TODO: Sort this out...
+//                if(PC.getValue() == 0x02ef) {
+//                    System.out.println(AF.F.getValue());
+//                    turnOffFlags(Flags.ZERO);
+//                    PC.setValue((char) 0x03ae);
+//                }
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
@@ -171,14 +172,14 @@ public class CPU {
                 }
 
 
-//                if (memory.read_byte(0xFF50) == 1) {
-//                    if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
-//                        push_to_stack_d16(this, PC.getValue());
-//                        PC.setValue((char) 0x40);
-//                        memory.write(0xFF0F, (byte) 1);
-//                        IME = false;
-//                    }
-//                }
+                if (memory.read_byte(0xFF50) == 1) {
+                    if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
+                        push_to_stack_d16(this, PC.getValue());
+                        PC.setValue((char) 0x40);
+                        memory.write(0xFF0F, (byte) 1);
+                        IME = false;
+                    }
+                }
             }
         }
 //        if(IME) {

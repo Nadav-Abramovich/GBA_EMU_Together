@@ -129,4 +129,8 @@ public class ExtendedInstructions implements CPUInstructions {
         }
         cpu.turnOffFlags(Flags.HALF_CARRY);
     }
+    // TODO: implement this
+    @Opcode(value = 0xCB27, length = 2, cycles = 8)
+    public static void sla_a(CPU cpu) {
+    }
 }
