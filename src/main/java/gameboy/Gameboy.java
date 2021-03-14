@@ -2,9 +2,6 @@ package gameboy;
 
 import gameboy.Screen.Screen;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 public class Gameboy {
     public final Memory _memory = new Memory();
     private final CPU cpu;
@@ -16,14 +13,14 @@ public class Gameboy {
     }
 
     public void tick() {
-        if(cpu.PC.getValue() == 0x235) {
-            cpu.AF.A.setValue((byte)148);
+        if (cpu.PC.getValue() == 0x235) {
+            cpu.AF.A.setValue((byte) 148);
         }
-        if(cpu.PC.getValue() == 0x282a) {
-            cpu.AF.A.setValue((byte)145);
+        if (cpu.PC.getValue() == 0x282a) {
+            cpu.AF.A.setValue((byte) 145);
         }
         cpu.tick();
-        if(cpu.cycles % 500 == 0) {
+        if (cpu.cycles % 500 == 0) {
             screen.loop();
         }
     }

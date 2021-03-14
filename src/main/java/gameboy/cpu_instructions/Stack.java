@@ -23,7 +23,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC0, length = 1, cycles = 2, should_update_pc = false)
     public static void ret_nz(CPU cpu) {
-        if(!cpu.AF.isZeroFlagOn()) {
+        if (!cpu.AF.isZeroFlagOn()) {
             cpu.PC.setValue(pop_from_stack_d16(cpu));
             cpu.performed_cycles += 3;
         } else {
@@ -40,14 +40,14 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC4, length = 3, cycles = 6, should_update_pc = false)
     public static void call_nz_a16(CPU cpu) {
-        if(!cpu.AF.isZeroFlagOn()) {
+        if (!cpu.AF.isZeroFlagOn()) {
             char target_lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
             char target_higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
 
             push_to_stack_d16(cpu, (char) (cpu.PC.getValue() + 3));
             cpu.PC.setValue((char) ((target_higher << 8) | target_lower));
             cpu.performed_cycles += 6;
-        } else{
+        } else {
             cpu.PC.increment(3);
             cpu.performed_cycles += 6;
         }
@@ -55,7 +55,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC8, length = 1, cycles = 2, should_update_pc = false)
     public static void ret_z(CPU cpu) {
-        if(cpu.AF.isZeroFlagOn()) {
+        if (cpu.AF.isZeroFlagOn()) {
             cpu.PC.setValue(pop_from_stack_d16(cpu));
             cpu.performed_cycles += 3;
         } else {
@@ -66,19 +66,26 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC9, length = 1, cycles = 4, should_update_pc = false)
     public static void ret(CPU cpu) {
-        if(cpu.PRINT_DEBUG_MESSAGES) {
-            System.out.println("");
-        }
         cpu.PC.setValue(pop_from_stack_d16(cpu));
     }
 
     @Opcode(value = 0xCD, length = 3, cycles = 6, should_update_pc = false)
     public static void call_a16(CPU cpu) {
-        char target_lower = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1)&255);
-        char target_higher = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 2)&255);
+        char target_lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+        char target_higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
 
         push_to_stack_d16(cpu, (char) (cpu.PC.getValue() + 3));
-        cpu.PC.setValue((char)((target_higher << 8) | target_lower));
+        cpu.PC.setValue((char) ((target_higher << 8) | target_lower));
+    }
+
+    @Opcode(value = 0xD0, length = 1, cycles = 2, should_update_pc = false)
+    public static void ret_nc(CPU cpu) {
+        if (!cpu.AF.isCarryFlagOn()) {
+            cpu.PC.setValue(pop_from_stack_d16(cpu));
+            cpu.performed_cycles += 3;
+        } else {
+            cpu.PC.increment(1);
+        }
     }
 
     @Opcode(value = 0xEF, length = 1, cycles = 4, should_update_pc = false)

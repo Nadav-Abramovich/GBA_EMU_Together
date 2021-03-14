@@ -6,13 +6,13 @@ public class SP extends RegisterPair {
 
 
     public void setValue(char value) {
-        this.lower.setValue((byte)(value & 255));
-        this.higher.setValue((byte)(value >> 8));
+        this.lower.setValue((byte) (value & 255));
+        this.higher.setValue((byte) (value >> 8));
     }
 
 
     public void increment(int amount) {
-        char new_value = (char)(this.getValue() + amount);
+        char new_value = (char) (this.getValue() + amount);
         this.setValue(new_value);
     }
 }

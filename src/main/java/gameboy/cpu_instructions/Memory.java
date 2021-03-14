@@ -38,7 +38,7 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x22, length = 1, cycles = 2)
     public static void ld_hl_plus_a(CPU cpu) {
-        cpu.memory.write(cpu.HL.getValue(), (byte)(cpu.AF.A.getValue()));
+        cpu.memory.write(cpu.HL.getValue(), (byte) (cpu.AF.A.getValue()));
         cpu.HL.increment(1);
     }
 
@@ -50,7 +50,7 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x32, length = 1, cycles = 2)
     public static void ld_hl_minus_a(CPU cpu) {
-        cpu.memory.write(cpu.HL.getValue(), (byte)cpu.AF.A.getValue());
+        cpu.memory.write(cpu.HL.getValue(), (byte) cpu.AF.A.getValue());
         cpu.HL.increment(-1);
     }
 
@@ -61,19 +61,51 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x86, length = 1, cycles = 2)
     public static void add_a_from_hl(CPU cpu) {
-        if(cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()) >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        char value = (char) (cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()));
+        if (value >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
-        }
-        if(cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()) < 0) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue())));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (value & 255));
+        if (cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x80, length = 1, cycles = 1)
+    public static void add_a_b(CPU cpu) {
+        if (cpu.AF.A.getValue() + cpu.BC.B.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.BC.B.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x81, length = 1, cycles = 1)
+    public static void add_a_c(CPU cpu) {
+        if (cpu.AF.A.getValue() + cpu.BC.C.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.BC.C.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -84,14 +116,14 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x82, length = 1, cycles = 1)
     public static void add_a_d(CPU cpu) {
-        if(cpu.AF.A.getValue() + cpu.DE.D.getValue() >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() + cpu.DE.D.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.DE.D.getValue()));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.DE.D.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -102,14 +134,14 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x83, length = 1, cycles = 1)
     public static void add_a_e(CPU cpu) {
-        if(cpu.AF.A.getValue() + cpu.DE.E.getValue() >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() + cpu.DE.E.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.DE.E.getValue()));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.DE.E.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -120,14 +152,14 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x85, length = 1, cycles = 2)
     public static void add_a_l(CPU cpu) {
-        if(cpu.AF.A.getValue() + cpu.HL.L.getValue() >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() + cpu.HL.L.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.HL.L.getValue()));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.HL.L.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -138,14 +170,42 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x87, length = 1, cycles = 2)
     public static void add_a_a(CPU cpu) {
-        if(cpu.AF.A.getValue() + cpu.AF.A.getValue() >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() + cpu.AF.A.getValue() >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + cpu.AF.A.getValue()));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.AF.A.getValue()));
+        if (cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0x8E, length = 1, cycles = 2)
+    public static void adc_a_from_hl(CPU cpu) {
+        int carry_value = 0;
+        if (cpu.AF.isCarryFlagOn()) {
+            carry_value = 1;
+        }
+
+        if ((cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()) + carry_value) >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()) < 0) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.memory.read_byte(cpu.HL.getValue()) + carry_value));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -157,14 +217,14 @@ public class Memory implements CPUInstructions {
     @Opcode(value = 0xC6, length = 2, cycles = 2)
     public static void add_a_d8(CPU cpu) {
         int value = cpu.memory.read_byte(cpu.PC.getValue() + 1);
-        if(cpu.AF.A.getValue() + value >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() + value >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() + value));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + value));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);
@@ -176,14 +236,14 @@ public class Memory implements CPUInstructions {
     @Opcode(value = 0xD6, length = 2, cycles = 2)
     public static void sub_d8(CPU cpu) {
         int value = cpu.memory.read_byte(cpu.PC.getValue() + 1);
-        if(cpu.AF.A.getValue() - value >= 256) {
-            cpu.turnOnFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+        if (cpu.AF.A.getValue() - value >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
-            cpu.turnOffFlags((byte)(Flags.CARRY | Flags.HALF_CARRY));
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         }
 
-        cpu.AF.A.setValue((byte)(cpu.AF.A.getValue() - value));
-        if(cpu.AF.A.getValue() == 0) {
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() - value));
+        if (cpu.AF.A.getValue() == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
             cpu.turnOffFlags(Flags.ZERO);

@@ -8,7 +8,7 @@ import static gameboy.HelperFunctions.pop_from_stack_d16;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Interrupts implements CPUInstructions {
-    @Opcode(value = 0xD9, length = 1, cycles = 4)
+    @Opcode(value = 0xD9, length = 1, cycles = 4, should_update_pc = false)
     public static void reti(CPU cpu) {
         cpu.IME = true;
         cpu.PC.setValue(pop_from_stack_d16(cpu));

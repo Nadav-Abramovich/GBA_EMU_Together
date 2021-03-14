@@ -42,7 +42,7 @@ public class Jumps implements CPUInstructions {
 
     @Opcode(value = 0xC2, length = 3, cycles = 3, should_update_pc = false)
     public static void jp_nz_a16(CPU cpu) {
-        if(!cpu.AF.isZeroFlagOn()) {
+        if (!cpu.AF.isZeroFlagOn()) {
             char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
             char higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
             cpu.PC.setValue((char) (lower | (higher << 8)));
@@ -54,14 +54,14 @@ public class Jumps implements CPUInstructions {
 
     @Opcode(value = 0xC3, length = 3, cycles = 4, should_update_pc = false)
     public static void jp_a16(CPU cpu) {
-        char lower = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
-        char higher = (char)(cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
-        cpu.PC.setValue((char)(lower | (higher<<8)));
+        char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
+        char higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
+        cpu.PC.setValue((char) (lower | (higher << 8)));
     }
 
     @Opcode(value = 0xCA, length = 3, cycles = 3, should_update_pc = false)
     public static void jp_z_a16(CPU cpu) {
-        if(cpu.AF.isZeroFlagOn()) {
+        if (cpu.AF.isZeroFlagOn()) {
             char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
             char higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
             cpu.PC.setValue((char) (lower | (higher << 8)));
@@ -73,7 +73,7 @@ public class Jumps implements CPUInstructions {
 
     @Opcode(value = 0xD2, length = 3, cycles = 3, should_update_pc = false)
     public static void jp_nc_a16(CPU cpu) {
-        if(!cpu.AF.isCarryFlagOn()) {
+        if (!cpu.AF.isCarryFlagOn()) {
             char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
             char higher = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 2) & 255);
             cpu.PC.setValue((char) (lower | (higher << 8)));

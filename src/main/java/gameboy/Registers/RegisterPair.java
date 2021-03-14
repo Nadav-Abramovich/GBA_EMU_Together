@@ -5,16 +5,16 @@ public class RegisterPair {
     protected final Register higher = new Register();
 
     public void setValue(char value) {
-        this.lower.setValue((byte)(value & 255));
-        this.higher.setValue((byte)(value >> 8));
+        this.lower.setValue((byte) (value & 255));
+        this.higher.setValue((byte) ((value >> 8) & 255));
     }
 
     public char getValue() {
-        return (char)(lower.getValue() | (higher.getValue() << 8));
+        return (char) (lower.getValue() | (higher.getValue() << 8));
     }
 
     public void increment(int amount) {
-        this.setValue((char)(this.getValue() + amount));
+        this.setValue((char) (this.getValue() + amount));
     }
 }
 
