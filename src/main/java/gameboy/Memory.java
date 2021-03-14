@@ -39,7 +39,7 @@ public class Memory {
             if (value == 0) {
                 bank_number = 1;
             }
-            System.out.println(bank_number);
+//            System.out.println(bank_number);
         } else if (address <= 0x7FFF) {
             System.out.println("MANDALACH");
         }
@@ -62,8 +62,6 @@ public class Memory {
         if (address == 0xC000 || address == 0xC09F) {
             System.out.println("TRANSFER");
         }
-
-
         _memory[address] = value;
     }
 

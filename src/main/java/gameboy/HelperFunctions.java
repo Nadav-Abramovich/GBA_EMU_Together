@@ -7,7 +7,7 @@ public class HelperFunctions {
         cpu.SP.increment(-2);
     }
 
-    public static char pop_from_stack_d16(CPU cpu) {
+    public static char  pop_from_stack_d16(CPU cpu) {
         char lower = (char) (cpu.memory.read_byte(cpu.SP.getValue()) & 255);
         char higher = (char) (cpu.memory.read_byte(cpu.SP.getValue() + 1) & 255);
         cpu.SP.increment(2);

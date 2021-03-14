@@ -7,24 +7,12 @@ import gameboy.Flags;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Ands implements CPUInstructions {
-    static int test = 0;
-
     @Opcode(value = 0xA7, length = 1, cycles = 1)
     public static void and_a(CPU cpu) {
         if (cpu.AF.A.getValue() == 0) {
             cpu.setFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
         } else {
             cpu.setFlags(Flags.HALF_CARRY);
-        }
-        System.out.println(test);
-
-        // TODO: Make this not needed
-        test++;
-        if(test > 9111 && test < 9180) {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        if (test == 30000000) {
-            cpu.memory.write(0xFFFF, (byte)(cpu.memory.read_byte(0xFFFF) | 16));
         }
     }
 

@@ -1,15 +1,19 @@
 package gameboy;
 
 import gameboy.Screen.Screen;
+import gameboy.Screen.Screen_low;
 
 public class Gameboy {
     public final Memory _memory = new Memory();
     private final CPU cpu;
     private final Screen screen;
 
+    private final Screen_low screen_low;
+
     public Gameboy() {
         this.cpu = new CPU(_memory, this);
         this.screen = new Screen(cpu);
+        this.screen_low = new Screen_low(cpu);
     }
 
     public void tick() {
@@ -22,6 +26,7 @@ public class Gameboy {
         cpu.tick();
         if (cpu.cycles % 500 == 0) {
             screen.loop();
+            screen_low.loop();
         }
     }
 }

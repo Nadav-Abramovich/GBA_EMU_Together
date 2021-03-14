@@ -60,7 +60,7 @@ public class Load implements CPUInstructions {
         cpu.HL.L.setValue(cpu.memory.read_byte(cpu.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x36, length = 1, cycles = 3)
+    @Opcode(value = 0x36, length = 2, cycles = 3)
     public static void ld_into_hl_d8(CPU cpu) {
         byte d8 = cpu.memory.read_byte(cpu.PC.getValue() + 1);
         cpu.memory.write(cpu.HL.getValue(), d8);

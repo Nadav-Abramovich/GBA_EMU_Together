@@ -155,7 +155,7 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x3D, length = 1, cycles = 1)
     public static void dec_a(CPU cpu) {
-        char current_value = cpu.AF.A.getValue();
+        byte current_value = (byte)cpu.AF.A.getValue();
         if (current_value == 0) {
             cpu.turnOnFlags(Flags.HALF_CARRY);
         } else {
@@ -163,7 +163,7 @@ public class Decrements implements CPUInstructions {
         }
 
         current_value -= 1;
-        cpu.AF.A.setValue((byte) current_value);
+        cpu.AF.A.setValue(current_value);
         if (current_value == 0) {
             cpu.turnOnFlags(Flags.ZERO);
         } else {
