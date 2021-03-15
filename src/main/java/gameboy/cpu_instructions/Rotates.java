@@ -73,13 +73,41 @@ public class Rotates implements CPUInstructions {
     }
 
     // TODO: Find a better place
+    @Opcode(value = 0xCB33, length = 2, cycles = 2)
+    public static void swap_e(CPU cpu) {
+        cpu.DE.E.setValue((byte) ((cpu.DE.E.getValue() >> 4) | (cpu.DE.E.getValue() << 4)));
+        if (cpu.DE.E.getValue() == 0) {
+            cpu.setFlags(Flags.ZERO);
+        } else {
+            cpu.setFlags((byte) 0);
+        }
+    }
+
+    // TODO: Find a better place
     @Opcode(value = 0xCB37, length = 2, cycles = 2)
     public static void swap_a(CPU cpu) {
-        cpu.AF.A.setValue((byte) ((cpu.AF.getValue() >> 4) | (cpu.AF.getValue() << 4)));
+        cpu.AF.A.setValue((byte) ((cpu.AF.A.getValue() >> 4) | (cpu.AF.A.getValue() << 4)));
         if (cpu.AF.A.getValue() == 0) {
             cpu.setFlags(Flags.ZERO);
         } else {
             cpu.setFlags((byte) 0);
         }
+    }
+
+    @Opcode(value = 0xCB3F, length = 2, cycles = 2)
+    public static void srl_a(CPU cpu) {
+        char new_msb = 0;
+        if ((cpu.AF.A.getValue() & 1) != 0) {
+            cpu.turnOnFlags(Flags.CARRY);
+        } else {
+            cpu.turnOffFlags(Flags.CARRY);
+        }
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() >> 1));
+        if(cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 }

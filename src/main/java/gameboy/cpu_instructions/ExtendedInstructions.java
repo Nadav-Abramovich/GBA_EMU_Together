@@ -47,9 +47,22 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 
+    @Opcode(value = 0xCB40, length = 2, cycles = 2)
+    public static void bit_0_b(CPU cpu) {
+        int C = (cpu.BC.B.getValue() & 1);
+
+        if (C == 1) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
     @Opcode(value = 0xCB41, length = 2, cycles = 2)
     public static void bit_0_c(CPU cpu) {
-        int C = (cpu.PC.C.getValue() & 1);
+        int C = (cpu.BC.C.getValue() & 1);
 
         if (C == 1) {
             cpu.turnOnFlags(Flags.ZERO);
@@ -73,9 +86,22 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
-    @Opcode(value = 0xCB7C, length = 2, cycles = 2)
-    public static void bit_7_h(CPU cpu) {
-        int H = (cpu.HL.getValue() >> 15);
+    @Opcode(value = 0xCB50, length = 2, cycles = 2)
+    public static void bit_2_b(CPU cpu) {
+        int C = (cpu.BC.B.getValue() >> 2) & 1;
+
+        if (C == 1) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB5F, length = 2, cycles = 2)
+    public static void bit_3_a(CPU cpu) {
+        int H = (cpu.AF.A.getValue() >> 3) & 1;
 
         if (H == 0) {
             cpu.turnOnFlags(Flags.ZERO);
@@ -86,11 +112,57 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
+    @Opcode(value = 0xCB7C, length = 2, cycles = 2)
+    public static void bit_7_h(CPU cpu) {
+        int H = (cpu.HL.getValue() >> 15) & 1;
+
+        if (H == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB7E, length = 2, cycles = 2)
+    public static void bit_7_hl(CPU cpu) {
+        int bit_7 = (cpu.memory.read_byte(cpu.HL.getValue()) >> 7) & 1;
+
+        if (bit_7 == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB7F, length = 2, cycles = 2)
+    public static void bit_7_a(CPU cpu) {
+        int H = (cpu.AF.A.getValue() >> 7) & 1;
+
+        if (H == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB86, length = 2, cycles = 4)
+    public static void res_0_from_hl(CPU cpu) {
+        byte new_value = cpu.memory.read_byte(cpu.HL.getValue());
+        cpu.memory.write(cpu.HL.getValue(), (byte) (new_value & 0xFE));
+    }
+
     @Opcode(value = 0xCB87, length = 2, cycles = 2)
     public static void res_0_a(CPU cpu) {
         byte new_value = (byte) cpu.AF.A.getValue();
         cpu.AF.A.setValue((byte) (new_value & 0xFE));
     }
+
 
     @Opcode(value = 0xCBCF, length = 2, cycles = 2)
     public static void set_1_a(CPU cpu) {
@@ -130,7 +202,7 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOffFlags(Flags.HALF_CARRY);
     }
     // TODO: implement this
-    @Opcode(value = 0xCB27, length = 2, cycles = 8)
+    @Opcode(value = 0xCB27, length = 2, cycles = 2)
     public static void sla_a(CPU cpu) {
     }
 }

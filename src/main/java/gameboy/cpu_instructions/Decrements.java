@@ -69,6 +69,10 @@ public class Decrements implements CPUInstructions {
         cpu.turnOnFlags(Flags.SUBTRACTION);
     }
 
+    @Opcode(value = 0x1B, length = 1, cycles = 2)
+    public static void dec_de(CPU cpu) {
+        cpu.DE.increment(-1);
+    }
 
     @Opcode(value = 0x1D, length = 1, cycles = 1)
     public static void dec_e(CPU cpu) {

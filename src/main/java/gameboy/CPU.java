@@ -129,21 +129,21 @@ public class CPU {
             Method action = supported_actions.getOrDefault(opcode, null);
 
             if (action != null) {
-                //TODO: replace this with working timing..
+//                //TODO: replace this with working timing..
                 if (PC.getValue() == 0x6D) {
                     AF.A.setValue((byte) 145);
                 }
-                if(PC.getValue() > 0x100) {
-                    System.out.println(Integer.toHexString(PC.getValue()));
+                if(PC.getValue() >= 0x100) {
+                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
                 }
                 execute_action(action, opcode);
 
-//                // TODO: Sort this out...
-//                if(PC.getValue() == 0x02ef) {
-//                    System.out.println(AF.F.getValue());
-//                    turnOffFlags(Flags.ZERO);
+                // TODO: THhis is not needed, only to speedup loading
+                if(PC.getValue() == 0x02ef) {
+                    System.out.println(AF.F.getValue());
+                    turnOffFlags(Flags.ZERO);
 //                    PC.setValue((char) 0x03ae);
-//                }
+                }
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);

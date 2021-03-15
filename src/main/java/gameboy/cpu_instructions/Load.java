@@ -1,6 +1,7 @@
 package gameboy.cpu_instructions;
 
 import gameboy.CPU;
+import gameboy.Flags;
 
 // We suppress this warning because this class and its methods are dynamically imported
 // and therefore IntelliJ doesn't recognize their usage.
@@ -19,7 +20,7 @@ public class Load implements CPUInstructions {
         cpu.memory.write(((higher << 8) | lower) + 1, (byte) cpu.SP.S.getValue());
     }
 
-    @Opcode(value = 0x0A, length = 1, cycles = 8)
+    @Opcode(value = 0x0A, length = 1, cycles = 2)
     public static void ld_a_from_bc(CPU cpu) {
         char a8 = (char) (cpu.memory.read_byte(cpu.BC.getValue()) & 255);
         cpu.AF.A.setValue((byte) a8);
@@ -82,6 +83,11 @@ public class Load implements CPUInstructions {
         cpu.BC.B.setValue((byte) cpu.BC.B.getValue());
     }
 
+    @Opcode(value = 0x44, length = 1, cycles = 1)
+    public static void ld_b_a(CPU cpu) {
+        cpu.BC.B.setValue((byte) cpu.HL.H.getValue());
+    }
+
     @Opcode(value = 0x46, length = 1, cycles = 2)
     public static void ld_b_from_hl(CPU cpu) {
         char d8 = (char) (cpu.memory.read_byte(cpu.HL.getValue()) & 255);
@@ -89,7 +95,7 @@ public class Load implements CPUInstructions {
     }
 
     @Opcode(value = 0x47, length = 1, cycles = 1)
-    public static void ld_b_a(CPU cpu) {
+    public static void ld_b_h(CPU cpu) {
         cpu.BC.B.setValue((byte) cpu.AF.A.getValue());
     }
 
@@ -103,7 +109,12 @@ public class Load implements CPUInstructions {
         cpu.BC.C.setValue((byte) cpu.DE.E.getValue());
     }
 
-    @Opcode(value = 0x4E, length = 1, cycles = 8)
+    @Opcode(value = 0x4D, length = 1, cycles = 1)
+    public static void ld_c_l(CPU cpu) {
+        cpu.BC.C.setValue((byte) cpu.HL.L.getValue());
+    }
+
+    @Opcode(value = 0x4E, length = 1, cycles = 2)
     public static void ld_c_from_hl(CPU cpu) {
         char d8 = (char) (cpu.memory.read_byte(cpu.HL.getValue()) & 255);
         cpu.BC.C.setValue((byte) d8);
@@ -122,6 +133,16 @@ public class Load implements CPUInstructions {
     @Opcode(value = 0x52, length = 1, cycles = 1)
     public static void ld_d_d(CPU cpu) {
         cpu.DE.D.setValue((byte) cpu.DE.D.getValue());
+    }
+
+    @Opcode(value = 0x53, length = 1, cycles = 1)
+    public static void ld_d_e(CPU cpu) {
+        cpu.DE.D.setValue((byte) cpu.DE.E.getValue());
+    }
+
+    @Opcode(value = 0x54, length = 1, cycles = 1)
+    public static void ld_d_h(CPU cpu) {
+        cpu.DE.D.setValue((byte) cpu.HL.H.getValue());
     }
 
     @Opcode(value = 0x55, length = 1, cycles = 1)
@@ -165,6 +186,10 @@ public class Load implements CPUInstructions {
         cpu.DE.E.setValue((byte) cpu.HL.H.getValue());
     }
 
+    @Opcode(value = 0x5D, length = 1, cycles = 1)
+    public static void ld_e_l(CPU cpu) {
+        cpu.DE.E.setValue((byte) cpu.HL.L.getValue());
+    }
 
     @Opcode(value = 0x5E, length = 1, cycles = 2)
     public static void ld_e_from_hl(CPU cpu) {
@@ -284,7 +309,6 @@ public class Load implements CPUInstructions {
         cpu.memory.write(0xFF00 | cpu.BC.C.getValue(), (byte) (cpu.AF.A.getValue()));
     }
 
-
     @Opcode(value = 0xEA, length = 3, cycles = 4)
     public static void ld_into_a16_a(CPU cpu) {
         char lower = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
@@ -292,10 +316,32 @@ public class Load implements CPUInstructions {
         cpu.memory.write((higher << 8) | lower, (byte) cpu.AF.A.getValue());
     }
 
+    @Opcode(value = 0xEE, length = 2, cycles = 2)
+    public static void xor_d8(CPU cpu) {
+        byte d8 = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        cpu.AF.A.setValue((byte)((cpu.AF.A.getValue() ^ d8)&255));
+        if(cpu.AF.getValue() == 0) {
+            cpu.setFlags(Flags.ZERO);
+        } else {
+            cpu.setFlags((byte) 0);
+        }
+    }
+
     @Opcode(value = 0xF0, length = 2, cycles = 3)
     public static void ld_a_from_a8(CPU cpu) {
         char a8 = (char) (cpu.memory.read_byte(cpu.PC.getValue() + 1) & 255);
         cpu.AF.A.setValue(cpu.memory.read_byte(0xFF00 | a8));
+    }
+
+    @Opcode(value = 0xF6, length = 2, cycles = 2)
+    public static void or_d8(CPU cpu) {
+        byte d8 = cpu.memory.read_byte(cpu.PC.getValue() + 1);
+        cpu.AF.A.setValue((byte)((cpu.AF.A.getValue() | d8)&255));
+        if(cpu.AF.getValue() == 0) {
+            cpu.setFlags(Flags.ZERO);
+        } else {
+            cpu.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xFA, length = 3, cycles = 4)

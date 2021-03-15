@@ -26,7 +26,7 @@ public class Gameboy {
         cpu.tick();
         if (cpu.cycles % 300 == 0) {
             screen.loop();
-//            screen_low.loop();
+            screen_low.loop();
         }
     }
 }

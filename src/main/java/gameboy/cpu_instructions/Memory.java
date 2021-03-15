@@ -54,6 +54,12 @@ public class Memory implements CPUInstructions {
         cpu.HL.increment(-1);
     }
 
+    @Opcode(value = 0x3A, length = 1, cycles = 2)
+    public static void ld_a_hl_minus(CPU cpu) {
+        cpu.AF.A.setValue(cpu.memory.read_byte(cpu.HL.getValue()));
+        cpu.HL.increment(-1);
+    }
+
     @Opcode(value = 0x7E, length = 1, cycles = 2)
     public static void ld_a_from_hl(CPU cpu) {
         cpu.AF.A.setValue(cpu.memory.read_byte(cpu.HL.getValue()));

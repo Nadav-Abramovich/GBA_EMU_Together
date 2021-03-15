@@ -23,6 +23,12 @@ public class Memory {
     }
 
     public void write(int address, byte value) {
+        if(address == 0x1C3A) {
+            System.out.println("BAD MEMORY WRITE!");
+            System.out.println(value);
+            System.exit(0);
+        }
+
         if (address == 0xFF01 || address == 0xFF02 || address == 0xFF0F) {
             System.out.println("serial data!");
             System.out.println(value);
