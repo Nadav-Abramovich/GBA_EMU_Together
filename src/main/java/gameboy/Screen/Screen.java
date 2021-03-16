@@ -257,13 +257,6 @@ public class Screen {
             char x = (char) (cpu.memory.read_byte(i + 1) & 255 - 8);
             char tile_index = (char) (cpu.memory.read_byte(i + 2) & 255);
             char attributes = (char) (cpu.memory.read_byte(i + 3) & 255);
-            if (tile_index != 0) {
-                System.out.println("OKKKK");
-                System.out.println(Integer.toHexString(y).toUpperCase());
-                System.out.println(Integer.toHexString(x).toUpperCase());
-                System.out.println(Integer.toHexString((char) (cpu.memory.read_byte(i + 2) & 255)).toUpperCase());
-                System.out.println("OKKKK");
-            }
             char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
             for (int spriteY = 0; spriteY < 8; spriteY++) {
                 for (int spriteX = 0; spriteX < 8; spriteX++) {
@@ -278,7 +271,6 @@ public class Screen {
                     } else if (COLOR == 2) {
                         color = Color.DARK_GRAY.getRGB();
                     } else {
-                        System.out.println(COLOR);
                         color = Color.BLACK.getRGB();
                     }
                     char vertical_y = (char) (cpu.memory.read_byte(0xFF42) & 255);
@@ -298,9 +290,14 @@ public class Screen {
 
         ByteBuffer pixels = screen_buffer.put(temp).flip();
 //        GL11.glPixelZoom(1, 1);
-        glWindowPos2i(0, 0);
+        glWindowPos2i(0, 144-256);
         GL11.glDrawPixels(256, 256, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
 
         glfwSwapBuffers(window); // swap the color buffers
+
+        if (cpu.memory.read_byte(0xFF00) == 0 && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            cpu.memory.write(0xFF00,(byte) 0x01);
+            cpu.memory.write(0xFF0F, (byte)(cpu.memory.read_byte(0xFF0F) | 16));
+        }
     }
 }

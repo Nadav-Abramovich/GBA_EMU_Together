@@ -123,7 +123,6 @@ public class CPU {
         memory.write(0xFF04, (byte)((memory.read_byte(0xFF04)&255) + 1));
         char opcode = get_opcode();
 //         KEYS?
-        memory.write(0xff81, (byte) 0x1);
 //        memory.write(0xff80, (byte) 0x1);
 //        memory.write(0xFF44, (byte)144);
         if (cycles >= performed_cycles) {
@@ -163,17 +162,17 @@ public class CPU {
                     memory.write(interrupt_pointer, current_interrupt_requests);
                 }
 
-                if ((current_interrupt_requests & 16) == 16) {
+                else if ((current_interrupt_requests & 16) == 16) {
                     push_to_stack_d16(this, PC.getValue());
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
-                    current_interrupt_requests &= 255 - 16;
+                    current_interrupt_requests &= (255 - 16);
                     memory.write(interrupt_pointer, current_interrupt_requests);
                 }
 
 
-                if (memory.read_byte(0xFF50) == 1) {
+                else if (memory.read_byte(0xFF50) == 1) {
                     if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
                         push_to_stack_d16(this, PC.getValue());
                         PC.setValue((char) 0x40);

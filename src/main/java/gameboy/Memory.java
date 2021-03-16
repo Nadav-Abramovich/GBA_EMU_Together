@@ -91,9 +91,6 @@ public class Memory {
             }
             return game_rom[address];
         }
-        if (address == 0xFF00) {
-            return _memory[address];
-        }
         return _memory[address];
     }
 
