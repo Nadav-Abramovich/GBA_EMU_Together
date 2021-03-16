@@ -30,11 +30,17 @@ public class Memory {
         }
 
         if (address == 0xFF01 || address == 0xFF02 || address == 0xFF0F) {
-            System.out.println("serial data!");
-            System.out.println(value);
+//            System.out.println("serial data!");
+//            System.out.println(value);
         }
         if (address == 0xFF46) {
-            System.out.println("DMA TRANSFER!");
+            for (int i = 0; i <= 0x9F; i++) {
+//                System.out.println("OK");
+                char src = (char) (((value << 8) | i)&0xFFFF);
+                char dest = (char) ((0xFE00 | i)&0xFFFF);
+                _memory[dest] = _memory[src];
+//                System.out.println("OK2");
+            }
         }
         if (address < 0x2000) {
             System.out.println("BADALACH");
@@ -53,14 +59,14 @@ public class Memory {
             System.out.println("MM");
         }
         if (address == 0xFFFF) {
-            System.out.println("Interrupts");
+//            System.out.println("Interrupts");
         }
         if (address == 0xFF0F) {
-            System.out.println("Interrupts 2");
+//            System.out.println("Interrupts 2");
         }
 
         if (address == 0xFF11) {
-            System.out.println("Interrupts 2");
+//            System.out.println("Interrupts 2");
         }
         if (address == 0xFFB8 || address == 0xFFB9) {
             System.out.println("BANKING 2");
@@ -77,7 +83,7 @@ public class Memory {
 
     public byte read_byte(int address, boolean is_PC) {
         if (address >= 0x4a07 && address <= 0x4b6f) {
-            System.out.println("NOW");
+//            System.out.println("NOW");
         }
         if (address <= 0x7FFF) {
             if (_memory[0xFF50] == 0 && address <= 0xFF) {

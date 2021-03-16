@@ -123,27 +123,28 @@ public class CPU {
         memory.write(0xFF04, (byte)((memory.read_byte(0xFF04)&255) + 1));
         char opcode = get_opcode();
 //         KEYS?
-        memory.write(0xff81, (byte) 0x80);
+        memory.write(0xff81, (byte) 0x1);
+//        memory.write(0xff80, (byte) 0x1);
 //        memory.write(0xFF44, (byte)144);
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);
 
             if (action != null) {
 //                //TODO: replace this with working timing..
-                if (PC.getValue() == 0x6D) {
-                    AF.A.setValue((byte) 145);
-                }
-                if(PC.getValue() >= 0x100) {
-                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
-                }
+//                if (PC.getValue() == 0x6D) {
+//                    AF.A.setValue((byte) 145);
+//                }
+//                if(PC.getValue() >= 0x100) {
+//                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
+//                }
                 execute_action(action, opcode);
 
-                // TODO: THhis is not needed, only to speedup loading
-                if(PC.getValue() == 0x02ef) {
-                    System.out.println(AF.F.getValue());
-                    turnOffFlags(Flags.ZERO);
+                // TODO: This is not needed, only to speedup loading
+//                if(PC.getValue() == 0x02ef) {
+//                    System.out.println(AF.F.getValue());
+//                    turnOffFlags(Flags.ZERO);
 //                    PC.setValue((char) 0x03ae);
-                }
+//                }
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);

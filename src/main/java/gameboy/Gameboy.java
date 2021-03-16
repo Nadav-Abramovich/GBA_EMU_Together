@@ -24,7 +24,7 @@ public class Gameboy {
             cpu.AF.A.setValue((byte) 145);
         }
         cpu.tick();
-        if (cpu.cycles % 300 == 0) {
+        if (cpu.cycles % 3000 == 0) {
             screen.loop();
             screen_low.loop();
         }

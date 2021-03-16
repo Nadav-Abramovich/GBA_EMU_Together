@@ -204,5 +204,15 @@ public class ExtendedInstructions implements CPUInstructions {
     // TODO: implement this
     @Opcode(value = 0xCB27, length = 2, cycles = 2)
     public static void sla_a(CPU cpu) {
+        byte new_lsb = 0;
+
+        if ((cpu.AF.A.getValue() & 128) != 0) {
+            cpu.turnOnFlags(Flags.CARRY);
+        } else {
+            cpu.turnOffFlags(Flags.CARRY);
+        }
+        // todo: CARRY AND VERIFY CARRY OF RLC
+        cpu.AF.A.setValue((byte) (((cpu.AF.A.getValue() << 1)) & 255));
+        cpu.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 }
