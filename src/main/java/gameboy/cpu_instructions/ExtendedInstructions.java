@@ -86,6 +86,19 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
+    @Opcode(value = 0xCB48, length = 2, cycles = 2)
+    public static void bit_1_b(CPU cpu) {
+        int A = (cpu.BC.B.getValue() >> 1) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
     @Opcode(value = 0xCB50, length = 2, cycles = 2)
     public static void bit_2_b(CPU cpu) {
         int C = (cpu.BC.B.getValue() >> 2) & 1;
@@ -112,9 +125,87 @@ public class ExtendedInstructions implements CPUInstructions {
         cpu.turnOnFlags(Flags.HALF_CARRY);
     }
 
+    @Opcode(value = 0xCB60, length = 2, cycles = 2)
+    public static void bit_4_b(CPU cpu) {
+        int A = (cpu.BC.B.getValue() >> 4) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB61, length = 2, cycles = 2)
+    public static void bit_4_c(CPU cpu) {
+        int A = (cpu.BC.C.getValue() >> 4) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB68, length = 2, cycles = 2)
+    public static void bit_5_b(CPU cpu) {
+        int A = (cpu.BC.B.getValue() >> 5) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB69, length = 2, cycles = 2)
+    public static void bit_5_c(CPU cpu) {
+        int A = (cpu.BC.C.getValue() >> 5) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB6F, length = 2, cycles = 2)
+    public static void bit_5_a(CPU cpu) {
+        int A = (cpu.AF.A.getValue() >> 5) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB77, length = 2, cycles = 2)
+    public static void bit_6_a(CPU cpu) {
+        int A = (cpu.AF.A.getValue() >> 6) & 1;
+
+        if (A == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+        cpu.turnOnFlags(Flags.HALF_CARRY);
+    }
+
     @Opcode(value = 0xCB7C, length = 2, cycles = 2)
     public static void bit_7_h(CPU cpu) {
-        int H = (cpu.HL.getValue() >> 15) & 1;
+        int H = (cpu.HL.H.getValue() >> 7) & 1;
 
         if (H == 0) {
             cpu.turnOnFlags(Flags.ZERO);

@@ -192,6 +192,34 @@ public class Memory implements CPUInstructions {
         cpu.turnOffFlags(Flags.SUBTRACTION);
     }
 
+    @Opcode(value = 0x89, length = 1, cycles = 2)
+    public static void adc_a_c(CPU cpu) {
+        int carry_value = 0;
+        if (cpu.AF.isCarryFlagOn()) {
+            carry_value = 1;
+        }
+
+        if ((cpu.AF.A.getValue() + cpu.BC.C.getValue() + carry_value) >= 256) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (((cpu.AF.A.getValue() + cpu.BC.C.getValue()) & 256) != 0) {
+            cpu.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            cpu.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+
+        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() + cpu.BC.C.getValue() + carry_value));
+        if (cpu.AF.A.getValue() == 0) {
+            cpu.turnOnFlags(Flags.ZERO);
+        } else {
+            cpu.turnOffFlags(Flags.ZERO);
+        }
+
+        cpu.turnOffFlags(Flags.SUBTRACTION);
+    }
+
     @Opcode(value = 0x8E, length = 1, cycles = 2)
     public static void adc_a_from_hl(CPU cpu) {
         int carry_value = 0;

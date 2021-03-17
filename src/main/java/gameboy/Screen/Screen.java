@@ -117,19 +117,20 @@ public class Screen {
         this.cpu.memory.write(0xFF44, (byte) ((this.cpu.memory.read_byte(0xFF44) & 255) + 1));
     }
 
-    public void loop() {
-        glfwMakeContextCurrent(window);
-
-        if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
-            if (get_ly() == 144) {
-                draw_screen();
-                // Poll for window events. The key callback above will only be
-                // invoked during this call.
-                glfwPollEvents();
-            }
-            inc_ly();
-            if (get_ly() == 156) {
-                xor_ly();
+    public void loop(int cpu_cycles) {
+        if(cpu_cycles % 3000 == 0) {
+            glfwMakeContextCurrent(window);
+            if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
+                if (get_ly() == 144) {
+                    draw_screen();
+                    // Poll for window events. The key callback above will only be
+                    // invoked during this call.
+                    glfwPollEvents();
+                }
+                inc_ly();
+                if (get_ly() == 156) {
+                    xor_ly();
+                }
             }
         }
     }
@@ -295,8 +296,8 @@ public class Screen {
 
         glfwSwapBuffers(window); // swap the color buffers
 
-        if (cpu.memory.read_byte(0xFF00) == 0 && glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-            cpu.memory.write(0xFF00,(byte) 0x01);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            cpu.memory.write(0xFF00, (byte) 0x01);
             cpu.memory.write(0xFF0F, (byte)(cpu.memory.read_byte(0xFF0F) | 16));
         }
     }

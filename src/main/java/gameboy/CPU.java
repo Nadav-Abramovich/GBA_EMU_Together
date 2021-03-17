@@ -73,7 +73,7 @@ public class CPU {
 ////                System.exit(1);
 //            }
 //            System.out.println("Starting ROM");
-//            PRINT_DEBUG_MESSAGES = true;
+            PRINT_DEBUG_MESSAGES = false;
 
             AF.setValue((char) 0x01b0);
             BC.setValue((char) 0x0013);
@@ -164,10 +164,11 @@ public class CPU {
 
                 else if ((current_interrupt_requests & 16) == 16) {
                     push_to_stack_d16(this, PC.getValue());
+                    System.out.println("NOOWWW");
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
-                    current_interrupt_requests &= (255 - 16);
+                    current_interrupt_requests &= 255 - 16;
                     memory.write(interrupt_pointer, current_interrupt_requests);
                 }
 

@@ -116,7 +116,7 @@ public class Screen_low {
         this.cpu.memory.write(0xFF44, (byte) ((this.cpu.memory.read_byte(0xFF44) & 255) + 1));
     }
 
-    public void loop() {
+    public void loop(int cpu_cycles) {
         glfwMakeContextCurrent(window);
 
         if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
