@@ -8,12 +8,12 @@ public class Gameboy {
     private final CPU cpu;
     private final Screen screen;
 
-//    private final Screen_low screen_low;
+    private final Screen_low screen_low;
 
     public Gameboy() {
         this.cpu = new CPU(_memory, this);
         this.screen = new Screen(cpu);
-//        this.screen_low = new Screen_low(cpu);
+        this.screen_low = new Screen_low(cpu);
     }
 
     public void tick() {
@@ -26,6 +26,6 @@ public class Gameboy {
         cpu.tick();
 
         screen.loop(cpu.cycles);
-//        screen_low.loop(cpu.cycles);
+        screen_low.loop(cpu.cycles);
     }
 }

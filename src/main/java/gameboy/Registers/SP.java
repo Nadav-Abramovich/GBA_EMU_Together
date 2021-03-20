@@ -5,9 +5,10 @@ public class SP extends RegisterPair {
     public Register P = this.lower;
 
 
+    @Override
     public void setValue(char value) {
-        this.lower.setValue((byte) (value & 255));
-        this.higher.setValue((byte) (value >> 8));
+        this.lower.setValue((char) (value & 255));
+        this.higher.setValue((char) ((value >> 8)&255));
     }
 
 

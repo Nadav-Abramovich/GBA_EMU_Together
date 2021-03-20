@@ -4,8 +4,13 @@ import gameboy.cpu_instructions.CPUInstructions;
 import gameboy.cpu_instructions.Opcode;
 import org.reflections.Reflections;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +18,7 @@ import java.util.Set;
 import static gameboy.HelperFunctions.push_to_stack_d16;
 
 public class CPU {
-    public boolean PRINT_DEBUG_MESSAGES = false;
+    public boolean PRINT_DEBUG_MESSAGES = true;
     public static final String CPU_INSTRUCTIONS_PACKAGE_PATH = "gameboy.cpu_instructions";
     public static final String EXECUTED_OPCODE_MSG_FORMAT = "[DEBUG] [0x%s] 0x%s: %s%n";
     public static final String FAILED_TO_EXECUTE_OPCODE_MSG_FORMAT = "[CRITICAL] Failed to execute opcode 0x%s%n";
@@ -28,6 +33,7 @@ public class CPU {
     public gameboy.Registers.PC PC = new gameboy.Registers.PC();
     public final Map<Character, Method> supported_actions = new HashMap<>();
     public boolean IME = false; // Interrupt master enable
+    private PrintWriter writer;
 
 
     public void setFlags(byte value) {
@@ -60,6 +66,11 @@ public class CPU {
                 supported_actions.put(annotation.value(), method);
             }
         }
+        try {
+            writer = new PrintWriter("C:\\temp\\the-file-name.txt", StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private char get_opcode() {
@@ -72,8 +83,8 @@ public class CPU {
 //                System.out.printf("Bad value for [0x%s]:0x%s", Integer.toHexString(0xFF11).toUpperCase(), Integer.toHexString(Byte.toUnsignedInt(memory.read_byte(0xFF11))).toUpperCase());
 ////                System.exit(1);
 //            }
-//            System.out.println("Starting ROM");
-            PRINT_DEBUG_MESSAGES = false;
+            System.out.println("Starting ROM");
+            PRINT_DEBUG_MESSAGES = true;
 
             AF.setValue((char) 0x01b0);
             BC.setValue((char) 0x0013);
@@ -103,7 +114,7 @@ public class CPU {
     private void execute_action(Method action, char opcode) {
         try {
             if (PRINT_DEBUG_MESSAGES) {
-                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
+                writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));;
             }
 
             action.invoke(null, this);
@@ -124,26 +135,19 @@ public class CPU {
         char opcode = get_opcode();
 //         KEYS?
 //        memory.write(0xff80, (byte) 0x1);
-//        memory.write(0xFF44, (byte)144);
+        memory.write(0xFF44, (byte)144);
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);
 
             if (action != null) {
 //                //TODO: replace this with working timing..
-//                if (PC.getValue() == 0x6D) {
-//                    AF.A.setValue((byte) 145);
-//                }
+                if (PC.getValue() == 0x6D) {
+                    AF.A.setValue((byte) 145);
+                }
 //                if(PC.getValue() >= 0x100) {
 //                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
 //                }
                 execute_action(action, opcode);
-
-                // TODO: This is not needed, only to speedup loading
-//                if(PC.getValue() == 0x02ef) {
-//                    System.out.println(AF.F.getValue());
-//                    turnOffFlags(Flags.ZERO);
-//                    PC.setValue((char) 0x03ae);
-//                }
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
@@ -168,7 +172,7 @@ public class CPU {
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
-                    current_interrupt_requests &= 255 - 16;
+                    current_interrupt_requests &= (255 - 16);
                     memory.write(interrupt_pointer, current_interrupt_requests);
                 }
 

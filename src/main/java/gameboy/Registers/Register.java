@@ -7,6 +7,10 @@ public class Register {
         return (char) (value & 255);
     }
 
+    public void setValue(char newValue) {
+        this.value = (byte) (newValue & 255);
+    }
+
     public void setValue(byte newValue) {
         this.value = newValue;
     }

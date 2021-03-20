@@ -3,139 +3,55 @@ package gameboy.cpu_instructions;
 import gameboy.CPU;
 import gameboy.Flags;
 
+import static gameboy.HelperFunctions.add_register;
+
 // We suppress this warning because this class and its methods are dynamically imported
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class Decrements implements CPUInstructions {
     @Opcode(value = 0x05, length = 1, cycles = 1)
     public static void dec_b(CPU cpu) {
-        char current_value = cpu.BC.B.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.BC.B.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.BC.B, 1, false, true);
     }
 
     @Opcode(value = 0x0B, length = 1, cycles = 2)
     public static void dec_bc(CPU cpu) {
-        cpu.BC.increment(-1);
+        add_register(cpu, cpu.BC, 1, false, true);
     }
 
     @Opcode(value = 0x0D, length = 1, cycles = 1)
     public static void dec_c(CPU cpu) {
-        char current_value = cpu.BC.C.getValue();
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.BC.C.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.BC.C, 1, false, true);
     }
 
     @Opcode(value = 0x15, length = 1, cycles = 1)
     public static void dec_d(CPU cpu) {
-        char current_value = cpu.DE.D.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.DE.D.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.DE.D, 1, false, true);
     }
 
     @Opcode(value = 0x1B, length = 1, cycles = 2)
     public static void dec_de(CPU cpu) {
-        cpu.DE.increment(-1);
+        add_register(cpu, cpu.DE, 1, false, true);
     }
 
     @Opcode(value = 0x1D, length = 1, cycles = 1)
     public static void dec_e(CPU cpu) {
-        char current_value = cpu.DE.E.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.DE.E.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.DE.E, 1, false, true);
     }
 
     @Opcode(value = 0x2D, length = 1, cycles = 1)
     public static void dec_l(CPU cpu) {
-        char current_value = cpu.HL.L.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.HL.L.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.HL.L, 1, false, true);
     }
 
     @Opcode(value = 0x25, length = 1, cycles = 1)
     public static void dec_h(CPU cpu) {
-        char current_value = cpu.HL.H.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.HL.H.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.HL.H, 1, false, true);
     }
 
     @Opcode(value = 0x2B, length = 1, cycles = 2)
     public static void dec_hl(CPU cpu) {
-        char current_value = cpu.HL.getValue();
-        current_value -= 1;
-        cpu.HL.setValue(current_value);
+        add_register(cpu, cpu.HL, 1, false, true);
     }
 
     @Opcode(value = 0x35, length = 1, cycles = 3)
@@ -159,20 +75,6 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x3D, length = 1, cycles = 1)
     public static void dec_a(CPU cpu) {
-        byte current_value = (byte)cpu.AF.A.getValue();
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.HALF_CARRY);
-        } else {
-            cpu.turnOffFlags(Flags.HALF_CARRY);
-        }
-
-        current_value -= 1;
-        cpu.AF.A.setValue(current_value);
-        if (current_value == 0) {
-            cpu.turnOnFlags(Flags.ZERO);
-        } else {
-            cpu.turnOffFlags(Flags.ZERO);
-        }
-        cpu.turnOnFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.AF.A, 1, false, true);
     }
 }

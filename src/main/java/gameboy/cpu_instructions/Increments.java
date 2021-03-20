@@ -3,6 +3,8 @@ package gameboy.cpu_instructions;
 import gameboy.CPU;
 import gameboy.Flags;
 
+import static gameboy.HelperFunctions.add_register;
+
 // We suppress this warning because this class and its methods are dynamically imported
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
@@ -14,29 +16,13 @@ public class Increments implements CPUInstructions {
 
     @Opcode(value = 0x04, length = 1, cycles = 1)
     public static void inc_b(CPU cpu) {
-        char current_value = cpu.BC.B.getValue();
-        current_value += 1;
-        cpu.BC.B.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.BC.B, 1, false, false);
     }
 
 
     @Opcode(value = 0x0C, length = 1, cycles = 1)
     public static void inc_c(CPU cpu) {
-        char current_value = cpu.BC.C.getValue();
-        current_value += 1;
-        cpu.BC.C.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.BC.C, 1, false, false);
     }
 
     @Opcode(value = 0x13, length = 1, cycles = 1)
@@ -46,15 +32,7 @@ public class Increments implements CPUInstructions {
 
     @Opcode(value = 0x1C, length = 1, cycles = 1)
     public static void inc_e(CPU cpu) {
-        char current_value = cpu.DE.E.getValue();
-        current_value += 1;
-        cpu.DE.E.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.DE.E, 1, false, false);
     }
 
 
@@ -65,28 +43,12 @@ public class Increments implements CPUInstructions {
 
     @Opcode(value = 0x24, length = 1, cycles = 1)
     public static void inc_h(CPU cpu) {
-        char current_value = cpu.HL.H.getValue();
-        current_value += 1;
-        cpu.HL.H.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.HL.H, 1, false, false);
     }
 
     @Opcode(value = 0x2C, length = 1, cycles = 1)
     public static void inc_l(CPU cpu) {
-        char current_value = cpu.HL.L.getValue();
-        current_value += 1;
-        cpu.HL.L.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.HL.L, 1, false, false);
     }
 
     @Opcode(value = 0x34, length = 1, cycles = 3)
@@ -104,15 +66,6 @@ public class Increments implements CPUInstructions {
 
     @Opcode(value = 0x3C, length = 1, cycles = 1)
     public static void inc_a(CPU cpu) {
-        char current_value = cpu.AF.A.getValue();
-        current_value += 1;
-        cpu.AF.A.setValue((byte) current_value);
-        if ((current_value & 255) == 0) {
-            cpu.turnOnFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            cpu.turnOffFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        }
-        cpu.turnOffFlags(Flags.SUBTRACTION);
+        add_register(cpu, cpu.AF.A, 1, false, false);
     }
-
 }

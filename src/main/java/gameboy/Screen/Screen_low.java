@@ -117,14 +117,17 @@ public class Screen_low {
     }
 
     public void loop(int cpu_cycles) {
-        glfwMakeContextCurrent(window);
+        if(cpu_cycles % 3000 == 0) {
 
-        if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
-            if (get_ly() == 144) {
-                draw_screen();
-                // Poll for window events. The key callback above will only be
-                // invoked during this call.
-                glfwPollEvents();
+            glfwMakeContextCurrent(window);
+
+            if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
+                if (get_ly() == 144) {
+                    draw_screen();
+                    // Poll for window events. The key callback above will only be
+                    // invoked during this call.
+                    glfwPollEvents();
+                }
             }
         }
     }
