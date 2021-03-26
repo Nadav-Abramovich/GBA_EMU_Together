@@ -1,7 +1,7 @@
 package gameboy.Screen;
 
 import gameboy.CPU;
-import org.lwjgl.Version;
+import gameboy.Keys;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL14.glWindowPos2i;
@@ -20,15 +19,13 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Screen {
-    private static CPU cpu = null;
     // The window handle
-    private final long window;
-    byte[][][] screen = new byte[256][256][4];
-    ByteBuffer screen_buffer = ByteBuffer.allocateDirect(256 * 256 * 4);
-    ByteBuffer pixels =  ByteBuffer.allocateDirect(256 * 256 * 4);
+    private static long window;
+    static byte[][][] screen = new byte[256][256][4];
+    static ByteBuffer screen_buffer = ByteBuffer.allocateDirect(256 * 256 * 4);
+    static ByteBuffer pixels = ByteBuffer.allocateDirect(256 * 256 * 4);
 
-    public Screen(CPU cpu) {
-        Screen.cpu = cpu;
+    public static void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
 //        GLFWErrorCallback.createPrint(System.err).set();
@@ -43,6 +40,7 @@ public class Screen {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
+        System.out.println("CREATING");
         window = glfwCreateWindow(160, 144, "GameBoy!", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
@@ -92,54 +90,75 @@ public class Screen {
         glfwSetKeyCallback(window, keyboard);
     }
 
-    private static final GLFWKeyCallback keyboard = new GLFWKeyCallback()
-    {
+    private static final GLFWKeyCallback keyboard = new GLFWKeyCallback() {
         @Override
-        public void invoke(long window, int key, int scancode, int action, int mods)
-        {
-            if(action == GLFW_PRESS) {
-                System.out.println(key);
-
-                if (key == GLFW_KEY_A) {
-                    System.out.println("GLFW_KEY_A");
-                    cpu.memory.write(0xFF00, (byte) 0x01);
-                    cpu.memory.write(0xFF0F, (byte) (cpu.memory.read_byte(0xFF0F) | 16));
+        public void invoke(long window, int key, int scancode, int action, int mods) {
+            //;  $80 - Start   $8 - Down
+            //;  $40 - Select  $4 - Up
+            //;  $20 - B       $2 - Left
+            //;  $10 - A       $1 - Right
+            if (action == GLFW_PRESS) {
+                if (key == GLFW_KEY_ENTER) {
+                    CPU.memory.keys_pressed = (byte) 0x80;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_BACKSPACE) {
+                    CPU.memory.keys_pressed = (byte) 0x40;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_A) {
+                    CPU.memory.keys_pressed = (byte) 0x10;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_S) {
+                    CPU.memory.keys_pressed = (byte) 0x20;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_DOWN) {
+                    CPU.memory.keys_pressed = Keys.DOWN.value;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_UP) {
+                    CPU.memory.keys_pressed = Keys.UP.value;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_LEFT) {
+                    CPU.memory.keys_pressed = Keys.LEFT.value;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
+                } else if (key == GLFW_KEY_RIGHT) {
+                    CPU.memory.keys_pressed = Keys.RIGHT.value;
+                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 }
+            } else if (action == GLFW_RELEASE) {
+                CPU.memory.keys_pressed = (byte) 0x0;
+                CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
             }
         }
     };
 
-    private static char get_ly() {
-        return (char) (cpu.memory.read_byte(0xFF44) & 255);
+    public static char get_ly() {
+        return (char) (CPU.memory.read_byte(0xFF44) & 255);
     }
 
     private static void xor_ly() {
-        cpu.memory.write(0xFF44, (byte) 0);
+        CPU.memory.write(0xFF44, (byte) 0);
     }
 
     private static void inc_ly() {
-        cpu.memory.write(0xFF44, (byte) ((cpu.memory.read_byte(0xFF44) & 255) + 1));
+        CPU.memory.write(0xFF44, (byte) ((CPU.memory.read_byte(0xFF44) & 255) + 1));
     }
 
-    public void loop(int cpu_cycles) {
-        if(cpu_cycles % 3000 == 0) {
-            glfwMakeContextCurrent(window);
-            if (((cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
-                if (get_ly() == 144) {
-                    draw_screen(cpu_cycles);
-                    // Poll for window events. The key callback above will only be
-                    // invoked during this call.
-                    glfwPollEvents();
-                }
-                inc_ly();
-                if (get_ly() == 156) {
-                    xor_ly();
-                }
+    public static void loop() {
+        if (((CPU.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
+            if (get_ly() == 144) {
+                draw_screen();
             }
         }
+        inc_ly();
+        if (get_ly() == 154) {
+            xor_ly();
+        }
+        // Poll for window events. The key callback above will only be
+        // invoked during this call.
+        glfwPollEvents();
+
     }
 
-    private void putPixel(int x, int y, int line, int col, int color) {
+    private static void putPixel(int x, int y, int line, int col, int color) {
         int width = 256;
 
         int real_x = x * 8 + (8 - col);
@@ -153,7 +172,7 @@ public class Screen {
         }
     }
 
-    private void putPixel2(int x, int y, int line, int col, int color) {
+    private static void putPixel2(int x, int y, int line, int col, int color) {
         int width = 256;
         int real_x = x + (8 - col);
 
@@ -167,129 +186,131 @@ public class Screen {
     }
 
 
-    private void draw_screen(int cpu_cycles) {
+    private static void draw_screen() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-//        cpu.memory.write(0xFF44, (byte) (cpu.memory.read_byte(0xFF44) + 1));
-        if(cpu_cycles % 3000 == 0) {
-            screen = new byte[256][256][4];
-            for (int x = 0; x < 256; x++) {
-                for (int y = 0; y < 256; y++) {
-                    screen[x][y][0] = (byte) ((Color.WHITE.getRGB() >> 16) & 255);
-                    screen[x][y][1] = (byte) ((Color.WHITE.getRGB() >> 8) & 255);
-                    screen[x][y][2] = (byte) (Color.WHITE.getRGB() & 255);
-                    screen[x][y][3] = (byte) ((Color.WHITE.getRGB() >> 24) & 255);
-                }
+//        CPU.memory.write(0xFF44, (byte) (CPU.memory.read_byte(0xFF44) + 1));
+
+        screen = new byte[256][256][4];
+        for (int x = 0; x < 256; x++) {
+            for (int y = 0; y < 256; y++) {
+                screen[x][y][0] = (byte) ((Color.WHITE.getRGB() >> 16) & 255);
+                screen[x][y][1] = (byte) ((Color.WHITE.getRGB() >> 8) & 255);
+                screen[x][y][2] = (byte) (Color.WHITE.getRGB() & 255);
+                screen[x][y][3] = (byte) ((Color.WHITE.getRGB() >> 24) & 255);
             }
-            screen_buffer = ByteBuffer.allocateDirect(screen.length);
+        }
+        screen_buffer = ByteBuffer.allocateDirect(screen.length);
 
-            // Background
-            for (int y = 0; y < 32; y++) {
-                for (int x = 0; x < 32; x++) {
-                    int val = cpu.memory.read_byte(0x9800 + y * 32 + x) & 255;
-                    if (val != 0) {
-                        int sprite_pointer = 0x8000 + 0x10 * val;
+        // Background
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                int val = CPU.memory.read_byte(0x9800 + y * 32 + x) & 255;
+                if (val != 0) {
+                    int sprite_pointer = 0x8000 + 0x10 * val;
 
-                        for (int line = 0; line < 8; line++) {
-                            for (int col = 0; col < 8; col++) {
-                                int LOWER = (cpu.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
-                                int HIGHER = (cpu.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
-                                int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
-                                int color;
-                                if (COLOR == 0) {
-                                    color = Color.WHITE.getRGB();
-                                } else if (COLOR == 1) {
-                                    color = Color.LIGHT_GRAY.getRGB();
-                                } else if (COLOR == 2) {
-                                    color = Color.DARK_GRAY.getRGB();
-                                } else {
-                                    color = Color.BLACK.getRGB();
-                                }
-                                //                                    int color = switch (COLOR) {
-                                //                                        case 0 -> Color.WHITE.getRGB();
-                                //                                        case 1 -> Color.BLACK.getRGB();
-                                //                                        case 2 -> Color.GREEN.getRGB();
-                                //                                        case 3 -> Color.RED.getRGB();
-                                //                                        default -> Color.BLUE.getRGB();
-                                //                                    };
-                                char vertical_y = (char) (cpu.memory.read_byte(0xFF42) & 255);
-                                putPixel(x, y, line, col, color);
+                    for (int line = 0; line < 8; line++) {
+                        for (int col = 0; col < 8; col++) {
+                            int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
+                            int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
+                            int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
+                            int color;
+                            if (COLOR == 0) {
+                                color = Color.WHITE.getRGB();
+                            } else if (COLOR == 1) {
+                                color = Color.LIGHT_GRAY.getRGB();
+                            } else if (COLOR == 2) {
+                                color = Color.DARK_GRAY.getRGB();
+                            } else {
+                                color = Color.BLACK.getRGB();
                             }
+                            //                                    int color = switch (COLOR) {
+                            //                                        case 0 -> Color.WHITE.getRGB();
+                            //                                        case 1 -> Color.BLACK.getRGB();
+                            //                                        case 2 -> Color.GREEN.getRGB();
+                            //                                        case 3 -> Color.RED.getRGB();
+                            //                                        default -> Color.BLUE.getRGB();
+                            //                                    };
+                            char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
+                            putPixel(x, y, line, col, color);
                         }
                     }
                 }
             }
-            //
+        }
+        //
 
-            // Window
-            for (int y = 0; y < 32; y++) {
-                for (int x = 0; x < 32; x++) {
-                    byte val = cpu.memory.read_byte(0x9C00 + y * 32 + x);
-                    if (val != 0) {
-                        var sprite_pointer = 0x8000 + 0x10 * val;
+        // Window
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                byte val = CPU.memory.read_byte(0x9C00 + y * 32 + x);
+                if (val != 0) {
+                    var sprite_pointer = 0x8000 + 0x10 * val;
 
-                        for (int line = 0; line < 8; line++) {
-                            for (int col = 0; col < 8; col++) {
-                                int LOWER = (cpu.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
-                                int HIGHER = (cpu.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
-                                int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
-                                int color;
-                                if (COLOR == 0) {
-                                    color = Color.WHITE.getRGB();
-                                } else if (COLOR == 1) {
-                                    color = Color.LIGHT_GRAY.getRGB();
-                                } else if (COLOR == 2) {
-                                    color = Color.DARK_GRAY.getRGB();
-                                } else {
-                                    color = Color.BLACK.getRGB();
-                                }
-                                //                                    int color = switch (COLOR) {
-                                //                                        case 0 -> Color.WHITE.getRGB();
-                                //                                        case 1 -> Color.BLACK.getRGB();
-                                //                                        case 2 -> Color.GREEN.getRGB();
-                                //                                        case 3 -> Color.RED.getRGB();
-                                //                                        default -> Color.BLUE.getRGB();
-                                //                                    };
-                                putPixel(x, y, line, col, color);
+                    for (int line = 0; line < 8; line++) {
+                        for (int col = 0; col < 8; col++) {
+                            int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
+                            int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
+                            int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
+                            int color;
+                            if (COLOR == 0) {
+                                color = Color.WHITE.getRGB();
+                            } else if (COLOR == 1) {
+                                color = Color.LIGHT_GRAY.getRGB();
+                            } else if (COLOR == 2) {
+                                color = Color.DARK_GRAY.getRGB();
+                            } else {
+                                color = Color.BLACK.getRGB();
                             }
+                            //                                    int color = switch (COLOR) {
+                            //                                        case 0 -> Color.WHITE.getRGB();
+                            //                                        case 1 -> Color.BLACK.getRGB();
+                            //                                        case 2 -> Color.GREEN.getRGB();
+                            //                                        case 3 -> Color.RED.getRGB();
+                            //                                        default -> Color.BLUE.getRGB();
+                            //                                    };
+                            putPixel(x, y, line, col, color);
                         }
                     }
+                }
+            }
+        }
+
+        for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
+            char y = (char) ((CPU.memory.read_byte(i) & 255) - 16);
+            char x = (char) (CPU.memory.read_byte(i + 1) & 255 - 8);
+            char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
+            if (tile_index == 0)
+                continue;
+            char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
+            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
+            for (int spriteY = 0; spriteY < 8; spriteY++) {
+                for (int spriteX = 0; spriteX < 8; spriteX++) {
+                    int LOWER = (CPU.memory.read_byte(sprite_pointer + spriteY * 2) & 255) & (1 << spriteX);
+                    int HIGHER = (CPU.memory.read_byte(sprite_pointer + spriteY * 2 + 1) & 255) & (1 << spriteX);
+                    int COLOR = ((HIGHER << 1) | (LOWER)) >> spriteX;
+                    int color;
+                    if (COLOR == 0) {
+                        color = Color.WHITE.getRGB();
+                    } else if (COLOR == 1) {
+                        color = Color.LIGHT_GRAY.getRGB();
+                    } else if (COLOR == 2) {
+                        color = Color.DARK_GRAY.getRGB();
+                    } else {
+                        color = Color.BLACK.getRGB();
+                    }
+                    char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
+                    putPixel2(x, y, spriteY, spriteX, color);
+                }
+            }
+        }
+        byte[] temp = new byte[256 * 256 * 4];
+        for (int y = 0; y < 255; y++) {
+            for (int x = 0; x < 255; x++) {
+                for (int z = 0; z < 4; z++) {
+                    temp[(y * 256 + x) * 4 + z] = screen[y][x][z];
                 }
             }
 
-            for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
-                char y = (char) ((cpu.memory.read_byte(i) & 255) - 16);
-                char x = (char) (cpu.memory.read_byte(i + 1) & 255 - 8);
-                char tile_index = (char) (cpu.memory.read_byte(i + 2) & 255);
-                char attributes = (char) (cpu.memory.read_byte(i + 3) & 255);
-                char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
-                for (int spriteY = 0; spriteY < 8; spriteY++) {
-                    for (int spriteX = 0; spriteX < 8; spriteX++) {
-                        int LOWER = (cpu.memory.read_byte(sprite_pointer + spriteY * 2) & 255) & (1 << spriteX);
-                        int HIGHER = (cpu.memory.read_byte(sprite_pointer + spriteY * 2 + 1) & 255) & (1 << spriteX);
-                        int COLOR = ((HIGHER << 1) | (LOWER)) >> spriteX;
-                        int color;
-                        if (COLOR == 0) {
-                            color = Color.WHITE.getRGB();
-                        } else if (COLOR == 1) {
-                            color = Color.LIGHT_GRAY.getRGB();
-                        } else if (COLOR == 2) {
-                            color = Color.DARK_GRAY.getRGB();
-                        } else {
-                            color = Color.BLACK.getRGB();
-                        }
-                        char vertical_y = (char) (cpu.memory.read_byte(0xFF42) & 255);
-                        putPixel2(x, y, spriteY, spriteX, color);
-                    }
-                }
-            }
-            byte[] temp = new byte[256 * 256 * 4];
-            for (int y = 0; y < 255; y++) {
-                for (int x = 0; x < 255; x++) {
-                    for (int z = 0; z < 4; z++) {
-                        temp[(y * 256 + x) * 4 + z] = screen[y][x][z];
-                    }
-                }
-            }
             ByteBuffer screen_buffer = ByteBuffer.allocateDirect(temp.length);
 
             pixels = screen_buffer.put(temp).flip();

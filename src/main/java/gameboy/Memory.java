@@ -14,7 +14,9 @@ public class Memory {
     public final byte[] boot_rom = new byte[0xFF + 1];
     public final byte[] game_rom = new byte[0xFFFFFF];
     public final int MEMORY_LENGTH = 0xFFFF + 1;
+    public static boolean actions_buttons_selected = false;
 
+    public byte keys_pressed = 0;
 
     public Memory() {
         _memory = new byte[MEMORY_LENGTH];
@@ -23,21 +25,29 @@ public class Memory {
     }
 
     public void write(int address, byte value) {
-        if(address == 0x1C3A) {
+        if (address == 0xFF00) {
+            // Action buttons
+            if (value == 32 || value == 48) {
+                actions_buttons_selected = true;
+            }
+            // direction keys
+            else if (value == 16) {
+                actions_buttons_selected = false;
+            } else {
+                System.out.println("Bad value written to 0xff00");
+            }
+        }
+        if (address == 0x1C3A) {
             System.out.println("BAD MEMORY WRITE!");
             System.out.println(value);
             System.exit(0);
         }
 
-        if (address == 0xFF01 || address == 0xFF02 || address == 0xFF0F) {
-//            System.out.println("serial data!");
-//            System.out.println(value);
-        }
         if (address == 0xFF46) {
             for (int i = 0; i <= 0x9F; i++) {
 //                System.out.println("OK");
-                char src = (char) (((value << 8) | i)&0xFFFF);
-                char dest = (char) ((0xFE00 | i)&0xFFFF);
+                char src = (char) (((value << 8) | i) & 0xFFFF);
+                char dest = (char) ((0xFE00 | i) & 0xFFFF);
                 _memory[dest] = _memory[src];
 //                System.out.println("OK2");
             }
@@ -46,17 +56,17 @@ public class Memory {
 //            System.out.println("BADALACH");
         }
         if (address >= 0x2000 && address <= 0x3FFF) {
-//            System.out.println("OPALACH");
+            System.out.println("OPALACH");
             bank_number = value & 0x7F;
             if (value == 0) {
                 bank_number = 1;
             }
 //            System.out.println(bank_number);
         } else if (address <= 0x7FFF) {
-//            System.out.println("MANDALACH");
+            System.out.println("MANDALACH");
         }
         if (address == 0xFF50) {
-//            System.out.println("MM");
+            System.out.println("MM");
         }
         if (address == 0xFFFF) {
 //            System.out.println("Interrupts");
@@ -69,10 +79,10 @@ public class Memory {
 //            System.out.println("Interrupts 2");
         }
         if (address == 0xFFB8 || address == 0xFFB9) {
-//            System.out.println("BANKING 2");
+            System.out.println("BANKING 2");
         }
         if (address == 0xC000 || address == 0xC09F) {
-//            System.out.println("TRANSFER");
+            System.out.println("TRANSFER");
         }
         _memory[address] = value;
     }
@@ -82,6 +92,18 @@ public class Memory {
     }
 
     public byte read_byte(int address, boolean is_PC) {
+        // KEYS
+        if (address == 0xFF00) {
+            // Action
+            if (actions_buttons_selected) {
+                return (byte) (keys_pressed & 15);
+            }
+            // Direction
+            return (byte) ((keys_pressed >> 4) & 15);
+        }
+        if (address == 0xFF81) {
+            return keys_pressed;
+        }
         if (address >= 0x4a07 && address <= 0x4b6f) {
 //            System.out.println("NOW");
         }

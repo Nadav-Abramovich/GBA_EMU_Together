@@ -18,15 +18,12 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Screen_low {
-    private final CPU cpu;
     // The window handle
     private final long window;
     byte[] screen = new byte[(256 * 256) * 4];
     ByteBuffer screen_buffer = ByteBuffer.allocateDirect(screen.length);
 
-    public Screen_low(CPU cpu) {
-        this.cpu = cpu;
-
+    public Screen_low() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
 //        GLFWErrorCallback.createPrint(System.err).set();
@@ -105,23 +102,23 @@ public class Screen_low {
     }
 
     private char get_ly() {
-        return (char) (this.cpu.memory.read_byte(0xFF44) & 255);
+        return (char) (CPU.memory.read_byte(0xFF44) & 255);
     }
 
     private void xor_ly() {
-        this.cpu.memory.write(0xFF44, (byte) 0);
+        CPU.memory.write(0xFF44, (byte) 0);
     }
 
     private void inc_ly() {
-        this.cpu.memory.write(0xFF44, (byte) ((this.cpu.memory.read_byte(0xFF44) & 255) + 1));
+        CPU.memory.write(0xFF44, (byte) ((CPU.memory.read_byte(0xFF44) & 255) + 1));
     }
 
-    public void loop(int cpu_cycles) {
-        if(cpu_cycles % 3000 == 0) {
+    public void loop() {
+        if(CPU.cycles % 3000 == 0) {
 
             glfwMakeContextCurrent(window);
 
-            if (((this.cpu.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
+            if (((CPU.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
                 if (get_ly() == 144) {
                     draw_screen();
                     // Poll for window events. The key callback above will only be
@@ -135,7 +132,7 @@ public class Screen_low {
     private void putPixel(int x, int y, int line, int col, int color) {
         int width = 32 * 8;
         int real_x = x * 8 - col + 8;
-        byte vertical_y = cpu.memory.read_byte(0xFF42);
+        byte vertical_y = CPU.memory.read_byte(0xFF42);
 
         int real_y = width - 30 - (y * 8 + line) + vertical_y - 100 + 16;
         if (real_y > 0 && real_x > 0) {
@@ -165,7 +162,7 @@ public class Screen_low {
         screen_buffer = ByteBuffer.allocateDirect(screen.length);
         int val = 0;
         // Background
-//        System.out.println(cpu.memory.read_byte(0xFF0F));
+//        System.out.println(CPU.memory.read_byte(0xFF0F));
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 16; x++) {
                 val++;
@@ -173,8 +170,8 @@ public class Screen_low {
 
                 for (int line = 0; line < 8; line++) {
                     for (int col = 0; col < 8; col++) {
-                        int LOWER = (cpu.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
-                        int HIGHER = (cpu.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
+                        int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
+                        int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
                         int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
                         int color;
                         if (COLOR == 0) {

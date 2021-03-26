@@ -8,83 +8,83 @@ import gameboy.Flags;
 @SuppressWarnings("unused")
 public class Ors implements CPUInstructions {
     @Opcode(value = 0xB0, length = 1, cycles = 1)
-    public static void or_b(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.BC.B.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_b() {
+        CPU.AF.A.setValue((byte) (CPU.BC.B.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB1, length = 1, cycles = 1)
-    public static void or_c(CPU cpu) {
-        cpu.AF.A.setValue((byte) (((255 & cpu.BC.C.getValue()) | (255 & cpu.AF.A.getValue()))));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_c() {
+        CPU.AF.A.setValue((byte) (((255 & CPU.BC.C.getValue()) | (255 & CPU.AF.A.getValue()))));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB2, length = 1, cycles = 1)
-    public static void or_d(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.DE.D.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_d() {
+        CPU.AF.A.setValue((byte) (CPU.DE.D.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB3, length = 1, cycles = 1)
-    public static void or_e(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.DE.E.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_e() {
+        CPU.AF.A.setValue((byte) (CPU.DE.E.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB3, length = 1, cycles = 1)
-    public static void or_h(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.HL.H.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_h() {
+        CPU.AF.A.setValue((byte) (CPU.HL.H.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB5, length = 1, cycles = 1)
-    public static void or_l(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.HL.L.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_l() {
+        CPU.AF.A.setValue((byte) (CPU.HL.L.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
 
     @Opcode(value = 0xB6, length = 1, cycles = 2)
-    public static void or_from_hl(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.memory.read_byte(cpu.HL.getValue()) | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_from_hl() {
+        CPU.AF.A.setValue((byte) (CPU.memory.read_byte(CPU.HL.getValue()) | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 
     @Opcode(value = 0xB7, length = 1, cycles = 1)
-    public static void or_a(CPU cpu) {
-        cpu.AF.A.setValue((byte) (cpu.AF.A.getValue() | cpu.AF.A.getValue()));
-        if (cpu.AF.A.getValue() == 0) {
-            cpu.setFlags(Flags.ZERO);
+    public static void or_a() {
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() | CPU.AF.A.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
         } else {
-            cpu.setFlags((byte) 0);
+            CPU.setFlags((byte) 0);
         }
     }
 }

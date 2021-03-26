@@ -7,6 +7,6 @@ import gameboy.CPU;
 @SuppressWarnings("unused")
 public class NOP implements CPUInstructions {
     @Opcode(value = 0x0, length = 1, cycles = 1)
-    public static void nop(CPU cpu) {
+    public static void nop() {
     }
 }
