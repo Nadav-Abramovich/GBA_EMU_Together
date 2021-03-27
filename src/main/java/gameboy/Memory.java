@@ -7,7 +7,7 @@ public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "ROMS/Tetris.gb";
+    public static final String GAME_ROM_PATH = "ROMS/tetris.gb";
     private int bank_number = 1;
 
     private final byte[] _memory;
@@ -56,7 +56,7 @@ public class Memory {
 //            System.out.println("BADALACH");
         }
         if (address >= 0x2000 && address <= 0x3FFF) {
-            System.out.println("OPALACH");
+            System.out.println("OPALACH " + Integer.toHexString(value).toUpperCase());
             bank_number = value & 0x7F;
             if (value == 0) {
                 bank_number = 1;
@@ -111,7 +111,10 @@ public class Memory {
             if (_memory[0xFF50] == 0 && address <= 0xFF) {
                 return boot_rom[address];
             }
-            return game_rom[address];
+            if(address <= 0x3FFF) {
+                return game_rom[address];
+            }
+            return game_rom[(0x7FFF - 0x4000 + 1) * (bank_number-1) + address];
         }
         return _memory[address];
     }

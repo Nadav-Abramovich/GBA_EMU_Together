@@ -168,4 +168,28 @@ public class Subtracts implements CPUInstructions {
 
         CPU.turnOnFlags(Flags.SUBTRACTION);
     }
+
+    @Opcode(value = 0x98, length = 1, cycles = 1)
+    public static void sbc_a_b() {
+        char new_value = (char) (CPU.AF.A.getValue() & 255);
+        char carry_value = 0;
+        if(CPU.AF.isCarryFlagOn()) {
+            carry_value = 1;
+        }
+        // TODO: Are these 2 flags correct?
+        if (new_value < ((CPU.BC.B.getValue() + carry_value) & 255)) {
+            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        new_value -= CPU.BC.B.getValue() & 255 + carry_value;
+        CPU.AF.A.setValue((byte) new_value);
+        if ((new_value & 255) == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+
+        CPU.turnOnFlags(Flags.SUBTRACTION);
+    }
 }

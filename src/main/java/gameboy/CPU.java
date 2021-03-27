@@ -4,10 +4,8 @@ import gameboy.cpu_instructions.CPUInstructions;
 import gameboy.cpu_instructions.Opcode;
 import org.reflections.Reflections;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -114,9 +112,9 @@ public class CPU {
     private static void execute_action(Method action, char opcode) {
         try {
             if (PRINT_DEBUG_MESSAGES) {
-//                if(IME) {
+                if (IME) {
                     writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
-//                }
+                }
             }
 
             action.invoke(null);
@@ -134,7 +132,7 @@ public class CPU {
     public static void tick() {
         // make time tick?
 //        System.out.println(1234);
-        memory.write(0xFF04, (byte)((memory.read_byte(0xFF04)&255) + 1));
+        memory.write(0xFF04, (byte) ((memory.read_byte(0xFF04) & 255) + 1));
         char opcode = get_opcode();
 //         KEYS?
 //        memory.write(0xff80, (byte) 0x1);
@@ -147,7 +145,7 @@ public class CPU {
 //                if (PC.getValue() == 0x6D) {
 //                    AF.A.setValue((byte) 145);
 //                }
-                if(PC.getValue() >= 0x100) {
+                if (PC.getValue() >= 0x100) {
 //                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
                 }
                 execute_action(action, opcode);
@@ -175,7 +173,6 @@ public class CPU {
 //                }
 
 
-
                 byte current_interrupt_requests = memory.read_byte(interrupt_pointer);
                 if ((current_interrupt_requests & 1) != 0) {
                     push_to_stack_d16(PC.getValue());
@@ -190,23 +187,20 @@ public class CPU {
                 else if ((current_interrupt_requests & 8) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x58);
-                    memory.write(0xFF01, (byte)0xFF);
+                    memory.write(0xFF01, (byte) 0xFF);
                     IME = false;
                     memory.write(0xFF0F, (byte) 8);
                     current_interrupt_requests &= (255 - 8);
                     memory.write(interrupt_pointer, current_interrupt_requests);
-                    memory.write(0xFF01, (byte)0xFF);
-                }
-
-                else if ((current_interrupt_requests & 16) != 0) {
+                    memory.write(0xFF01, (byte) 0xFF);
+                } else if ((current_interrupt_requests & 16) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
                     current_interrupt_requests &= (255 - 16);
                     memory.write(interrupt_pointer, current_interrupt_requests);
-                }
-                else if (memory.read_byte(0xFF50) == 1) {
+                } else if (memory.read_byte(0xFF50) == 1) {
                     if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
                         push_to_stack_d16(PC.getValue());
                         PC.setValue((char) 0x40);
@@ -216,6 +210,7 @@ public class CPU {
                 }
             }
         }
+        CPU.memory.write(0xFF41, (byte) ((byte)( CPU.memory.read_byte(0xFF41) + 1)%4));
         cycles++;
     }
 }

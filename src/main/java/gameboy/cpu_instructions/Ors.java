@@ -47,7 +47,7 @@ public class Ors implements CPUInstructions {
         }
     }
 
-    @Opcode(value = 0xB3, length = 1, cycles = 1)
+    @Opcode(value = 0xB4, length = 1, cycles = 1)
     public static void or_h() {
         CPU.AF.A.setValue((byte) (CPU.HL.H.getValue() | CPU.AF.A.getValue()));
         if (CPU.AF.A.getValue() == 0) {

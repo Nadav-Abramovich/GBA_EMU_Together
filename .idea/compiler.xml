@@ -9,8 +9,8 @@
         <module name="GBA_EMU_Together" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="GBA_EMU_Together" target="11" />
+    <bytecodeTargetLevel target="15">
+      <module name="GBA_EMU_Together" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>

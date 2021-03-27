@@ -185,6 +185,71 @@ public class Screen {
         }
     }
 
+    private static void draw_tile(int sprite_pointer, int x, int y, boolean putpixel_by_tile, boolean should_add_vertical_horizontal_y) {
+        for (int line = 0; line < 8; line++) {
+            for (int col = 0; col < 8; col++) {
+                int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
+                int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
+                int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
+
+                int color = switch (COLOR) {
+                    case 0 -> Color.WHITE.getRGB();
+                    case 1 -> Color.LIGHT_GRAY.getRGB();
+                    case 2 -> Color.DARK_GRAY.getRGB();
+                    case 3 -> Color.BLACK.getRGB();
+                    default -> throw new IllegalStateException("Unexpected value: " + COLOR);
+                };
+                char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
+                char horizontal_x = (char) (CPU.memory.read_byte(0xFF43) & 255);
+                if(should_add_vertical_horizontal_y) {
+                    putPixel(x + horizontal_x, y + vertical_y, line, col, color);
+                } else {
+                    if(putpixel_by_tile) {
+                        putPixel(x, y, line, col, color);
+                    } else {
+                        putPixel2(x, y, line, col, color);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void draw_background() {
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                int val = CPU.memory.read_byte(0x9800 + y * 32 + x) & 255;
+                if (val != 0) {
+                    int sprite_pointer = 0x8000 + 0x10 * val;
+                    draw_tile(sprite_pointer, x, y, true, true);
+                }
+            }
+        }
+    }
+
+    private static void draw_window() {
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                byte val = CPU.memory.read_byte(0x9C00 + y * 32 + x);
+                if (val != 0) {
+                    var sprite_pointer = 0x8000 + 0x10 * val;
+                    draw_tile(sprite_pointer, x, y, true, false);
+                }
+            }
+        }
+    }
+
+    private static void draw_objects() {
+        for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
+            char y = (char) ((CPU.memory.read_byte(i) & 255) - 16);
+            char x = (char) (CPU.memory.read_byte(i + 1) & 255 - 8);
+            char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
+            if (tile_index == 0)
+                continue;
+            char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
+            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
+            draw_tile(sprite_pointer, x, y, false, false);
+        }
+    }
 
     private static void draw_screen() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
@@ -202,107 +267,14 @@ public class Screen {
         screen_buffer = ByteBuffer.allocateDirect(screen.length);
 
         // Background
-        for (int y = 0; y < 32; y++) {
-            for (int x = 0; x < 32; x++) {
-                int val = CPU.memory.read_byte(0x9800 + y * 32 + x) & 255;
-                if (val != 0) {
-                    int sprite_pointer = 0x8000 + 0x10 * val;
-
-                    for (int line = 0; line < 8; line++) {
-                        for (int col = 0; col < 8; col++) {
-                            int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
-                            int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
-                            int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
-                            int color;
-                            if (COLOR == 0) {
-                                color = Color.WHITE.getRGB();
-                            } else if (COLOR == 1) {
-                                color = Color.LIGHT_GRAY.getRGB();
-                            } else if (COLOR == 2) {
-                                color = Color.DARK_GRAY.getRGB();
-                            } else {
-                                color = Color.BLACK.getRGB();
-                            }
-                            //                                    int color = switch (COLOR) {
-                            //                                        case 0 -> Color.WHITE.getRGB();
-                            //                                        case 1 -> Color.BLACK.getRGB();
-                            //                                        case 2 -> Color.GREEN.getRGB();
-                            //                                        case 3 -> Color.RED.getRGB();
-                            //                                        default -> Color.BLUE.getRGB();
-                            //                                    };
-                            char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
-                            putPixel(x, y, line, col, color);
-                        }
-                    }
-                }
-            }
-        }
+        draw_background();
         //
 
         // Window
-        for (int y = 0; y < 32; y++) {
-            for (int x = 0; x < 32; x++) {
-                byte val = CPU.memory.read_byte(0x9C00 + y * 32 + x);
-                if (val != 0) {
-                    var sprite_pointer = 0x8000 + 0x10 * val;
+        draw_window();
 
-                    for (int line = 0; line < 8; line++) {
-                        for (int col = 0; col < 8; col++) {
-                            int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
-                            int HIGHER = (CPU.memory.read_byte(sprite_pointer + line * 2 + 1) & 255) & (1 << col);
-                            int COLOR = ((HIGHER << 1) | (LOWER)) >> col;
-                            int color;
-                            if (COLOR == 0) {
-                                color = Color.WHITE.getRGB();
-                            } else if (COLOR == 1) {
-                                color = Color.LIGHT_GRAY.getRGB();
-                            } else if (COLOR == 2) {
-                                color = Color.DARK_GRAY.getRGB();
-                            } else {
-                                color = Color.BLACK.getRGB();
-                            }
-                            //                                    int color = switch (COLOR) {
-                            //                                        case 0 -> Color.WHITE.getRGB();
-                            //                                        case 1 -> Color.BLACK.getRGB();
-                            //                                        case 2 -> Color.GREEN.getRGB();
-                            //                                        case 3 -> Color.RED.getRGB();
-                            //                                        default -> Color.BLUE.getRGB();
-                            //                                    };
-                            putPixel(x, y, line, col, color);
-                        }
-                    }
-                }
-            }
-        }
+        draw_objects();
 
-        for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
-            char y = (char) ((CPU.memory.read_byte(i) & 255) - 16);
-            char x = (char) (CPU.memory.read_byte(i + 1) & 255 - 8);
-            char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
-            if (tile_index == 0)
-                continue;
-            char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
-            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
-            for (int spriteY = 0; spriteY < 8; spriteY++) {
-                for (int spriteX = 0; spriteX < 8; spriteX++) {
-                    int LOWER = (CPU.memory.read_byte(sprite_pointer + spriteY * 2) & 255) & (1 << spriteX);
-                    int HIGHER = (CPU.memory.read_byte(sprite_pointer + spriteY * 2 + 1) & 255) & (1 << spriteX);
-                    int COLOR = ((HIGHER << 1) | (LOWER)) >> spriteX;
-                    int color;
-                    if (COLOR == 0) {
-                        color = Color.WHITE.getRGB();
-                    } else if (COLOR == 1) {
-                        color = Color.LIGHT_GRAY.getRGB();
-                    } else if (COLOR == 2) {
-                        color = Color.DARK_GRAY.getRGB();
-                    } else {
-                        color = Color.BLACK.getRGB();
-                    }
-                    char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
-                    putPixel2(x, y, spriteY, spriteX, color);
-                }
-            }
-        }
         byte[] temp = new byte[256 * 256 * 4];
         for (int y = 0; y < 255; y++) {
             for (int x = 0; x < 255; x++) {

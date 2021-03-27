@@ -53,6 +53,15 @@ public class Stack implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xC7, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_0() {
+        char target_lower = 0x00;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
+    }
+
     @Opcode(value = 0xC8, length = 1, cycles = 2, should_update_pc = false)
     public static void ret_z() {
         if (CPU.AF.isZeroFlagOn()) {
@@ -63,10 +72,24 @@ public class Stack implements CPUInstructions {
         }
     }
 
-
     @Opcode(value = 0xC9, length = 1, cycles = 4, should_update_pc = false)
     public static void ret() {
         CPU.PC.setValue(pop_from_stack_d16());
+    }
+
+    @Opcode(value = 0xCC, length = 3, cycles = 6, should_update_pc = false)
+    public static void call_n_a16() {
+        if (CPU.AF.isZeroFlagOn()) {
+            char target_lower = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
+            char target_higher = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 2) & 255);
+
+            push_to_stack_d16((char) (CPU.PC.getValue() + 3));
+            CPU.PC.setValue((char) ((target_higher << 8) | target_lower));
+            CPU.performed_cycles += 6;
+        } else {
+            CPU.PC.increment(3);
+            CPU.performed_cycles += 6;
+        }
     }
 
     @Opcode(value = 0xCD, length = 3, cycles = 6, should_update_pc = false)
@@ -76,6 +99,15 @@ public class Stack implements CPUInstructions {
 
         push_to_stack_d16((char) (CPU.PC.getValue() + 3));
         CPU.PC.setValue((char) ((target_higher << 8) | target_lower));
+    }
+
+    @Opcode(value = 0xCF, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_1() {
+        char target_lower = 0x08;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
     }
 
     @Opcode(value = 0xD0, length = 1, cycles = 2, should_update_pc = false)
@@ -146,5 +178,14 @@ public class Stack implements CPUInstructions {
     @Opcode(value = 0xF9, length = 1, cycles = 2)
     public static void ld_sp_hl() {
         CPU.SP.setValue(CPU.HL.getValue());
+    }
+
+    @Opcode(value = 0xFF, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_7() {
+        char target_lower = 0x38;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
     }
 }

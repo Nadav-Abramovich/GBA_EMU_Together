@@ -47,10 +47,24 @@ public class Ands implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xA4, length = 1, cycles = 1)
+    public static void and_h() {
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & CPU.HL.H.getValue()));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            CPU.setFlags(Flags.HALF_CARRY);
+        }
+    }
 
-    @Opcode(value = 0xE6, length = 2, cycles = 1)
+
+    @Opcode(value = 0xE6, length = 2, cycles = 2)
     public static void and_d8() {
         byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
         CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & d8));
+        CPU.setFlags(Flags.HALF_CARRY);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        }
     }
 }

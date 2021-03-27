@@ -73,6 +73,20 @@ public class ExtendedInstructions implements CPUInstructions {
         CPU.turnOnFlags(Flags.HALF_CARRY);
     }
 
+    @Opcode(value = 0xCB42, length = 2, cycles = 2)
+    public static void bit_0_d() {
+        int C = (CPU.DE.D.getValue() & 1);
+
+        if (C == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags(Flags.SUBTRACTION);
+        CPU.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+
     @Opcode(value = 0xCB47, length = 2, cycles = 2)
     public static void bit_0_a() {
         int A = (CPU.AF.A.getValue() & 1);
@@ -89,6 +103,19 @@ public class ExtendedInstructions implements CPUInstructions {
     @Opcode(value = 0xCB48, length = 2, cycles = 2)
     public static void bit_1_b() {
         int A = (CPU.BC.B.getValue() >> 1) & 1;
+
+        if (A == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags(Flags.SUBTRACTION);
+        CPU.turnOnFlags(Flags.HALF_CARRY);
+    }
+
+    @Opcode(value = 0xCB4F, length = 2, cycles = 2)
+    public static void bit_1_a() {
+        int A = ((CPU.AF.A.getValue() >> 1) & 1);
 
         if (A == 0) {
             CPU.turnOnFlags(Flags.ZERO);
@@ -304,6 +331,24 @@ public class ExtendedInstructions implements CPUInstructions {
     public static void res_0_a() {
         byte new_value = (byte) CPU.AF.A.getValue();
         CPU.AF.A.setValue((byte) (new_value & 0xFE));
+    }
+
+    @Opcode(value = 0xCB8F, length = 2, cycles = 2)
+    public static void res_1_a() {
+        byte new_value = (byte) CPU.AF.A.getValue();
+        CPU.AF.A.setValue((byte) (new_value & 0xFD));
+    }
+
+    @Opcode(value = 0xCB97, length = 2, cycles = 2)
+    public static void res_2_a() {
+        byte new_value = (byte) CPU.AF.A.getValue();
+        CPU.AF.A.setValue((byte) (new_value & 0xFB));
+    }
+
+    @Opcode(value = 0xCBAF, length = 2, cycles = 2)
+    public static void res_5_a() {
+        byte new_value = (byte) CPU.AF.A.getValue();
+        CPU.AF.A.setValue((byte) (new_value & (0xFF-16)));
     }
 
     @Opcode(value = 0xCBBE, length = 2, cycles = 4)
