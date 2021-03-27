@@ -77,6 +77,9 @@ public class Compares implements CPUInstructions {
 
     @Opcode(value = 0xFE, length = 2, cycles = 2)
     public static void cp_d8() {
+        if(CPU.PC.getValue() == 0x2D1) {
+//            System.out.println(1);
+        }
         char compare_value = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
         if (CPU.AF.A.getValue() < compare_value) {
             CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));

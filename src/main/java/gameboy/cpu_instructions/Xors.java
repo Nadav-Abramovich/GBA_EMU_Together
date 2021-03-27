@@ -15,50 +15,74 @@ public class Xors implements CPUInstructions {
 
     @Opcode(value = 0xA8, length = 1, cycles = 1)
     public static void xorB() {
-        CPU.BC.B.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.BC.B.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xA9, length = 1, cycles = 1)
     public static void xorC() {
-        CPU.BC.C.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.BC.C.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xAA, length = 1, cycles = 1)
     public static void xorD() {
-        CPU.DE.D.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.DE.D.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xAB, length = 1, cycles = 1)
     public static void xorE() {
-        CPU.DE.E.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.DE.E.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xAC, length = 1, cycles = 1)
     public static void xorH() {
-        CPU.HL.H.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.HL.H.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xAD, length = 1, cycles = 1)
     public static void xorL() {
-        CPU.HL.L.setValue((byte) 0);
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() ^ CPU.HL.L.getValue()));
 
         // Make the ZERO flag the only turned on flag
-        CPU.setFlags(Flags.ZERO);
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
     }
 
     @Opcode(value = 0xAE, length = 1, cycles = 1)

@@ -111,11 +111,8 @@ public class CPU {
 
     private static void execute_action(Method action, char opcode) {
         try {
-            if (PRINT_DEBUG_MESSAGES) {
-                if (IME) {
-                    writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
-                }
-            }
+            writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+
 
             action.invoke(null);
             Opcode opcode_metadata = action.getAnnotation(Opcode.class);
@@ -160,8 +157,9 @@ public class CPU {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
             }
-            if (IME) {
-                int interrupt_pointer = 0xFFFF;
+            if (IME && PC.getValue() > 0x100) {
+                int interrupt_request_pointer = 0xFF0F;
+                int interrupt_enable_pointer = 0xFFFF;
 //                if(memory.read_byte(0xFF02) == (byte)0x81) {
 //                    memory.write(interrupt_pointer, (byte) (memory.read_byte(interrupt_pointer) | 8));
 //                    memory.write(0xFF02, (byte)0x1);
@@ -172,15 +170,16 @@ public class CPU {
 //                    memory.write(0xFF02, (byte)0x0);
 //                }
 
-
-                byte current_interrupt_requests = memory.read_byte(interrupt_pointer);
+                byte enabled_interrupts = memory.read_byte(interrupt_enable_pointer);
+                byte requested_interrupts = memory.read_byte(interrupt_request_pointer);
+                byte current_interrupt_requests = (byte)(enabled_interrupts & requested_interrupts);
                 if ((current_interrupt_requests & 1) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x40);
                     IME = false;
                     memory.write(0xFF0F, (byte) 1);
-                    current_interrupt_requests &= 254;
-                    memory.write(interrupt_pointer, current_interrupt_requests);
+                    requested_interrupts &= 254;
+                    memory.write(interrupt_request_pointer, requested_interrupts);
                 }
 
                 // serial transfer complete
@@ -190,16 +189,16 @@ public class CPU {
                     memory.write(0xFF01, (byte) 0xFF);
                     IME = false;
                     memory.write(0xFF0F, (byte) 8);
-                    current_interrupt_requests &= (255 - 8);
-                    memory.write(interrupt_pointer, current_interrupt_requests);
+                    requested_interrupts &= (255 - 8);
+                    memory.write(interrupt_request_pointer, requested_interrupts);
                     memory.write(0xFF01, (byte) 0xFF);
                 } else if ((current_interrupt_requests & 16) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
-                    current_interrupt_requests &= (255 - 16);
-                    memory.write(interrupt_pointer, current_interrupt_requests);
+                    requested_interrupts &= (255 - 16);
+                    memory.write(interrupt_request_pointer, requested_interrupts);
                 } else if (memory.read_byte(0xFF50) == 1) {
                     if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
                         push_to_stack_d16(PC.getValue());

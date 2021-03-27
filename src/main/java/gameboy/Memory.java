@@ -7,7 +7,7 @@ public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "ROMS/tetris.gb";
+    public static final String GAME_ROM_PATH = "ROMS/Game.gb";
     private int bank_number = 1;
 
     private final byte[] _memory;
@@ -27,15 +27,14 @@ public class Memory {
     public void write(int address, byte value) {
         if (address == 0xFF00) {
             // Action buttons
-            if (value == 32 || value == 48) {
+            if (value == 32 ) {
                 actions_buttons_selected = true;
             }
             // direction keys
-            else if (value == 16) {
+            else if (value == 16 || value == 48) {
                 actions_buttons_selected = false;
-            } else {
-                System.out.println("Bad value written to 0xff00");
             }
+            return;
         }
         if (address == 0x1C3A) {
             System.out.println("BAD MEMORY WRITE!");
@@ -69,7 +68,8 @@ public class Memory {
             System.out.println("MM");
         }
         if (address == 0xFFFF) {
-//            System.out.println("Interrupts");
+            System.out.println("PC: " + Integer.toHexString(CPU.PC.getValue()).toUpperCase());
+            System.out.println("Interrupts: " + Integer.toHexString(value).toUpperCase());
         }
         if (address == 0xFF0F) {
 //            System.out.println("Interrupts 2");
@@ -78,12 +78,18 @@ public class Memory {
         if (address == 0xFF11) {
 //            System.out.println("Interrupts 2");
         }
+
+        if (address == 0xFF80) {
+//            System.out.println("Interrupts 2");
+        }
+
         if (address == 0xFFB8 || address == 0xFFB9) {
             System.out.println("BANKING 2");
         }
         if (address == 0xC000 || address == 0xC09F) {
             System.out.println("TRANSFER");
         }
+
         _memory[address] = value;
     }
 
@@ -96,13 +102,10 @@ public class Memory {
         if (address == 0xFF00) {
             // Action
             if (actions_buttons_selected) {
-                return (byte) (keys_pressed & 15);
+                return (byte) (~keys_pressed&0xF);
             }
             // Direction
-            return (byte) ((keys_pressed >> 4) & 15);
-        }
-        if (address == 0xFF81) {
-            return keys_pressed;
+            return (byte) (~(keys_pressed >> 4)&0xF);
         }
         if (address >= 0x4a07 && address <= 0x4b6f) {
 //            System.out.println("NOW");

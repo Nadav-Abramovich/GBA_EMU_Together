@@ -63,6 +63,7 @@ public class Screen {
             GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
             // Center the window
+            assert vidmode != null;
             glfwSetWindowPos(
                     window,
                     (vidmode.width() - pWidth.get(0)) / 2,
@@ -99,28 +100,28 @@ public class Screen {
             //;  $10 - A       $1 - Right
             if (action == GLFW_PRESS) {
                 if (key == GLFW_KEY_ENTER) {
-                    CPU.memory.keys_pressed = (byte) 0x80;
+                    CPU.memory.keys_pressed |= Keys.START.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_BACKSPACE) {
-                    CPU.memory.keys_pressed = (byte) 0x40;
+                    CPU.memory.keys_pressed |= Keys.SELECT.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_A) {
-                    CPU.memory.keys_pressed = (byte) 0x10;
+                    CPU.memory.keys_pressed |= Keys.B.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_S) {
-                    CPU.memory.keys_pressed = (byte) 0x20;
+                    CPU.memory.keys_pressed |= Keys.A.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_DOWN) {
-                    CPU.memory.keys_pressed = Keys.DOWN.value;
+                    CPU.memory.keys_pressed |= Keys.DOWN.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_UP) {
-                    CPU.memory.keys_pressed = Keys.UP.value;
+                    CPU.memory.keys_pressed |= Keys.UP.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_LEFT) {
-                    CPU.memory.keys_pressed = Keys.LEFT.value;
+                    CPU.memory.keys_pressed |= Keys.LEFT.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 } else if (key == GLFW_KEY_RIGHT) {
-                    CPU.memory.keys_pressed = Keys.RIGHT.value;
+                    CPU.memory.keys_pressed |= Keys.RIGHT.value;
                     CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
                 }
             } else if (action == GLFW_RELEASE) {
@@ -159,8 +160,6 @@ public class Screen {
     }
 
     private static void putPixel(int x, int y, int line, int col, int color) {
-        int width = 256;
-
         int real_x = x * 8 + (8 - col);
 
         int real_y = 256 - (y * 8 + line);
@@ -173,7 +172,6 @@ public class Screen {
     }
 
     private static void putPixel2(int x, int y, int line, int col, int color) {
-        int width = 256;
         int real_x = x + (8 - col);
 
         int real_y = 256 - (y + line);
@@ -271,16 +269,17 @@ public class Screen {
         //
 
         // Window
-        draw_window();
-
-        draw_objects();
+        if((CPU.memory.read_byte(0xFF40) & (1<<5)) != 0) {
+            draw_window();
+        }
+        if((CPU.memory.read_byte(0xFF40) & (1<<1)) != 0) {
+            draw_objects();
+        }
 
         byte[] temp = new byte[256 * 256 * 4];
         for (int y = 0; y < 255; y++) {
             for (int x = 0; x < 255; x++) {
-                for (int z = 0; z < 4; z++) {
-                    temp[(y * 256 + x) * 4 + z] = screen[y][x][z];
-                }
+                System.arraycopy(screen[y][x], 0, temp, (y * 256 + x) * 4, 4);
             }
 
             ByteBuffer screen_buffer = ByteBuffer.allocateDirect(temp.length);
