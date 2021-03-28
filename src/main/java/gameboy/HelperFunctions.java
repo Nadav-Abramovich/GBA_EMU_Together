@@ -17,7 +17,7 @@ public class HelperFunctions {
         return (char) (lower | (higher << 8));
     }
 
-    // TODO: Fix carry/halfcarry
+    // TODO: Fix halfcarry
     public static void add_register(Register reg, int value, boolean carry, boolean subtract) {
         int carry_value = 0;
         if (CPU.AF.isCarryFlagOn()) {
@@ -27,6 +27,7 @@ public class HelperFunctions {
         if (!subtract) {
             // 16 bit addition
             if (reg instanceof RegisterPair) {
+                value &= 0xFFFF;
                 long sum = reg.getValue();
                 sum += value;
                 if(carry) {
@@ -42,6 +43,10 @@ public class HelperFunctions {
             }
             // 8 bit addition
             else {
+                value &= 0xFF;
+                if((byte)((reg.getValue() & 0xF) + (value & 0xF)) > (byte)0xF){
+                    CPU.turnOnFlags(Flags.HALF_CARRY);
+                }
                 char sum = (char) (reg.getValue() + (char) (value & 255));
                 if(carry) {
                     sum += carry_value;
@@ -58,6 +63,8 @@ public class HelperFunctions {
         } else {
             // 16 bit subtraction
             if (reg instanceof RegisterPair) {
+                value &= 0xFFFF;
+
                 char sum = reg.getValue();
                 sum -= value;
 
@@ -70,6 +77,7 @@ public class HelperFunctions {
             }
             // 8 bit subtraction
             else {
+                value &= 0xFF;
                 byte sum = (byte) ((reg.getValue() - value) & 0xFF);
                 if (value > reg.getValue()) {
                     CPU.turnOnFlags(Flags.CARRY);
@@ -87,5 +95,6 @@ public class HelperFunctions {
                 CPU.turnOffFlags(Flags.ZERO);
             }
         }
+        CPU.turnOnFlags(Flags.HALF_CARRY);
     }
 }

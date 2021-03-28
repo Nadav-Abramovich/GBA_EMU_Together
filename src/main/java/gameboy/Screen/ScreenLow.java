@@ -2,6 +2,7 @@ package gameboy.Screen;
 
 import gameboy.CPU;
 import gameboy.Keys;
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -18,9 +19,9 @@ import static org.lwjgl.opengl.GL14.glWindowPos2i;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Screen {
+public class ScreenLow {
     // The window handle
-    public static long window;
+    private static long window;
     static byte[][][] screen = new byte[256][256][4];
     static ByteBuffer screen_buffer = ByteBuffer.allocateDirect(256 * 256 * 4);
     static ByteBuffer pixels = ByteBuffer.allocateDirect(256 * 256 * 4);
@@ -28,7 +29,7 @@ public class Screen {
     public static void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
-//        GLFWErrorCallback.createPrint(System.err).set();
+        GLFWErrorCallback.createPrint(System.err).set();
 
         // Initialize GLFW. Most GLFW functions will not work before doing this.
         if (!glfwInit())
@@ -41,7 +42,7 @@ public class Screen {
 
         // Create the window
         System.out.println("CREATING");
-        window = glfwCreateWindow(160, 144, "GameBoy!", NULL, NULL);
+        window = glfwCreateWindow(160, 144, "GameBoy2!", NULL, Screen.window);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -88,48 +89,7 @@ public class Screen {
         glDisable(GL_BLEND);
         // Set the clear color
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glfwSetKeyCallback(window, keyboard);
     }
-
-    private static final GLFWKeyCallback keyboard = new GLFWKeyCallback() {
-        @Override
-        public void invoke(long window, int key, int scancode, int action, int mods) {
-            //;  $80 - Start   $8 - Down
-            //;  $40 - Select  $4 - Up
-            //;  $20 - B       $2 - Left
-            //;  $10 - A       $1 - Right
-            if (action == GLFW_PRESS) {
-                if (key == GLFW_KEY_ENTER) {
-                    CPU.memory.keys_pressed |= Keys.START.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_BACKSPACE) {
-                    CPU.memory.keys_pressed |= Keys.SELECT.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_A) {
-                    CPU.memory.keys_pressed |= Keys.B.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_S) {
-                    CPU.memory.keys_pressed |= Keys.A.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_DOWN) {
-                    CPU.memory.keys_pressed |= Keys.DOWN.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_UP) {
-                    CPU.memory.keys_pressed |= Keys.UP.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_LEFT) {
-                    CPU.memory.keys_pressed |= Keys.LEFT.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                } else if (key == GLFW_KEY_RIGHT) {
-                    CPU.memory.keys_pressed |= Keys.RIGHT.value;
-                    CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-                }
-            } else if (action == GLFW_RELEASE) {
-                CPU.memory.keys_pressed = (byte) 0x0;
-                CPU.memory.write(0xFF0F, (byte) (CPU.memory.read_byte(0xFF0F) | 16));
-            }
-        }
-    };
 
     public static char get_ly() {
         return (char) (CPU.memory.read_byte(0xFF44) & 255);
@@ -147,18 +107,14 @@ public class Screen {
         glfwMakeContextCurrent(window);
 
         if (((CPU.memory.read_byte(0xFF40) >> 7) & 1) == 1) {
-            if (get_ly() == 144) {
+            if (Screen.get_ly() == 145) {
                 draw_screen();
             }
         }
-        inc_ly();
-        if (get_ly() == 154) {
-            xor_ly();
-        }
+
         // Poll for window events. The key callback above will only be
         // invoked during this call.
         glfwPollEvents();
-
     }
 
     private static void putPixel(int x, int y, int line, int col, int color) {
@@ -237,14 +193,8 @@ public class Screen {
     private static void draw_background() {
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                int val = CPU.memory.read_byte(0x9800 + y * 32 + x) & 255;
-                if (val != 0) {
-                    int sprite_pointer = 0x8000 + 0x10 * val;
-                    if(val == 23) {
-                        System.out.println();
-                    }
-                    draw_tile(sprite_pointer, x, y, true, true);
-                }
+                    int sprite_pointer = 0x8000 + 0x10 * x + 0x10*32*y;
+                    draw_tile(sprite_pointer, x, y, true, false);
             }
         }
     }
@@ -263,18 +213,34 @@ public class Screen {
 
     private static void draw_objects() {
         for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
-            int y = ((CPU.memory.read_byte(i) & 255) - 16);
-            int x = (char) ((CPU.memory.read_byte(i + 1) & 255) - 8);
+            char y = (char) ((CPU.memory.read_byte(i) & 255) - 16);
+            char x = (char) (CPU.memory.read_byte(i + 1) & 255 - 8);
             char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
-            if(tile_index == 7 * 16 + 8) {
-                System.out.println("AAA");
-            }
             char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
             char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
             draw_tile(sprite_pointer, x, y, false, false);
         }
     }
 
+    private static void draw_objects_debug() {
+        for (char i = 0xFE00; i <= 0xFE9F; i += 4) {
+            if(i == 0xFE00 || true) {
+                System.out.println("INDEX: " + Integer.toHexString(i).toUpperCase());
+                System.out.println("X: " + Integer.toHexString((char) (CPU.memory.read_byte(i + 1) & 255)).toUpperCase());
+                System.out.println("Y: " + Integer.toHexString((char) (CPU.memory.read_byte(i + 0) & 255)).toUpperCase());
+                System.out.println("I: " + Integer.toHexString((char) (CPU.memory.read_byte(i + 2) & 255)).toUpperCase());
+                System.out.println("A: " + Integer.toHexString((char) (CPU.memory.read_byte(i + 3) & 255)).toUpperCase());
+                System.out.println("----------------------");
+            }
+            char index = (char) ((i-0xFE00)/4);
+            int x = (index % 0x10) * 0x10;
+            int y = (index / 0x10) * 0x10 + 16;
+            char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
+            char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
+            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
+            draw_tile(sprite_pointer, x, y, false, false);
+        }
+    }
 
     private static void draw_screen() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
@@ -292,16 +258,7 @@ public class Screen {
 
         // Background
         draw_background();
-        //
-
-        // Window
-        if((CPU.memory.read_byte(0xFF40) & (1<<5)) != 0) {
-            draw_window();
-        }
-        if((CPU.memory.read_byte(0xFF40) & (1<<1)) != 0) {
-            draw_objects();
-        }
-
+//        draw_objects_debug();
         byte[] temp = new byte[256 * 256 * 4];
         for (int y = 0; y < 255; y++) {
             for (int x = 0; x < 255; x++) {
@@ -312,10 +269,8 @@ public class Screen {
 
             pixels = screen_buffer.put(temp).flip();
         }
-//        GL11.glPixelZoom(1, 1);
         glWindowPos2i(0, 144 - 256);
         GL11.glDrawPixels(256, 256, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, pixels);
-
         glfwSwapBuffers(window); // swap the color buffers
     }
 }

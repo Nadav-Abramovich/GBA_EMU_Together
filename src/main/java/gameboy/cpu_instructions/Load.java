@@ -159,9 +159,6 @@ public class Load implements CPUInstructions {
 
     @Opcode(value = 0x4F, length = 1, cycles = 1)
     public static void ld_c_a() {
-        if(CPU.PC.getValue() == 0x29D4) {
-            System.out.println("ld_c_a: " + Integer.toHexString(CPU.AF.A.getValue()).toUpperCase());
-        }
         CPU.BC.C.setValue((byte) CPU.AF.A.getValue());
     }
 
@@ -403,12 +400,6 @@ public class Load implements CPUInstructions {
     @Opcode(value = 0xE0, length = 2, cycles = 3)
     public static void ld_into_a8_a() {
         int position = CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255;
-        if(position == 0x80) {
-            System.out.println("0x80:" + Integer.toHexString(CPU.AF.A.getValue()).toUpperCase());
-        }
-        if(position == 0x81) {
-            System.out.println("0x81:" + Integer.toHexString(CPU.AF.A.getValue()).toUpperCase());
-        }
         CPU.memory.write(0xFF00 | position, (byte) CPU.AF.A.getValue());
     }
 
@@ -438,11 +429,6 @@ public class Load implements CPUInstructions {
     @Opcode(value = 0xF0, length = 2, cycles = 3)
     public static void ld_a_from_a8() {
         char a8 = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
-//        if(CPU.PC.getValue() == 0x2CD) {\
-        if(CPU.PC.getValue() == 0x29CE) {
-            System.out.println("A: " + Integer.toHexString(CPU.memory.read_byte(0xFF00 | a8)).toUpperCase());
-        }
-
         CPU.AF.A.setValue(CPU.memory.read_byte(0xFF00 | a8));
     }
 

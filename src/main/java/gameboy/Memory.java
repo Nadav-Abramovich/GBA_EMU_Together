@@ -7,7 +7,7 @@ public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "ROMS/Game.gb";
+    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\Tetris.gb";
     private int bank_number = 1;
 
     private final byte[] _memory;
@@ -55,21 +55,21 @@ public class Memory {
 //            System.out.println("BADALACH");
         }
         if (address >= 0x2000 && address <= 0x3FFF) {
-            System.out.println("OPALACH " + Integer.toHexString(value).toUpperCase());
+//            System.out.println("OPALACH " + Integer.toHexString(value).toUpperCase());
             bank_number = value & 0x7F;
             if (value == 0) {
                 bank_number = 1;
             }
 //            System.out.println(bank_number);
         } else if (address <= 0x7FFF) {
-            System.out.println("MANDALACH");
+//            System.out.println("MANDALACH");
         }
         if (address == 0xFF50) {
-            System.out.println("MM");
+//            System.out.println("MM");
         }
         if (address == 0xFFFF) {
-            System.out.println("PC: " + Integer.toHexString(CPU.PC.getValue()).toUpperCase());
-            System.out.println("Interrupts: " + Integer.toHexString(value).toUpperCase());
+//            System.out.println("PC: " + Integer.toHexString(CPU.PC.getValue()).toUpperCase());
+//            System.out.println("Interrupts: " + Integer.toHexString(value).toUpperCase());
         }
         if (address == 0xFF0F) {
 //            System.out.println("Interrupts 2");
@@ -84,10 +84,10 @@ public class Memory {
         }
 
         if (address == 0xFFB8 || address == 0xFFB9) {
-            System.out.println("BANKING 2");
+//            System.out.println("BANKING 2");
         }
-        if (address == 0xC000 || address == 0xC09F) {
-            System.out.println("TRANSFER");
+        if (address >= 0xC000 && address <= 0xC100) {
+//            System.out.println("{" + Integer.toHexString(CPU.PC.getValue()).toUpperCase() + "}" + "[" + address + "] = " + Integer.toHexString(value).toUpperCase());
         }
 
         _memory[address] = value;

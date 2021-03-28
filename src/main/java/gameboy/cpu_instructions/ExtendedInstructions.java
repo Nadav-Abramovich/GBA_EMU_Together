@@ -413,6 +413,11 @@ public class ExtendedInstructions implements CPUInstructions {
         }
         // todo: CARRY AND VERIFY CARRY OF RLC
         CPU.AF.A.setValue((byte) (((CPU.AF.A.getValue() << 1)) & 255));
+        if(CPU.AF.A.getValue() == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
         CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 }

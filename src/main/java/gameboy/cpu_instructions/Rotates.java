@@ -52,7 +52,7 @@ public class Rotates implements CPUInstructions {
     @Opcode(value = 0xCB19, length = 2, cycles = 2)
     public static void rr_c() {
         char new_msb = 0;
-        if((CPU.AF.F.getValue() & Flags.CARRY) != 0) {
+        if(CPU.AF.isCarryFlagOn()) {
             new_msb = 1 << 7;
         }
         if ((CPU.BC.C.getValue() & 1) != 0) {
@@ -72,7 +72,7 @@ public class Rotates implements CPUInstructions {
     @Opcode(value = 0xCB1A, length = 2, cycles = 2)
     public static void rr_d() {
         char new_msb = 0;
-        if((CPU.AF.F.getValue() & Flags.CARRY) != 0) {
+        if(CPU.AF.isCarryFlagOn()) {
             new_msb = 1 << 7;
         }
         if ((CPU.DE.D.getValue() & 1) != 0) {
@@ -92,7 +92,7 @@ public class Rotates implements CPUInstructions {
     @Opcode(value = 0xCB1B, length = 2, cycles = 2)
     public static void rr_e() {
         char new_msb = 0;
-        if((CPU.AF.F.getValue() & Flags.CARRY) != 0) {
+        if(CPU.AF.isCarryFlagOn()) {
             new_msb = 1 << 7;
         }
         if ((CPU.DE.E.getValue() & 1) != 0) {
@@ -129,9 +129,6 @@ public class Rotates implements CPUInstructions {
     @Opcode(value = 0x2F, length = 1, cycles = 1)
     public static void cpl() {
         CPU.AF.A.setValue((byte) (~(byte) CPU.AF.A.getValue()));
-        if(CPU.PC.getValue() == 0x29D0) {
-            System.out.println("CPL: " + Integer.toHexString(CPU.AF.A.getValue()).toUpperCase());
-        }
         CPU.turnOnFlags((byte) (Flags.HALF_CARRY | Flags.SUBTRACTION));
     }
 

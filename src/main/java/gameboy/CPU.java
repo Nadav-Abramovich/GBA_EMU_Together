@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -112,6 +113,8 @@ public class CPU {
     private static void execute_action(Method action, char opcode) {
         try {
             writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+//            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+//            System.out.println(Integer.toHexString(CPU.DE.getValue()).toUpperCase());
 
 
             action.invoke(null);
@@ -128,31 +131,13 @@ public class CPU {
 
     public static void tick() {
         // make time tick?
-//        System.out.println(1234);
         memory.write(0xFF04, (byte) ((memory.read_byte(0xFF04) & 255) + 1));
         char opcode = get_opcode();
-//         KEYS?
-//        memory.write(0xff80, (byte) 0x1);
-//        memory.write(0xFF44, (byte)144);
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);
 
             if (action != null) {
-//                //TODO: replace this with working timing..
-//                if (PC.getValue() == 0x6D) {
-//                    AF.A.setValue((byte) 145);
-//                }
-                if (PC.getValue() >= 0x100) {
-//                    System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
-                }
                 execute_action(action, opcode);
-
-                // TODO: This is not needed, only to speedup loading
-//                if(PC.getValue() == 0x02ef) {
-//                    System.out.println(AF.F.getValue());
-//                    turnOffFlags(Flags.ZERO);
-//                    PC.setValue((char) 0x03ae);
-//                }
             } else {
                 System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
                 System.exit(1);
@@ -160,15 +145,6 @@ public class CPU {
             if (IME && PC.getValue() > 0x100) {
                 int interrupt_request_pointer = 0xFF0F;
                 int interrupt_enable_pointer = 0xFFFF;
-//                if(memory.read_byte(0xFF02) == (byte)0x81) {
-//                    memory.write(interrupt_pointer, (byte) (memory.read_byte(interrupt_pointer) | 8));
-//                    memory.write(0xFF02, (byte)0x1);
-//                }
-
-//                if(memory.read_byte(0xFF02) == (byte)0x80) {
-//                    memory.write(interrupt_pointer, (byte) (memory.read_byte(interrupt_pointer) | 8));
-//                    memory.write(0xFF02, (byte)0x0);
-//                }
 
                 byte enabled_interrupts = memory.read_byte(interrupt_enable_pointer);
                 byte requested_interrupts = memory.read_byte(interrupt_request_pointer);
@@ -209,7 +185,7 @@ public class CPU {
                 }
             }
         }
-        CPU.memory.write(0xFF41, (byte) ((byte)( CPU.memory.read_byte(0xFF41) + 1)%4));
+//        CPU.memory.write(0xFF41, (byte) ((byte)( CPU.memory.read_byte(0xFF41) + 1)%4));
         cycles++;
     }
 }

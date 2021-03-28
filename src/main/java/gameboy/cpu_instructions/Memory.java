@@ -85,7 +85,7 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0x82, length = 1, cycles = 1)
     public static void add_a_d() {
-        add_register(CPU.AF.A, CPU.DE.E.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.DE.D.getValue(), false, false);
     }
 
     @Opcode(value = 0x83, length = 1, cycles = 1)
