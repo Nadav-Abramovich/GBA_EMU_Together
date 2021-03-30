@@ -419,7 +419,7 @@ public class Load implements CPUInstructions {
     public static void xor_d8() {
         byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
         CPU.AF.A.setValue((byte)((CPU.AF.A.getValue() ^ d8)));
-        if(CPU.AF.getValue() == 0) {
+        if(CPU.AF.A.getValue() == 0) {
             CPU.setFlags(Flags.ZERO);
         } else {
             CPU.setFlags((byte) 0);
@@ -436,7 +436,7 @@ public class Load implements CPUInstructions {
     public static void or_d8() {
         byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
         CPU.AF.A.setValue((byte)((CPU.AF.A.getValue() | d8)&255));
-        if(CPU.AF.getValue() == 0) {
+        if(CPU.AF.A.getValue() == 0) {
             CPU.setFlags(Flags.ZERO);
         } else {
             CPU.setFlags((byte) 0);

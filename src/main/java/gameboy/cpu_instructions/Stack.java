@@ -33,9 +33,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xC1, length = 1, cycles = 3)
     public static void pop_bc() {
-        CPU.BC.C.setValue(CPU.memory.read_byte(CPU.SP.getValue()));
-        CPU.BC.B.setValue(CPU.memory.read_byte(CPU.SP.getValue() + 1));
-        CPU.SP.increment(2);
+        CPU.BC.setValue(pop_from_stack_d16());
     }
 
     @Opcode(value = 0xC4, length = 3, cycles = 6, should_update_pc = false)
@@ -150,9 +148,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xD1, length = 1, cycles = 3)
     public static void pop_de() {
-        CPU.DE.E.setValue(CPU.memory.read_byte(CPU.SP.getValue()));
-        CPU.DE.D.setValue(CPU.memory.read_byte(CPU.SP.getValue() + 1));
-        CPU.SP.increment(2);
+        CPU.DE.setValue(pop_from_stack_d16());
     }
 
     @Opcode(value = 0xD5, length = 1, cycles = 4)
@@ -162,9 +158,7 @@ public class Stack implements CPUInstructions {
 
     @Opcode(value = 0xE1, length = 1, cycles = 3)
     public static void pop_hl() {
-        CPU.HL.L.setValue(CPU.memory.read_byte(CPU.SP.getValue()));
-        CPU.HL.H.setValue(CPU.memory.read_byte(CPU.SP.getValue() + 1));
-        CPU.SP.increment(2);
+        CPU.HL.setValue(pop_from_stack_d16());
     }
 
     @Opcode(value = 0xE5, length = 1, cycles = 4)
@@ -173,10 +167,8 @@ public class Stack implements CPUInstructions {
     }
 
     @Opcode(value = 0xF1, length = 1, cycles = 3)
-    public static void pop_AF() {
-        CPU.AF.F.setValue(CPU.memory.read_byte(CPU.SP.getValue()));
-        CPU.AF.A.setValue(CPU.memory.read_byte(CPU.SP.getValue() + 1));
-        CPU.SP.increment(2);
+    public static void pop_af() {
+        CPU.AF.setValue(pop_from_stack_d16());
     }
 
     @Opcode(value = 0xF5, length = 1, cycles = 4)

@@ -70,96 +70,96 @@ public class Memory implements CPUInstructions {
     @Opcode(value = 0x86, length = 1, cycles = 2)
     public static void add_a_from_hl() {
         char value = (char) CPU.memory.read_byte(CPU.HL.getValue());
-        add_register(CPU.AF.A, value, false, false);
+        add_register(CPU.AF.A, value, false, false, false);
     }
 
     @Opcode(value = 0x80, length = 1, cycles = 1)
     public static void add_a_b() {
-        add_register(CPU.AF.A, CPU.BC.B.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.BC.B.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x81, length = 1, cycles = 1)
     public static void add_a_c() {
-        add_register(CPU.AF.A, CPU.BC.C.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.BC.C.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x82, length = 1, cycles = 1)
     public static void add_a_d() {
-        add_register(CPU.AF.A, CPU.DE.D.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.DE.D.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x83, length = 1, cycles = 1)
     public static void add_a_e() {
-        add_register(CPU.AF.A, CPU.DE.E.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.DE.E.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x84, length = 1, cycles = 1)
     public static void add_a_h() {
-        add_register(CPU.AF.A, CPU.HL.H.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.HL.H.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x85, length = 1, cycles = 2)
     public static void add_a_l() {
-        add_register(CPU.AF.A, CPU.HL.L.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.HL.L.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x87, length = 1, cycles = 2)
     public static void add_a_a() {
-        add_register(CPU.AF.A, CPU.AF.A.getValue(), false, false);
+        add_register(CPU.AF.A, CPU.AF.A.getValue(), false, false, false);
     }
 
     @Opcode(value = 0x88, length = 1, cycles = 2)
     public static void adc_a_b() {
-        add_register(CPU.AF.A, CPU.BC.B.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.BC.B.getValue(), true, false, false);
     }
 
     @Opcode(value = 0x89, length = 1, cycles = 2)
     public static void adc_a_c() {
-        add_register(CPU.AF.A, CPU.BC.C.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.BC.C.getValue(), true, false, false);
     }
 
     @Opcode(value = 0x8A, length = 1, cycles = 2)
     public static void adc_a_d() {
-        add_register(CPU.AF.A, CPU.DE.D.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.DE.D.getValue(), true, false, false);
     }
 
     @Opcode(value = 0x8B, length = 1, cycles = 2)
     public static void adc_a_e() {
-        add_register(CPU.AF.A, CPU.DE.E.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.DE.E.getValue(), true, false, false);
     }
 
     @Opcode(value = 0x8C, length = 1, cycles = 2)
     public static void adc_a_h() {
-        add_register(CPU.AF.A, CPU.HL.H.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.HL.H.getValue(), true, false, false);
     }
 
     @Opcode(value = 0x8E, length = 1, cycles = 2)
     public static void adc_a_from_hl() {
         byte HL_value = CPU.memory.read_byte(CPU.HL.getValue());
-        add_register(CPU.AF.A, HL_value, true, false);
+        add_register(CPU.AF.A, HL_value, true, false, false);
     }
 
     @Opcode(value = 0x8F, length = 1, cycles = 2)
     public static void adc_a_a() {
-        add_register(CPU.AF.A, CPU.AF.A.getValue(), true, false);
+        add_register(CPU.AF.A, CPU.AF.A.getValue(), true, false, false);
     }
 
     @Opcode(value = 0xC6, length = 2, cycles = 2)
     public static void add_a_d8() {
         int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        add_register(CPU.AF.A, d8_value, false, false);
+        add_register(CPU.AF.A, d8_value, false, false, false);
     }
 
     @Opcode(value = 0xCE, length = 2, cycles = 2)
     public static void adc_a_d8() {
-        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1), true, false);
+        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1), true, false, false);
     }
 
 
     @Opcode(value = 0xD6, length = 2, cycles = 2)
     public static void sub_d8() {
         int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        add_register(CPU.AF.A, d8_value, false, true);
+        add_register(CPU.AF.A, d8_value, false, true, false);
     }
 
     @Opcode(value = 0xF8, length = 2, cycles = 3)

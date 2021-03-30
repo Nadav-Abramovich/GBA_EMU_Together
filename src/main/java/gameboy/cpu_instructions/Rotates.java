@@ -167,7 +167,6 @@ public class Rotates implements CPUInstructions {
 
     @Opcode(value = 0xCB38, length = 2, cycles = 2)
     public static void srl_b() {
-        char new_msb = 0;
         if ((CPU.BC.B.getValue() & 1) != 0) {
             CPU.turnOnFlags(Flags.CARRY);
         } else {
@@ -184,7 +183,6 @@ public class Rotates implements CPUInstructions {
 
     @Opcode(value = 0xCB3F, length = 2, cycles = 2)
     public static void srl_a() {
-        char new_msb = 0;
         if ((CPU.AF.A.getValue() & 1) != 0) {
             CPU.turnOnFlags(Flags.CARRY);
         } else {
