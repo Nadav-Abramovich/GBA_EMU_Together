@@ -23,16 +23,21 @@ public class HelperFunctions {
         if (CPU.AF.isCarryFlagOn()) {
             carry_value = 1;
         }
+        if(carry) {
+            value += carry_value;
+        }
 
         if (!subtract) {
             // 16 bit addition
             if (reg instanceof RegisterPair) {
                 value &= 0xFFFF;
                 long sum = reg.getValue();
-                sum += value;
-                if(carry) {
-                    sum += carry_value;
+                if((((reg.getValue()>>8) & 0xF) + ((value>>8) & 0xF)) > 0xF){
+                    CPU.turnOnFlags(Flags.HALF_CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.HALF_CARRY);
                 }
+                sum += value;
 
                 if (sum > 0xFFFF) {
                     CPU.turnOnFlags(Flags.CARRY);
@@ -44,13 +49,12 @@ public class HelperFunctions {
             // 8 bit addition
             else {
                 value &= 0xFF;
-                if((byte)((reg.getValue() & 0xF) + (value & 0xF)) > (byte)0xF){
+                if( ((reg.getValue() & 0xF) + (value & 0xF)) > 0xF){
                     CPU.turnOnFlags(Flags.HALF_CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.HALF_CARRY);
                 }
                 char sum = (char) (reg.getValue() + (char) (value & 255));
-                if(carry) {
-                    sum += carry_value;
-                }
 
                 if (sum > 0xFF) {
                     CPU.turnOnFlags(Flags.CARRY);
@@ -68,6 +72,13 @@ public class HelperFunctions {
                 char sum = reg.getValue();
                 sum -= value;
 
+                if(( (((reg.getValue()>>8) & 0xF) - ((value>>8) & 0xF)) & 0x10) != 0)
+                {
+                    CPU.turnOnFlags(Flags.HALF_CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.HALF_CARRY);
+                }
+
                 if (value > reg.getValue()) {
                     CPU.turnOnFlags(Flags.CARRY);
                 } else {
@@ -79,6 +90,12 @@ public class HelperFunctions {
             else {
                 value &= 0xFF;
                 byte sum = (byte) ((reg.getValue() - value) & 0xFF);
+                if(( ((reg.getValue() & 0xF) - (value & 0xF)) & 0x10) != 0)
+                {
+                    CPU.turnOnFlags(Flags.HALF_CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.HALF_CARRY);
+                }
                 if (value > reg.getValue()) {
                     CPU.turnOnFlags(Flags.CARRY);
                 } else {

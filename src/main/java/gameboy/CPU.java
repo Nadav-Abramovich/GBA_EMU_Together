@@ -34,6 +34,7 @@ public class CPU {
     public static boolean IME = false; // Interrupt master enable
     private static PrintWriter writer;
 
+    public static boolean HALTED = false;
 
     public static void setFlags(byte value) {
         AF.F.setValue((byte) (value & 255));
@@ -73,6 +74,11 @@ public class CPU {
     }
 
     private static char get_opcode() {
+//        while (PC.getValue() > 0x7FFF && PC.getValue() < 0xC000) {
+//            System.out.println("");
+//            memory.bank_number++;
+//            PC.setValue((char)(PC.getValue() - 0x4000));
+//        }
         if (PC.getValue() == 0x100) {
 //            if(AF.getValue() != 0x01B0) {
 //                System.out.printf("Bad value for AF 0x%s", Integer.toHexString(AF.getValue()));
@@ -114,9 +120,10 @@ public class CPU {
         try {
             writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
 //            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+//            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
 //            System.out.println(Integer.toHexString(CPU.DE.getValue()).toUpperCase());
 
-
+//            System.out.println(Integer.toHexString(PC.getValue()).toUpperCase());
             action.invoke(null);
             Opcode opcode_metadata = action.getAnnotation(Opcode.class);
             performed_cycles += opcode_metadata.cycles();
@@ -136,11 +143,13 @@ public class CPU {
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);
 
-            if (action != null) {
-                execute_action(action, opcode);
-            } else {
-                System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
-                System.exit(1);
+            if(!HALTED) {
+                if (action != null) {
+                    execute_action(action, opcode);
+                } else {
+                    System.out.printf(OPCODE_NOT_IMPLEMENTED_MSG_FORMAT, Integer.toHexString(opcode));
+                    System.exit(1);
+                }
             }
             if (IME && PC.getValue() > 0x100) {
                 int interrupt_request_pointer = 0xFF0F;
@@ -156,6 +165,7 @@ public class CPU {
                     memory.write(0xFF0F, (byte) 1);
                     requested_interrupts &= 254;
                     memory.write(interrupt_request_pointer, requested_interrupts);
+                    HALTED = false;
                 }
 
                 // serial transfer complete
@@ -168,19 +178,23 @@ public class CPU {
                     requested_interrupts &= (255 - 8);
                     memory.write(interrupt_request_pointer, requested_interrupts);
                     memory.write(0xFF01, (byte) 0xFF);
-                } else if ((current_interrupt_requests & 16) != 0) {
+                    HALTED = false;
+                }
+                else if ((current_interrupt_requests & 16) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x60);
                     IME = false;
                     memory.write(0xFF0F, (byte) 16);
                     requested_interrupts &= (255 - 16);
                     memory.write(interrupt_request_pointer, requested_interrupts);
+                    HALTED = false;
                 } else if (memory.read_byte(0xFF50) == 1) {
                     if (((char) (memory.read_byte(0xFF44) & 255) == 144)) {
                         push_to_stack_d16(PC.getValue());
                         PC.setValue((char) 0x40);
                         memory.write(0xFF0F, (byte) 1);
                         IME = false;
+                        HALTED = false;
                     }
                 }
             }

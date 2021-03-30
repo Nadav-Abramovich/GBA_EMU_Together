@@ -130,6 +130,15 @@ public class Stack implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xE7, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_4() {
+        char target_lower = 0x20;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
+    }
+
     @Opcode(value = 0xEF, length = 1, cycles = 4, should_update_pc = false)
     public static void rst_5() {
         char target_lower = 0x28;

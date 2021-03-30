@@ -139,6 +139,11 @@ public class Memory implements CPUInstructions {
         add_register(CPU.AF.A, HL_value, true, false);
     }
 
+    @Opcode(value = 0x8F, length = 1, cycles = 2)
+    public static void adc_a_a() {
+        add_register(CPU.AF.A, CPU.AF.A.getValue(), true, false);
+    }
+
     @Opcode(value = 0xC6, length = 2, cycles = 2)
     public static void add_a_d8() {
         int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1);

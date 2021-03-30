@@ -67,7 +67,7 @@ public class ScreenLow {
             assert vidmode != null;
             glfwSetWindowPos(
                     window,
-                    (vidmode.width() - pWidth.get(0)) / 2,
+                    (vidmode.width() - pWidth.get(0)) / 2 + 85,
                     (vidmode.height() - pHeight.get(0)) / 2
             );
         } // the stack frame is popped automatically
@@ -193,7 +193,7 @@ public class ScreenLow {
     private static void draw_background() {
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                    int sprite_pointer = 0x8000 + 0x10 * x + 0x10*32*y;
+                    int sprite_pointer = 0x8800 + 0x10 * x + 0x10*32*y;
                     draw_tile(sprite_pointer, x, y, true, false);
             }
         }
@@ -204,7 +204,7 @@ public class ScreenLow {
             for (int x = 0; x < 32; x++) {
                 byte val = CPU.memory.read_byte(0x9C00 + y * 32 + x);
                 if (val != 0) {
-                    var sprite_pointer = 0x8000 + 0x10 * val;
+                    var sprite_pointer = 0x8800 + 0x10 * val;
                     draw_tile(sprite_pointer, x, y, true, false);
                 }
             }
@@ -217,7 +217,7 @@ public class ScreenLow {
             char x = (char) (CPU.memory.read_byte(i + 1) & 255 - 8);
             char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
             char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
-            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
+            char sprite_pointer = (char) (0x8800 + 0x10 * tile_index);
             draw_tile(sprite_pointer, x, y, false, false);
         }
     }
@@ -237,7 +237,7 @@ public class ScreenLow {
             int y = (index / 0x10) * 0x10 + 16;
             char tile_index = (char) (CPU.memory.read_byte(i + 2) & 255);
             char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
-            char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
+            char sprite_pointer = (char) (0x8800 + 0x10 * tile_index);
             draw_tile(sprite_pointer, x, y, false, false);
         }
     }

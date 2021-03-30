@@ -133,6 +133,17 @@ public class Rotates implements CPUInstructions {
     }
 
     // TODO: Find a better place
+    @Opcode(value = 0x3F, length = 1, cycles = 1)
+    public static void cff() {
+        if(CPU.AF.isCarryFlagOn()) {
+            CPU.turnOffFlags(Flags.CARRY);
+        } else {
+            CPU.turnOnFlags(Flags.CARRY);
+        }
+        CPU.turnOffFlags((byte)(Flags.HALF_CARRY | Flags.SUBTRACTION));
+    }
+
+    // TODO: Find a better place
     @Opcode(value = 0xCB33, length = 2, cycles = 2)
     public static void swap_e() {
         CPU.DE.E.setValue((byte) ((CPU.DE.E.getValue() >> 4) | (CPU.DE.E.getValue() << 4)));

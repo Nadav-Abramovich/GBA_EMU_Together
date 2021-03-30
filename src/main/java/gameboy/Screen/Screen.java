@@ -66,7 +66,7 @@ public class Screen {
             assert vidmode != null;
             glfwSetWindowPos(
                     window,
-                    (vidmode.width() - pWidth.get(0)) / 2,
+                    (vidmode.width() - pWidth.get(0)) / 2 - 85,
                     (vidmode.height() - pHeight.get(0)) / 2
             );
         } // the stack frame is popped automatically
@@ -189,7 +189,8 @@ public class Screen {
         }
     }
 
-    private static void draw_tile(int sprite_pointer, int x, int y, boolean putpixel_by_tile, boolean should_add_vertical_horizontal_y) {
+    private static void draw_tile(int sprite_pointer, int x, int y, boolean putpixel_by_tile,
+                                  boolean should_add_vertical_horizontal_y, boolean flip_x, boolean flip_y) {
         for (int line = 0; line < 8; line++) {
             for (int col = 0; col < 8; col++) {
                 int LOWER = (CPU.memory.read_byte(sprite_pointer + line * 2) & 255) & (1 << col);
@@ -227,7 +228,15 @@ public class Screen {
                     if(putpixel_by_tile) {
                         putPixel(x, y, line, col, color);
                     } else {
-                        putPixel2(x, y, line, col, color);
+                        if(flip_y && flip_x) {
+                            putPixel2(x, y, 8-line, 8-col, color);
+                        } else if (flip_x) {
+                            putPixel2(x, y, line, 8-col, color);
+                        } else if(flip_y) {
+                            putPixel2(x, y, 16-line, col, color);
+                        } else {
+                            putPixel2(x, y, line, col, color);
+                        }
                     }
                 }
             }
@@ -237,13 +246,12 @@ public class Screen {
     private static void draw_background() {
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                int val = CPU.memory.read_byte(0x9800 + y * 32 + x) & 255;
+                int base_address = (CPU.memory.read_byte(0xFF40)&(1<<3)) != 0?0x9C00:0x9800;
+                int val = CPU.memory.read_byte(base_address + y * 32 + x) & 255;
                 if (val != 0) {
-                    int sprite_pointer = 0x8000 + 0x10 * val;
-                    if(val == 23) {
-                        System.out.println();
-                    }
-                    draw_tile(sprite_pointer, x, y, true, true);
+                    int sprite_base_address = (CPU.memory.read_byte(0xFF40)&(1<<4)) != 0?0x8000:0x8800;
+                    int sprite_pointer = sprite_base_address + 0x10 * val;
+                    draw_tile(sprite_pointer, x, y, true, true, false, false);
                 }
             }
         }
@@ -252,10 +260,12 @@ public class Screen {
     private static void draw_window() {
         for (int y = 0; y < 32; y++) {
             for (int x = 0; x < 32; x++) {
-                byte val = CPU.memory.read_byte(0x9C00 + y * 32 + x);
+                int base_address = (CPU.memory.read_byte(0xFF40)&(1<<6)) != 0?0x9C00:0x9800;
+                byte val = CPU.memory.read_byte(base_address + y * 32 + x);
                 if (val != 0) {
-                    var sprite_pointer = 0x8000 + 0x10 * val;
-                    draw_tile(sprite_pointer, x, y, true, false);
+                    int sprite_base_address = (CPU.memory.read_byte(0xFF40)&(1<<4)) != 0?0x8000:0x8800;
+                    var sprite_pointer = sprite_base_address + 0x10 * val;
+                    draw_tile(sprite_pointer, x, y, true, false, false, false);
                 }
             }
         }
@@ -270,8 +280,15 @@ public class Screen {
                 System.out.println("AAA");
             }
             char attributes = (char) (CPU.memory.read_byte(i + 3) & 255);
+            boolean flip_x = false, flip_y = false;
+            if((attributes & 64) != 0) {
+                flip_y = true;
+            }
+            if((attributes & 32) != 0) {
+                flip_x = true;
+            }
             char sprite_pointer = (char) (0x8000 + 0x10 * tile_index);
-            draw_tile(sprite_pointer, x, y, false, false);
+            draw_tile(sprite_pointer, x, y, false, false, flip_x, flip_y);
         }
     }
 

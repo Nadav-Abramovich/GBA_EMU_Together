@@ -2,13 +2,14 @@ package gameboy;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\Tetris.gb";
-    private int bank_number = 1;
+    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\cpu_instrs_06.gb";
+    public int bank_number = 1;
 
     private final byte[] _memory;
     public final byte[] boot_rom = new byte[0xFF + 1];
@@ -25,6 +26,15 @@ public class Memory {
     }
 
     public void write(int address, byte value) {
+        if(address == 0xFF01) {
+            System.out.print((char)value);
+        }
+        if(address == 0x8000) {
+            System.out.println(CPU.PC.getValue());
+        }
+        if(address == 0xFF40) {
+//            System.out.println(value);
+        }
         if (address == 0xFF00) {
             // Action buttons
             if (value == 32 ) {
@@ -51,8 +61,8 @@ public class Memory {
 //                System.out.println("OK2");
             }
         }
-        if (address < 0x2000) {
-//            System.out.println("BADALACH");
+        if (address == 0x8000) {
+            System.out.println("BADALACH");
         }
         if (address >= 0x2000 && address <= 0x3FFF) {
 //            System.out.println("OPALACH " + Integer.toHexString(value).toUpperCase());
@@ -117,7 +127,13 @@ public class Memory {
             if(address <= 0x3FFF) {
                 return game_rom[address];
             }
-            return game_rom[(0x7FFF - 0x4000 + 1) * (bank_number-1) + address];
+//            return game_rom[address];
+            int base = 0x4000;
+            address -= base;
+            address = 0x4000 * bank_number + address;
+//            System.out.printf("bank: 0x%s\r\n", Integer.toHexString(bank_number).toUpperCase());
+//            System.out.printf("Address: 0x%s\r\n", Integer.toHexString(address).toUpperCase());
+            return game_rom[address];
         }
         return _memory[address];
     }
