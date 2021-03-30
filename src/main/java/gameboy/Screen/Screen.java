@@ -163,20 +163,22 @@ public class Screen {
 
     private static void putPixel(int x, int y, int line, int col, int color) {
         int real_x = x * 8 + (8 - col);
-
-        int real_y = 256 - (y * 8 + line);
+        // The y axis is from bottom and upwards so (0,0) is bottom-left....
+        int real_y = 255 - ((byte)(y * 8 + line))&255;
         if (real_y > 0 && real_x > 0 && real_x < 256 && real_y < 256) {
             screen[real_y][real_x][0] = (byte) ((color >> 16) & 255);
             screen[real_y][real_x][1] = (byte) ((color >> 8) & 255);
             screen[real_y][real_x][2] = (byte) (color & 255);
             screen[real_y][real_x][3] = (byte) ((color >> 24) & 255);
+        } else {
+//            System.out.printf("NOT DRAWING: 0x%s, 0x%s\r\n", Integer.toHexString(real_x).toUpperCase(), Integer.toHexString(real_y).toUpperCase());
         }
     }
 
     private static void putPixel2(int x, int y, int line, int col, int color) {
         int real_x = x + (8 - col);
 
-        int real_y = 256 - (y + line);
+        int real_y = 255 - (y + line);
         if (real_y >= 0 && real_x >= 0 && real_x < 256 && real_y < 256) {
             screen[real_y][real_x][0] = (byte) ((color >> 16) & 255);
             screen[real_y][real_x][1] = (byte) ((color >> 8) & 255);
@@ -223,7 +225,7 @@ public class Screen {
                 char vertical_y = (char) (CPU.memory.read_byte(0xFF42) & 255);
                 char horizontal_x = (char) (CPU.memory.read_byte(0xFF43) & 255);
                 if(should_add_vertical_horizontal_y) {
-                    putPixel(x + horizontal_x, y + vertical_y, line, col, color);
+                    putPixel(x, y, line - vertical_y, col - horizontal_x, color);
                 } else {
                     if(putpixel_by_tile) {
                         putPixel(x, y, line, col, color);

@@ -20,44 +20,40 @@ public class HelperFunctions {
     // TODO: Fix halfcarry
     public static void add_register(Register reg, int value, boolean carry, boolean subtract, boolean is_inc_dec) {
         int carry_value = 0;
-        if (CPU.AF.isCarryFlagOn()) {
+        if (CPU.AF.isCarryFlagOn() && carry) {
             carry_value = 1;
         }
-        if(carry) {
-            value += carry_value;
+        if(value == -32768) {
+            System.out.println();
         }
-
         if (!subtract) {
             // 16 bit addition
             if (reg instanceof RegisterPair) {
-                value &= 0xFFFF;
                 long sum = reg.getValue();
-                if(!is_inc_dec) {
-                    if ((((value >> 8) & 0xF) + ((value >> 8) & 0xF)) > 0xF) {
-                        CPU.turnOnFlags(Flags.HALF_CARRY);
-                    } else {
-                        CPU.turnOffFlags(Flags.HALF_CARRY);
-                    }
-                }
-                sum += value;
-                if(!is_inc_dec) {
-                    if (sum > 0xFFFF) {
-                        CPU.turnOnFlags(Flags.CARRY);
-                    } else {
-                        CPU.turnOffFlags(Flags.CARRY);
-                    }
-                }
-                reg.setValue((char) (sum & 0xFFFF));
-            }
-            // 8 bit addition
-            else {
-                value &= 0xFF;
-                if( ((reg.getValue() & 0xF) + (value & 0xF)) > 0xF){
+                if( (((reg.getValue()>>8) & 0xF) + ((value>>8) & 0xF) + carry_value) > 0xF){
                     CPU.turnOnFlags(Flags.HALF_CARRY);
                 } else {
                     CPU.turnOffFlags(Flags.HALF_CARRY);
                 }
-                char sum = (char) (reg.getValue() + (char) (value & 255));
+
+                sum += value;
+                sum += carry_value;
+                if (sum > 0xFFFF || (reg.getValue() > 0 && sum < 0)) {
+                    CPU.turnOnFlags(Flags.CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.CARRY);
+                }
+                reg.setValue((char)sum);
+            }
+            // 8 bit addition
+            else {
+                if( ((reg.getValue() & 0xF) + (value & 0xF) + carry_value) > 0xF){
+                    CPU.turnOnFlags(Flags.HALF_CARRY);
+                } else {
+                    CPU.turnOffFlags(Flags.HALF_CARRY);
+                }
+                char sum = (char) (reg.getValue() + value);
+                sum += carry_value;
                 if(!is_inc_dec) {
                     if (sum > 0xFF) {
                         CPU.turnOnFlags(Flags.CARRY);
@@ -75,9 +71,8 @@ public class HelperFunctions {
             }
             // 8 bit subtraction
             else {
-                value &= 0xFF;
-                byte sum = (byte) ((reg.getValue() - value) & 0xFF);
-                if((reg.getValue() & 0xF) - (value & 0xF) < 0)
+                byte sum = (byte) ((reg.getValue() - value - carry_value) & 0xFF);
+                if((reg.getValue() & 0xF) - (value & 0xF) - carry_value < 0)
                 {
                     CPU.turnOnFlags(Flags.HALF_CARRY);
                 } else {

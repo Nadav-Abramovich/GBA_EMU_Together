@@ -36,13 +36,13 @@ public class Gameboy {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 0, 4, TimeUnit.NANOSECONDS);
+        }, 0, 1, TimeUnit.NANOSECONDS);
     }
     public void tick() {
         Screen.loop();
         ScreenLow.loop();
         // Busy wait on main thread as lwjgl needs to be run / updated from the mainthread...
         long start = System.nanoTime();
-        while(start + 114 * 4 >= System.nanoTime());
+        while(start + 114 * 1 >= System.nanoTime());
     }
 }

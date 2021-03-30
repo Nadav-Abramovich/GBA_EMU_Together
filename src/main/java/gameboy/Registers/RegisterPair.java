@@ -15,6 +15,10 @@ public class RegisterPair extends Register {
         return (char) (lower.getValue() | (higher.getValue() << 8));
     }
 
+    public short getSignedValue() {
+        return (short) (lower.getValue() | (higher.getValue() << 8));
+    }
+
     public void increment(int amount) {
         this.setValue((char) (this.getValue() + amount));
     }

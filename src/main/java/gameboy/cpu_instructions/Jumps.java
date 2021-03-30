@@ -92,6 +92,18 @@ public class Jumps implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xDA, length = 3, cycles = 3, should_update_pc = false)
+    public static void jp_c_a16() {
+        if(CPU.AF.isCarryFlagOn()) {
+            char lower = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
+            char higher = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 2) & 255);
+            CPU.PC.setValue((char) (lower | (higher << 8)));
+            CPU.performed_cycles += 1;
+        } else {
+            CPU.PC.increment(3);
+        }
+    }
+
     @Opcode(value = 0xE9, length = 1, cycles = 1, should_update_pc = false)
     public static void jp_hl() {
         CPU.PC.setValue(CPU.HL.getValue());

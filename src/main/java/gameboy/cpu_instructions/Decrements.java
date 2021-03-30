@@ -16,7 +16,7 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x0B, length = 1, cycles = 2)
     public static void dec_bc() {
-        add_register(CPU.BC, 1, false, true, true);
+        CPU.BC.increment(-1);
     }
 
     @Opcode(value = 0x0D, length = 1, cycles = 1)
@@ -31,7 +31,7 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x1B, length = 1, cycles = 2)
     public static void dec_de() {
-        add_register(CPU.DE, 1, false, true, true);
+        CPU.DE.increment(-1);
     }
 
     @Opcode(value = 0x1D, length = 1, cycles = 1)
@@ -51,7 +51,7 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x2B, length = 1, cycles = 2)
     public static void dec_hl() {
-        add_register(CPU.HL, 1, false, true, true);
+        CPU.HL.increment(-1);
     }
 
     @Opcode(value = 0x35, length = 1, cycles = 3)
@@ -76,7 +76,7 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x3B, length = 1, cycles = 2)
     public static void dec_sp() {
-        add_register(CPU.SP, 1, false, true, true);
+        CPU.SP.increment(-1);
     }
 
     @Opcode(value = 0x3D, length = 1, cycles = 1)

@@ -134,7 +134,7 @@ public class Rotates implements CPUInstructions {
 
     // TODO: Find a better place
     @Opcode(value = 0x3F, length = 1, cycles = 1)
-    public static void cff() {
+    public static void ccf() {
         if(CPU.AF.isCarryFlagOn()) {
             CPU.turnOffFlags(Flags.CARRY);
         } else {
@@ -147,6 +147,19 @@ public class Rotates implements CPUInstructions {
     @Opcode(value = 0xCB33, length = 2, cycles = 2)
     public static void swap_e() {
         CPU.DE.E.setValue((byte) ((CPU.DE.E.getValue() >> 4) | (CPU.DE.E.getValue() << 4)));
+        if (CPU.DE.E.getValue() == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
+    }
+
+    // TODO: Find a better place
+    @Opcode(value = 0xCB36, length = 2, cycles = 2)
+    public static void swap_from_hl() {
+        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
+        new_value = (byte)((new_value<<4)|(new_value>>4));
+        CPU.memory.write(CPU.HL.getValue(), new_value);
         if (CPU.DE.E.getValue() == 0) {
             CPU.setFlags(Flags.ZERO);
         } else {

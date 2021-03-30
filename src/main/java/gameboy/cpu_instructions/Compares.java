@@ -41,9 +41,60 @@ public class Compares implements CPUInstructions {
         CPU.turnOnFlags(Flags.SUBTRACTION);
     }
 
+    @Opcode(value = 0xBA, length = 1, cycles = 1)
+    public static void cp_d() {
+        char compare_value = CPU.DE.D.getValue();
+        if (CPU.AF.A.getValue() < compare_value) {
+            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (CPU.AF.A.getValue() == compare_value) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+
+        CPU.turnOnFlags(Flags.SUBTRACTION);
+    }
+
     @Opcode(value = 0xBB, length = 1, cycles = 1)
     public static void cp_e() {
         char compare_value = CPU.DE.E.getValue();
+        if (CPU.AF.A.getValue() < compare_value) {
+            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (CPU.AF.A.getValue() == compare_value) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+
+        CPU.turnOnFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0xBC, length = 1, cycles = 1)
+    public static void cp_h() {
+        char compare_value = CPU.HL.H.getValue();
+        if (CPU.AF.A.getValue() < compare_value) {
+            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (CPU.AF.A.getValue() == compare_value) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+
+        CPU.turnOnFlags(Flags.SUBTRACTION);
+    }
+
+    @Opcode(value = 0xBD, length = 1, cycles = 1)
+    public static void cp_l() {
+        char compare_value = CPU.HL.L.getValue();
         if (CPU.AF.A.getValue() < compare_value) {
             CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
         } else {
@@ -74,6 +125,24 @@ public class Compares implements CPUInstructions {
 
         CPU.turnOnFlags(Flags.SUBTRACTION);
     }
+
+    @Opcode(value = 0xBF, length = 1, cycles = 2)
+    public static void cp_a() {
+        char compare_value = CPU.AF.A.getValue();
+        if (CPU.AF.A.getValue() < compare_value) {
+            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
+        }
+        if (CPU.AF.A.getValue() == compare_value) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+
+        CPU.turnOnFlags(Flags.SUBTRACTION);
+    }
+
 
     @Opcode(value = 0xFE, length = 2, cycles = 2)
     public static void cp_d8() {

@@ -133,6 +133,11 @@ public class Memory implements CPUInstructions {
         add_register(CPU.AF.A, CPU.HL.H.getValue(), true, false, false);
     }
 
+    @Opcode(value = 0x8D, length = 1, cycles = 2)
+    public static void adc_a_l() {
+        add_register(CPU.AF.A, CPU.HL.L.getValue(), true, false, false);
+    }
+
     @Opcode(value = 0x8E, length = 1, cycles = 2)
     public static void adc_a_from_hl() {
         byte HL_value = CPU.memory.read_byte(CPU.HL.getValue());
@@ -164,12 +169,8 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0xF8, length = 2, cycles = 3)
     public static void ld_hl_sp_plus_s8() {
-        byte Byte = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        CPU.setFlags((byte) 0);
-        if((Byte + CPU.SP.getValue()) > 255) {
-            CPU.turnOnFlags((byte) (Flags.CARRY | Flags.HALF_CARRY));
-        }
-
-        CPU.HL.setValue((byte) (Byte + CPU.SP.getValue()));
+        CPU.HL.setValue(CPU.SP.getValue());
+        add_register(CPU.HL, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false);
+        CPU.turnOffFlags(Flags.ZERO);
     }
 }

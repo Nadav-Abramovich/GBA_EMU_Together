@@ -118,6 +118,30 @@ public class Stack implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xD4, length = 3, cycles = 6, should_update_pc = false)
+    public static void call_nc_a16() {
+        if (!CPU.AF.isCarryFlagOn()) {
+            char target_lower = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
+            char target_higher = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 2) & 255);
+
+            push_to_stack_d16((char) (CPU.PC.getValue() + 3));
+            CPU.PC.setValue((char) ((target_higher << 8) | target_lower));
+            CPU.performed_cycles += 6;
+        } else {
+            CPU.PC.increment(3);
+            CPU.performed_cycles += 6;
+        }
+    }
+
+    @Opcode(value = 0xD7, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_2() {
+        char target_lower = 0x10;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
+    }
+
     @Opcode(value = 0xD8, length = 1, cycles = 2, should_update_pc = false)
     public static void ret_c() {
         if (CPU.AF.isCarryFlagOn()) {
@@ -126,6 +150,30 @@ public class Stack implements CPUInstructions {
         } else {
             CPU.PC.increment(1);
         }
+    }
+
+    @Opcode(value = 0xDC, length = 3, cycles = 6, should_update_pc = false)
+    public static void call_c_a16() {
+        if (CPU.AF.isCarryFlagOn()) {
+            char target_lower = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);
+            char target_higher = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 2) & 255);
+
+            push_to_stack_d16((char) (CPU.PC.getValue() + 3));
+            CPU.PC.setValue((char) ((target_higher << 8) | target_lower));
+            CPU.performed_cycles += 6;
+        } else {
+            CPU.PC.increment(3);
+            CPU.performed_cycles += 6;
+        }
+    }
+
+    @Opcode(value = 0xDF, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_3() {
+        char target_lower = 0x18;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
     }
 
     @Opcode(value = 0xE7, length = 1, cycles = 4, should_update_pc = false)
@@ -174,6 +222,15 @@ public class Stack implements CPUInstructions {
     @Opcode(value = 0xF5, length = 1, cycles = 4)
     public static void push_af() {
         push_to_stack_d16(CPU.AF.getValue());
+    }
+
+    @Opcode(value = 0xF7, length = 1, cycles = 4, should_update_pc = false)
+    public static void rst_6() {
+        char target_lower = 0x30;
+        char target_higher = 0;
+
+        push_to_stack_d16((char) (CPU.PC.getValue() + 1));
+        CPU.PC.setValue(target_lower);
     }
 
     @Opcode(value = 0xF9, length = 1, cycles = 2)

@@ -89,7 +89,7 @@ public class CPU {
 ////                System.exit(1);
 //            }
             System.out.println("Starting ROM");
-            PRINT_DEBUG_MESSAGES = true;
+            PRINT_DEBUG_MESSAGES = false;
 
 //            AF.setValue((char) 0x01b0);
 //            BC.setValue((char) 0x0013);
@@ -118,9 +118,9 @@ public class CPU {
 
     private static void execute_action(Method action, char opcode) {
         try {
-            if(CPU.PC.getValue() != 0xCC5F) {
+            if(PRINT_DEBUG_MESSAGES && CPU.PC.getValue() != 0xC7D2) {
                 writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
-                System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
             }
 //            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
 //            System.out.println(Integer.toHexString(CPU.DE.getValue()).toUpperCase());
@@ -141,7 +141,6 @@ public class CPU {
     public static void tick() {
         // make time tick?
         memory.write(0xFF04, (byte) ((memory.read_byte(0xFF04) & 255) + 1));
-        memory.write(0xFF44, (byte)144);
         char opcode = get_opcode();
         if (cycles >= performed_cycles) {
             Method action = supported_actions.getOrDefault(opcode, null);

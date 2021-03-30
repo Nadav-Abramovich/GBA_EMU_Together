@@ -432,6 +432,11 @@ public class Load implements CPUInstructions {
         CPU.AF.A.setValue(CPU.memory.read_byte(0xFF00 | a8));
     }
 
+    @Opcode(value = 0xF2, length = 1, cycles = 2)
+    public static void ld_a_from_c() {
+        CPU.AF.A.setValue(CPU.memory.read_byte(0xFF00 | CPU.BC.C.getValue()));
+    }
+
     @Opcode(value = 0xF6, length = 2, cycles = 2)
     public static void or_d8() {
         byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
