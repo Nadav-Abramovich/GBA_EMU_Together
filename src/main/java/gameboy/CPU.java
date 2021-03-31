@@ -63,6 +63,11 @@ public class CPU {
             Method[] functions = aClass.getDeclaredMethods();
             for (Method method : functions) {
                 Opcode annotation = method.getAnnotation(Opcode.class);
+                var duplicate = supported_actions.getOrDefault(annotation.value(), null);
+                if(duplicate != null) {
+                    System.out.println("Duplicate implementation for " + Integer.toHexString(annotation.value()));
+                    System.exit(0);
+                }
                 supported_actions.put(annotation.value(), method);
             }
         }
@@ -118,8 +123,11 @@ public class CPU {
 
     private static void execute_action(Method action, char opcode) {
         try {
-            if(PRINT_DEBUG_MESSAGES && CPU.PC.getValue() != 0xC7D2) {
+            if(PRINT_DEBUG_MESSAGES) {
                 writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
+                if(CPU.PC.getValue() == 0x1e7e) {
+                    int a=1;
+                }
 //                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
             }
 //            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
@@ -160,33 +168,50 @@ public class CPU {
                 byte enabled_interrupts = memory.read_byte(interrupt_enable_pointer);
                 byte requested_interrupts = memory.read_byte(interrupt_request_pointer);
                 byte current_interrupt_requests = (byte)(enabled_interrupts & requested_interrupts);
+                // Vblank interrupt
                 if ((current_interrupt_requests & 1) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x40);
                     IME = false;
-                    memory.write(0xFF0F, (byte) 1);
                     requested_interrupts &= 254;
                     memory.write(interrupt_request_pointer, requested_interrupts);
                     HALTED = false;
                 }
+                // STAT interrupt
+                else if ((current_interrupt_requests & 2) != 0) {
+                    push_to_stack_d16(PC.getValue());
+                    PC.setValue((char) 0x48);
+                    IME = false;
+                    requested_interrupts &= 253;
+                    memory.write(interrupt_request_pointer, requested_interrupts);
+                    HALTED = false;
+                }
+                // timer interrupt
+                else if ((current_interrupt_requests & 4) != 0) {
+                    push_to_stack_d16(PC.getValue());
+                    PC.setValue((char) 0x50);
+                    IME = false;
+                    requested_interrupts &= 251;
+                    memory.write(interrupt_request_pointer, requested_interrupts);
+                    HALTED = false;
+                }
 
-                // serial transfer complete
+                // Serial Interrupt
                 else if ((current_interrupt_requests & 8) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x58);
                     memory.write(0xFF01, (byte) 0xFF);
                     IME = false;
-                    memory.write(0xFF0F, (byte) 8);
                     requested_interrupts &= (255 - 8);
                     memory.write(interrupt_request_pointer, requested_interrupts);
                     memory.write(0xFF01, (byte) 0xFF);
                     HALTED = false;
                 }
+                // Joypad interrupt
                 else if ((current_interrupt_requests & 16) != 0) {
                     push_to_stack_d16(PC.getValue());
                     PC.setValue((char) 0x60);
                     IME = false;
-                    memory.write(0xFF0F, (byte) 16);
                     requested_interrupts &= (255 - 16);
                     memory.write(interrupt_request_pointer, requested_interrupts);
                     HALTED = false;

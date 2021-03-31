@@ -6,17 +6,13 @@ public class RegisterPair extends Register {
 
     @Override
     public void setValue(char value) {
-        this.lower.setValue((char) (value & 255));
-        this.higher.setValue((char) ((value >> 8) & 255));
+        this.lower.setValue((char) (value & 0xFF));
+        this.higher.setValue((char) ((value >> 8) & 0xFF));
     }
 
     @Override
     public char getValue() {
         return (char) (lower.getValue() | (higher.getValue() << 8));
-    }
-
-    public short getSignedValue() {
-        return (short) (lower.getValue() | (higher.getValue() << 8));
     }
 
     public void increment(int amount) {

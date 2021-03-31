@@ -18,20 +18,12 @@ public class Gameboy {
         CPU.init(_memory, this);
         Screen.init();
         ScreenLow.init();
-//        this.screen = new Screen(CPU.;
-//        this.screen_low = new Screen_low(CPU.;
 
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
         executorService.scheduleAtFixedRate(() -> {
-            try {  // Let no Exception reach the ScheduledExecutorService.
-//                if (CPU.PC.getValue() == 0x235) {
-//                    CPU.AF.A.setValue((byte) 148);
-//                }
-//                if (CPU.PC.getValue() == 0x282a) {
-//                    CPU.AF.A.setValue((byte) 145);
-//                }
+            try {
                 CPU.tick();
             } catch (Exception e) {
                 e.printStackTrace();

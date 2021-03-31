@@ -101,9 +101,6 @@ public class HelperFunctions {
                 CPU.turnOffFlags(Flags.ZERO);
             }
         }
-        if(override_d8) {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
     }
 
     public static void cmp_value(char value) {

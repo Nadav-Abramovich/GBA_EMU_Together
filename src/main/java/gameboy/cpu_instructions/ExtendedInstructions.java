@@ -133,6 +133,11 @@ public class ExtendedInstructions implements CPUInstructions {
     public static void rl_hl() {
         CPU.memory.write(CPU.HL.getValue(), rl_val(CPU.memory.read_byte(CPU.HL.getValue())));
     }
+
+    @Opcode(value = 0xCB17, length = 2, cycles = 2)
+    public static void rl_a() {
+        rl_reg(CPU.AF.A);
+    }
     // endregion
 
     // region RR

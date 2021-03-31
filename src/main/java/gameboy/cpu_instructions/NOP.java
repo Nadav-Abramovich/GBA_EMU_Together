@@ -13,6 +13,7 @@ public class NOP implements CPUInstructions {
 
     @Opcode(value = 0x37, length = 1, cycles = 1)
     public static void scf() {
+        CPU.turnOffFlags((byte) (Flags.HALF_CARRY | Flags.SUBTRACTION));
         CPU.turnOnFlags(Flags.CARRY);
     }
 }

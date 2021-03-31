@@ -33,5 +33,6 @@ public class Adds implements CPUInstructions {
     @Opcode(value = 0xE8, length = 2, cycles = 4)
     public static void add_sp_s8() {
         add_register(CPU.SP, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false, true);
+        CPU.turnOffFlags(Flags.ZERO);
     }
 }

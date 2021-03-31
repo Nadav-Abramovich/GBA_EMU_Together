@@ -191,10 +191,12 @@ public class ScreenLow {
     }
 
     private static void draw_background() {
-        for (int y = 0; y < 32; y++) {
-            for (int x = 0; x < 32; x++) {
-                    int sprite_pointer = 0x8800 + 0x10 * x + 0x10*32*y;
-                    draw_tile(sprite_pointer, x, y, true, false);
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                // TODO: Sprite decompression routine throws garbage in here. Debug this.
+                int sprite_base_address = (CPU.memory.read_byte(0xFF40)&(1<<4)) != 0?0xA000 :0xA000 ;
+                int sprite_pointer = sprite_base_address + 0x10 * x + 0x10*16*y;
+                draw_tile(sprite_pointer, x, y, true, false);
             }
         }
     }

@@ -17,9 +17,6 @@ public class Memory implements CPUInstructions {
         byte higherByte = CPU.memory.read_byte(CPU.PC.getValue() + 2);
         CPU.BC.C.setValue(lowerByte);
         CPU.BC.B.setValue(higherByte);
-        if(CPU.BC.getValue() == 0x1200) {
-            System.out.println();
-        }
     }
 
     @Opcode(value = 0x11, length = 3, cycles = 3)
@@ -156,8 +153,7 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0xC6, length = 2, cycles = 2)
     public static void add_a_d8() {
-        int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        add_register(CPU.AF.A, d8_value, false, false, false);
+        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1)&0xFF, false, false, false);
     }
 
     @Opcode(value = 0xCE, length = 2, cycles = 2)
@@ -168,8 +164,7 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0xD6, length = 2, cycles = 2)
     public static void sub_d8() {
-        int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1) & 0xFF;
-        add_register(CPU.AF.A, d8_value, false, true, false);
+        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1) & 0xFF, false, true, false);
     }
 
     @Opcode(value = 0xF8, length = 2, cycles = 3)

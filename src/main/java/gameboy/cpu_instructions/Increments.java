@@ -18,20 +18,13 @@ public class Increments implements CPUInstructions {
     public static void inc_b() {
         int value = CPU.BC.B.getValue();
         add_register(CPU.BC.B, 1, false, false, true);
-        if(CPU.BC.B.getValue() - 1 != value) {
-            System.out.println();
-        }
     }
 
 
     @Opcode(value = 0x0C, length = 1, cycles = 1)
     public static void inc_c() {
         int value = CPU.BC.C.getValue();
-
         add_register(CPU.BC.C, 1, false, false, true);
-        if(CPU.BC.C.getValue() - 1 != value) {
-            System.out.println();
-        }
     }
 
     @Opcode(value = 0x13, length = 1, cycles = 1)

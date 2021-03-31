@@ -48,12 +48,6 @@ public class Load implements CPUInstructions {
         CPU.DE.D.setValue(CPU.memory.read_byte(CPU.PC.getValue() + 1));
     }
 
-    @Opcode(value = 0x1A, length = 1, cycles = 2)
-    public static void ld_a_from_de() {
-        char a8 = (char) (CPU.memory.read_byte(CPU.DE.getValue()) & 255);
-        CPU.AF.A.setValue((byte) a8);
-    }
-
     @Opcode(value = 0x1E, length = 2, cycles = 2)
     public static void ld_e_d8() {
         CPU.DE.E.setValue(CPU.memory.read_byte(CPU.PC.getValue() + 1));
