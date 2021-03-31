@@ -22,4 +22,11 @@ public class AF extends RegisterPair {
     public boolean isCarryFlagOn() {
         return (this.F.getValue() & Flags.CARRY) != 0;
     }
+
+    @Override
+    public void setValue(char value) {
+        value&=0xFFF0;
+        this.lower.setValue((char) (value & 255));
+        this.higher.setValue((char) ((value >> 8) & 255));
+    }
 }

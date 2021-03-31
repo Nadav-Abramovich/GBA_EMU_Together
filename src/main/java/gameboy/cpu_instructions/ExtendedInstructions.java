@@ -3,6 +3,8 @@ package gameboy.cpu_instructions;
 import gameboy.CPU;
 import gameboy.Flags;
 
+import static gameboy.HelperFunctions.*;
+
 // We suppress this warning because this class and its methods are dynamically called
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
@@ -53,8 +55,48 @@ public class ExtendedInstructions implements CPUInstructions {
         }
     }
 
+    @Opcode(value = 0xCB06, length = 2, cycles = 2)
+    public static void rlc_hl() {
+        byte value = CPU.memory.read_byte(CPU.HL.getValue());
+
+        byte new_lsb = 0;
+        if ((value & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+            new_lsb = 1;
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        CPU.memory.write(CPU.HL.getValue(), (byte) ((value<<1) | new_lsb));
+        if (CPU.HL.H.getValue() == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+            CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
+        }
+    }
+
+    @Opcode(value = 0xCB16, length = 2, cycles = 2)
+    public static void rl_hl() {
+        byte value = CPU.memory.read_byte(CPU.HL.getValue());
+
+        int prev_carry = CPU.AF.isCarryFlagOn() ? 1 : 0;
+
+        if ((value & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        CPU.memory.write(CPU.HL.getValue(), (byte) ((value << 1) | prev_carry));
+        if (CPU.memory.read_byte(CPU.HL.getValue()) == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+    }
+
     @Opcode(value = 0xCB0B, length = 1, cycles = 1)
-    public static void rrce() {
+    public static void rrc_e() {
         char new_msb = 0;
         if ((CPU.DE.E.getValue() & 1) != 0) {
             CPU.turnOnFlags(Flags.CARRY);
@@ -118,532 +160,972 @@ public class ExtendedInstructions implements CPUInstructions {
         CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
     }
 
+    //region BIT OPS
     @Opcode(value = 0xCB40, length = 2, cycles = 2)
     public static void bit_0_b() {
-        int C = (CPU.BC.B.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.B, 0);
     }
 
     @Opcode(value = 0xCB41, length = 2, cycles = 2)
     public static void bit_0_c() {
-        int C = (CPU.BC.C.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.C, 0);
     }
 
     @Opcode(value = 0xCB42, length = 2, cycles = 2)
     public static void bit_0_d() {
-        int C = (CPU.DE.D.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.DE.D, 0);
     }
 
     @Opcode(value = 0xCB43, length = 2, cycles = 2)
     public static void bit_0_e() {
-        int C = (CPU.DE.E.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.DE.E, 0);
     }
 
     @Opcode(value = 0xCB44, length = 2, cycles = 2)
     public static void bit_0_h() {
-        int C = (CPU.HL.H.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.HL.H, 0);
     }
 
     @Opcode(value = 0xCB45, length = 2, cycles = 2)
     public static void bit_0_l() {
-        int C = (CPU.HL.L.getValue() & 1);
-
-        if (C == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.HL.L, 0);
     }
 
     @Opcode(value = 0xCB46, length = 2, cycles = 2)
     public static void bit_0_from_hl() {
-        int bit_0 = CPU.memory.read_byte(CPU.HL.getValue()) & 1;
-
-        if (bit_0 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 0);
     }
 
     @Opcode(value = 0xCB47, length = 2, cycles = 2)
     public static void bit_0_a() {
-        int A = (CPU.AF.A.getValue() & 1);
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 0);
     }
 
     @Opcode(value = 0xCB48, length = 2, cycles = 2)
     public static void bit_1_b() {
-        int A = (CPU.BC.B.getValue() >> 1) & 1;
+        bit_reg(CPU.BC.B, 1);
+    }
 
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB49, length = 2, cycles = 2)
+    public static void bit_1_c() {
+        bit_reg(CPU.BC.C, 1);
+    }
+
+    @Opcode(value = 0xCB4A, length = 2, cycles = 2)
+    public static void bit_1_d() {
+        bit_reg(CPU.DE.D, 1);
+    }
+
+    @Opcode(value = 0xCB4B, length = 2, cycles = 2)
+    public static void bit_1_e() {
+        bit_reg(CPU.DE.E, 1);
+    }
+
+    @Opcode(value = 0xCB4C, length = 2, cycles = 2)
+    public static void bit_1_h() {
+        bit_reg(CPU.HL.H, 1);
+    }
+
+    @Opcode(value = 0xCB4D, length = 2, cycles = 2)
+    public static void bit_1_l() {
+        bit_reg(CPU.HL.L, 1);
     }
 
     @Opcode(value = 0xCB4E, length = 2, cycles = 2)
     public static void bit_1_from_hl() {
-        int bit_2 = CPU.memory.read_byte(CPU.HL.getValue()) & (1<<1);
-
-        if (bit_2 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 1);
     }
 
     @Opcode(value = 0xCB4F, length = 2, cycles = 2)
     public static void bit_1_a() {
-        int A = ((CPU.AF.A.getValue() >> 1) & 1);
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 1);
     }
 
     @Opcode(value = 0xCB50, length = 2, cycles = 2)
     public static void bit_2_b() {
-        int B = (CPU.BC.B.getValue() >> 2) & 1;
+        bit_reg(CPU.BC.B, 2);
+    }
 
-        if (B == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB51, length = 2, cycles = 2)
+    public static void bit_2_c() {
+        bit_reg(CPU.BC.C, 2);
+    }
+
+    @Opcode(value = 0xCB52, length = 2, cycles = 2)
+    public static void bit_2_d() {
+        bit_reg(CPU.DE.D, 2);
+    }
+
+    @Opcode(value = 0xCB53, length = 2, cycles = 2)
+    public static void bit_2_e() {
+        bit_reg(CPU.DE.E, 2);
+    }
+
+    @Opcode(value = 0xCB54, length = 2, cycles = 2)
+    public static void bit_2_h() {
+        bit_reg(CPU.HL.H, 2);
+    }
+
+    @Opcode(value = 0xCB55, length = 2, cycles = 2)
+    public static void bit_2_l() {
+        bit_reg(CPU.HL.L, 2);
     }
 
     @Opcode(value = 0xCB56, length = 2, cycles = 2)
     public static void bit_2_from_hl() {
-        int bit_2 = CPU.memory.read_byte(CPU.HL.getValue()) & (1<<2);
-
-        if (bit_2 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 2);
     }
 
     @Opcode(value = 0xCB57, length = 2, cycles = 2)
     public static void bit_2_a() {
-        int B = (CPU.AF.A.getValue() >> 2) & 1;
-
-        if (B == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 2);
     }
 
     @Opcode(value = 0xCB58, length = 2, cycles = 2)
     public static void bit_3_b() {
-        int B = (CPU.BC.B.getValue() >> 3) & 1;
+        bit_reg(CPU.BC.B, 3);
+    }
 
-        if (B == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB59, length = 2, cycles = 2)
+    public static void bit_3_c() {
+        bit_reg(CPU.BC.C, 3);
+    }
+
+    @Opcode(value = 0xCB5A, length = 2, cycles = 2)
+    public static void bit_3_d() {
+        bit_reg(CPU.DE.D, 3);
+    }
+
+    @Opcode(value = 0xCB5B, length = 2, cycles = 2)
+    public static void bit_3_e() {
+        bit_reg(CPU.DE.E, 3);
+    }
+
+    @Opcode(value = 0xCB5C, length = 2, cycles = 2)
+    public static void bit_3_h() {
+        bit_reg(CPU.HL.H, 3);
+    }
+
+    @Opcode(value = 0xCB5D, length = 2, cycles = 2)
+    public static void bit_3_l() {
+        bit_reg(CPU.HL.L, 3);
     }
 
     @Opcode(value = 0xCB5E, length = 2, cycles = 2)
     public static void bit_3_from_hl() {
-        int bit_2 = CPU.memory.read_byte(CPU.HL.getValue()) & (1<<3);
-
-        if (bit_2 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 3);
     }
-
 
     @Opcode(value = 0xCB5F, length = 2, cycles = 2)
     public static void bit_3_a() {
-        int H = (CPU.AF.A.getValue() >> 3) & 1;
-
-        if (H == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 3);
     }
 
     @Opcode(value = 0xCB60, length = 2, cycles = 2)
     public static void bit_4_b() {
-        int A = (CPU.BC.B.getValue() >> 4) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.B, 4);
     }
 
     @Opcode(value = 0xCB61, length = 2, cycles = 2)
     public static void bit_4_c() {
-        int A = (CPU.BC.C.getValue() >> 4) & 1;
+        bit_reg(CPU.BC.C, 4);
+    }
 
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB62, length = 2, cycles = 2)
+    public static void bit_4_d() {
+        bit_reg(CPU.DE.D, 4);
+    }
+
+    @Opcode(value = 0xCB63, length = 2, cycles = 2)
+    public static void bit_4_e() {
+        bit_reg(CPU.DE.E, 4);
+    }
+
+    @Opcode(value = 0xCB64, length = 2, cycles = 2)
+    public static void bit_4_h() {
+        bit_reg(CPU.HL.H, 4);
+    }
+
+    @Opcode(value = 0xCB65, length = 2, cycles = 2)
+    public static void bit_4_l() {
+        bit_reg(CPU.HL.L, 4);
     }
 
     @Opcode(value = 0xCB66, length = 2, cycles = 2)
     public static void bit_4_from_hl() {
-        int bit_2 = CPU.memory.read_byte(CPU.HL.getValue()) & (1<<4);
-
-        if (bit_2 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 4);
     }
 
+    @Opcode(value = 0xCB67, length = 2, cycles = 2)
+    public static void bit_4_a() {
+        bit_reg(CPU.AF.A, 4);
+    }
 
     @Opcode(value = 0xCB68, length = 2, cycles = 2)
     public static void bit_5_b() {
-        int A = (CPU.BC.B.getValue() >> 5) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.B, 5);
     }
 
     @Opcode(value = 0xCB69, length = 2, cycles = 2)
     public static void bit_5_c() {
-        int A = (CPU.BC.C.getValue() >> 5) & 1;
+        bit_reg(CPU.BC.C, 5);
+    }
 
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB6A, length = 2, cycles = 2)
+    public static void bit_5_d() {
+        bit_reg(CPU.DE.D, 5);
+    }
+
+    @Opcode(value = 0xCB6B, length = 2, cycles = 2)
+    public static void bit_5_e() {
+        bit_reg(CPU.DE.E, 5);
+    }
+
+    @Opcode(value = 0xCB6C, length = 2, cycles = 2)
+    public static void bit_5_h() {
+        bit_reg(CPU.HL.H, 5);
+    }
+
+    @Opcode(value = 0xCB6D, length = 2, cycles = 2)
+    public static void bit_5_l() {
+        bit_reg(CPU.HL.L, 5);
+    }
+
+    @Opcode(value = 0xCB6E, length = 2, cycles = 2)
+    public static void bit_5_from_hl() {
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 5);
     }
 
     @Opcode(value = 0xCB6F, length = 2, cycles = 2)
     public static void bit_5_a() {
-        int A = (CPU.AF.A.getValue() >> 5) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 5);
     }
 
     @Opcode(value = 0xCB70, length = 2, cycles = 2)
     public static void bit_6_b() {
-        int A = (CPU.BC.B.getValue() >> 6) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.B, 6);
     }
 
     @Opcode(value = 0xCB71, length = 2, cycles = 2)
     public static void bit_6_c() {
-        int A = (CPU.BC.C.getValue() >> 6) & 1;
+        bit_reg(CPU.BC.C, 6);
+    }
 
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB72, length = 2, cycles = 2)
+    public static void bit_6_d() {
+        bit_reg(CPU.DE.D, 6);
+    }
+
+    @Opcode(value = 0xCB73, length = 2, cycles = 2)
+    public static void bit_6_e() {
+        bit_reg(CPU.DE.E, 6);
+    }
+
+    @Opcode(value = 0xCB74, length = 2, cycles = 2)
+    public static void bit_6_h() {
+        bit_reg(CPU.HL.H, 6);
+    }
+
+    @Opcode(value = 0xCB75, length = 2, cycles = 2)
+    public static void bit_6_l() {
+        bit_reg(CPU.HL.L, 6);
     }
 
     @Opcode(value = 0xCB76, length = 2, cycles = 2)
     public static void bit_6_from_hl() {
-        int bit_2 = CPU.memory.read_byte(CPU.HL.getValue()) & (1<<6);
-
-        if (bit_2 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 6);
     }
 
     @Opcode(value = 0xCB77, length = 2, cycles = 2)
     public static void bit_6_a() {
-        int A = (CPU.AF.A.getValue() >> 6) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.AF.A, 6);
     }
 
     @Opcode(value = 0xCB78, length = 2, cycles = 2)
     public static void bit_7_b() {
-        int A = (CPU.BC.B.getValue() >> 7) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.B, 7);
     }
 
     @Opcode(value = 0xCB79, length = 2, cycles = 2)
     public static void bit_7_c() {
-        int A = (CPU.BC.C.getValue() >> 7) & 1;
-
-        if (A == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.BC.C, 7);
     }
 
+    @Opcode(value = 0xCB7A, length = 2, cycles = 2)
+    public static void bit_7_d() {
+        bit_reg(CPU.DE.D, 7);
+    }
+
+    @Opcode(value = 0xCB7B, length = 2, cycles = 2)
+    public static void bit_7_e() {
+        bit_reg(CPU.DE.E, 7);
+    }
 
     @Opcode(value = 0xCB7C, length = 2, cycles = 2)
     public static void bit_7_h() {
-        int H = (CPU.HL.H.getValue() >> 7) & 1;
+        bit_reg(CPU.HL.H, 7);
+    }
 
-        if (H == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    @Opcode(value = 0xCB7D, length = 2, cycles = 2)
+    public static void bit_7_l() {
+        bit_reg(CPU.HL.L, 7);
     }
 
     @Opcode(value = 0xCB7E, length = 2, cycles = 2)
     public static void bit_7_from_hl() {
-        int bit_7 = (CPU.memory.read_byte(CPU.HL.getValue()) >> 7) & 1;
-
-        if (bit_7 == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+        bit_reg(CPU.memory.read_byte(CPU.HL.getValue()), 7);
     }
 
     @Opcode(value = 0xCB7F, length = 2, cycles = 2)
     public static void bit_7_a() {
-        int H = (CPU.AF.A.getValue() >> 7) & 1;
+        bit_reg(CPU.AF.A, 7);
+    }
+    //endregion
 
-        if (H == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags(Flags.SUBTRACTION);
-        CPU.turnOnFlags(Flags.HALF_CARRY);
+    //region RES OPS
+    @Opcode(value = 0xCB80, length = 2, cycles = 2)
+    public static void res_0_b() {
+        res_reg(CPU.BC.B, 0);
     }
 
-    @Opcode(value = 0xCB86, length = 2, cycles = 4)
+    @Opcode(value = 0xCB81, length = 2, cycles = 2)
+    public static void res_0_c() {
+        res_reg(CPU.BC.C, 0);
+    }
+
+    @Opcode(value = 0xCB82, length = 2, cycles = 2)
+    public static void res_0_d() {
+        res_reg(CPU.DE.D, 0);
+    }
+
+    @Opcode(value = 0xCB83, length = 2, cycles = 2)
+    public static void res_0_e() {
+        res_reg(CPU.DE.E, 0);
+    }
+
+    @Opcode(value = 0xCB84, length = 2, cycles = 2)
+    public static void res_0_h() {
+        res_reg(CPU.HL.H, 0);
+    }
+
+    @Opcode(value = 0xCB85, length = 2, cycles = 2)
+    public static void res_0_l() {
+        res_reg(CPU.HL.L, 0);
+    }
+
+    @Opcode(value = 0xCB86, length = 2, cycles = 2)
     public static void res_0_from_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value & 0xFE));
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 0));
     }
 
     @Opcode(value = 0xCB87, length = 2, cycles = 2)
     public static void res_0_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value & 0xFE));
+        res_reg(CPU.AF.A, 0);
+    }
+
+    @Opcode(value = 0xCB88, length = 2, cycles = 2)
+    public static void res_1_b() {
+        res_reg(CPU.BC.B, 1);
+    }
+
+    @Opcode(value = 0xCB89, length = 2, cycles = 2)
+    public static void res_1_c() {
+        res_reg(CPU.BC.C, 1);
+    }
+
+    @Opcode(value = 0xCB8A, length = 2, cycles = 2)
+    public static void res_1_d() {
+        res_reg(CPU.DE.D, 1);
+    }
+
+    @Opcode(value = 0xCB8B, length = 2, cycles = 2)
+    public static void res_1_e() {
+        res_reg(CPU.DE.E, 1);
+    }
+
+    @Opcode(value = 0xCB8C, length = 2, cycles = 2)
+    public static void res_1_h() {
+        res_reg(CPU.HL.H, 1);
+    }
+
+    @Opcode(value = 0xCB8D, length = 2, cycles = 2)
+    public static void res_1_l() {
+        res_reg(CPU.HL.L, 1);
+    }
+
+    @Opcode(value = 0xCB8E, length = 2, cycles = 2)
+    public static void res_1_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 1));
     }
 
     @Opcode(value = 0xCB8F, length = 2, cycles = 2)
     public static void res_1_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value & 0xFD));
+        res_reg(CPU.AF.A, 1);
     }
 
-    @Opcode(value = 0xCB96, length = 2, cycles = 4)
+    @Opcode(value = 0xCB90, length = 2, cycles = 2)
+    public static void res_2_b() {
+        res_reg(CPU.BC.B, 2);
+    }
+
+    @Opcode(value = 0xCB91, length = 2, cycles = 2)
+    public static void res_2_c() {
+        res_reg(CPU.BC.C, 2);
+    }
+
+    @Opcode(value = 0xCB92, length = 2, cycles = 2)
+    public static void res_2_d() {
+        res_reg(CPU.DE.D, 2);
+    }
+
+    @Opcode(value = 0xCB93, length = 2, cycles = 2)
+    public static void res_2_e() {
+        res_reg(CPU.DE.E, 2);
+    }
+
+    @Opcode(value = 0xCB94, length = 2, cycles = 2)
+    public static void res_2_h() {
+        res_reg(CPU.HL.H, 2);
+    }
+
+    @Opcode(value = 0xCB95, length = 2, cycles = 2)
+    public static void res_2_l() {
+        res_reg(CPU.HL.L, 2);
+    }
+
+    @Opcode(value = 0xCB96, length = 2, cycles = 2)
     public static void res_2_from_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value & 0xFB));
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 2));
     }
 
     @Opcode(value = 0xCB97, length = 2, cycles = 2)
     public static void res_2_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value & 0xFB));
+        res_reg(CPU.AF.A, 2);
     }
 
-    @Opcode(value = 0xCB9E, length = 2, cycles = 4)
+    @Opcode(value = 0xCB98, length = 2, cycles = 2)
+    public static void res_3_b() {
+        res_reg(CPU.BC.B, 3);
+    }
+
+    @Opcode(value = 0xCB99, length = 2, cycles = 2)
+    public static void res_3_c() {
+        res_reg(CPU.BC.C, 3);
+    }
+
+    @Opcode(value = 0xCB9A, length = 2, cycles = 2)
+    public static void res_3_d() {
+        res_reg(CPU.DE.D, 3);
+    }
+
+    @Opcode(value = 0xCB9B, length = 2, cycles = 2)
+    public static void res_3_e() {
+        res_reg(CPU.DE.E, 3);
+    }
+
+    @Opcode(value = 0xCB9C, length = 2, cycles = 2)
+    public static void res_3_h() {
+        res_reg(CPU.HL.H, 3);
+    }
+
+    @Opcode(value = 0xCB9D, length = 2, cycles = 2)
+    public static void res_3_l() {
+        res_reg(CPU.HL.L, 3);
+    }
+
+    @Opcode(value = 0xCB9E, length = 2, cycles = 2)
     public static void res_3_from_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value & 0xF7));
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 3));
     }
 
-    @Opcode(value = 0xCBA6, length = 2, cycles = 4)
-    public static void set_4_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 4)));
+    @Opcode(value = 0xCB9F, length = 2, cycles = 2)
+    public static void res_3_a() {
+        res_reg(CPU.AF.A, 3);
     }
 
-    @Opcode(value = 0xCBAE, length = 2, cycles = 4)
+    @Opcode(value = 0xCBA0, length = 2, cycles = 2)
+    public static void res_4_b() {
+        res_reg(CPU.BC.B, 4);
+    }
+
+    @Opcode(value = 0xCBA1, length = 2, cycles = 2)
+    public static void res_4_c() {
+        res_reg(CPU.BC.C, 4);
+    }
+
+    @Opcode(value = 0xCBA2, length = 2, cycles = 2)
+    public static void res_4_d() {
+        res_reg(CPU.DE.D, 4);
+    }
+
+    @Opcode(value = 0xCBA3, length = 2, cycles = 2)
+    public static void res_4_e() {
+        res_reg(CPU.DE.E, 4);
+    }
+
+    @Opcode(value = 0xCBA4, length = 2, cycles = 2)
+    public static void res_4_h() {
+        res_reg(CPU.HL.H, 4);
+    }
+
+    @Opcode(value = 0xCBA5, length = 2, cycles = 2)
+    public static void res_4_l() {
+        res_reg(CPU.HL.L, 4);
+    }
+
+    @Opcode(value = 0xCBA6, length = 2, cycles = 2)
+    public static void res_4_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 4));
+    }
+
+    @Opcode(value = 0xCBA7, length = 2, cycles = 2)
+    public static void res_4_a() {
+        res_reg(CPU.AF.A, 4);
+    }
+
+    @Opcode(value = 0xCBA8, length = 2, cycles = 2)
+    public static void res_5_b() {
+        res_reg(CPU.BC.B, 5);
+    }
+
+    @Opcode(value = 0xCBA9, length = 2, cycles = 2)
+    public static void res_5_c() {
+        res_reg(CPU.BC.C, 5);
+    }
+
+    @Opcode(value = 0xCBAA, length = 2, cycles = 2)
+    public static void res_5_d() {
+        res_reg(CPU.DE.D, 5);
+    }
+
+    @Opcode(value = 0xCBAB, length = 2, cycles = 2)
+    public static void res_5_e() {
+        res_reg(CPU.DE.E, 5);
+    }
+
+    @Opcode(value = 0xCBAC, length = 2, cycles = 2)
+    public static void res_5_h() {
+        res_reg(CPU.HL.H, 5);
+    }
+
+    @Opcode(value = 0xCBAD, length = 2, cycles = 2)
+    public static void res_5_l() {
+        res_reg(CPU.HL.L, 5);
+    }
+
+    @Opcode(value = 0xCBAE, length = 2, cycles = 2)
     public static void res_5_from_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value & 0xEF));
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 5));
     }
 
     @Opcode(value = 0xCBAF, length = 2, cycles = 2)
     public static void res_5_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value & (0xFF-16)));
+        res_reg(CPU.AF.A, 5);
     }
 
-    @Opcode(value = 0xCBBE, length = 2, cycles = 4)
+    @Opcode(value = 0xCBB0, length = 2, cycles = 2)
+    public static void res_6_b() {
+        res_reg(CPU.BC.B, 6);
+    }
+
+    @Opcode(value = 0xCBB1, length = 2, cycles = 2)
+    public static void res_6_c() {
+        res_reg(CPU.BC.C, 6);
+    }
+
+    @Opcode(value = 0xCBB2, length = 2, cycles = 2)
+    public static void res_6_d() {
+        res_reg(CPU.DE.D, 6);
+    }
+
+    @Opcode(value = 0xCBB3, length = 2, cycles = 2)
+    public static void res_6_e() {
+        res_reg(CPU.DE.E, 6);
+    }
+
+    @Opcode(value = 0xCBB4, length = 2, cycles = 2)
+    public static void res_6_h() {
+        res_reg(CPU.HL.H, 6);
+    }
+
+    @Opcode(value = 0xCBB5, length = 2, cycles = 2)
+    public static void res_6_l() {
+        res_reg(CPU.HL.L, 6);
+    }
+
+    @Opcode(value = 0xCBB6, length = 2, cycles = 2)
+    public static void res_6_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 6));
+    }
+
+    @Opcode(value = 0xCBB7, length = 2, cycles = 2)
+    public static void res_6_a() {
+        res_reg(CPU.AF.A, 6);
+    }
+
+    @Opcode(value = 0xCBB8, length = 2, cycles = 2)
+    public static void res_7_b() {
+        res_reg(CPU.BC.B, 7);
+    }
+
+    @Opcode(value = 0xCBB9, length = 2, cycles = 2)
+    public static void res_7_c() {
+        res_reg(CPU.BC.C, 7);
+    }
+
+    @Opcode(value = 0xCBBA, length = 2, cycles = 2)
+    public static void res_7_d() {
+        res_reg(CPU.DE.D, 7);
+    }
+
+    @Opcode(value = 0xCBBB, length = 2, cycles = 2)
+    public static void res_7_e() {
+        res_reg(CPU.DE.E, 7);
+    }
+
+    @Opcode(value = 0xCBBC, length = 2, cycles = 2)
+    public static void res_7_h() {
+        res_reg(CPU.HL.H, 7);
+    }
+
+    @Opcode(value = 0xCBBD, length = 2, cycles = 2)
+    public static void res_7_l() {
+        res_reg(CPU.HL.L, 7);
+    }
+
+    @Opcode(value = 0xCBBE, length = 2, cycles = 2)
     public static void res_7_from_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value & 0x7F));
+        CPU.memory.write(CPU.HL.getValue(), res_reg(CPU.memory.read_byte(CPU.HL.getValue()), 7));
     }
 
-    @Opcode(value = 0xCBCE, length = 2, cycles = 4)
-    public static void set_1_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 1)));
+    @Opcode(value = 0xCBBF, length = 2, cycles = 2)
+    public static void res_7_a() {
+        res_reg(CPU.AF.A, 7);
+    }
+    //endregion
+
+    //region SET OPS
+    @Opcode(value = 0xCBC0, length = 2, cycles = 2)
+    public static void set_0_b() {
+        set_reg(CPU.BC.B, 0);
+    }
+
+    @Opcode(value = 0xCBC1, length = 2, cycles = 2)
+    public static void set_0_c() {
+        set_reg(CPU.BC.C, 0);
+    }
+
+    @Opcode(value = 0xCBC2, length = 2, cycles = 2)
+    public static void set_0_d() {
+        set_reg(CPU.DE.D, 0);
+    }
+
+    @Opcode(value = 0xCBC3, length = 2, cycles = 2)
+    public static void set_0_e() {
+        set_reg(CPU.DE.E, 0);
+    }
+
+    @Opcode(value = 0xCBC4, length = 2, cycles = 2)
+    public static void set_0_h() {
+        set_reg(CPU.HL.H, 0);
+    }
+
+    @Opcode(value = 0xCBC5, length = 2, cycles = 2)
+    public static void set_0_l() {
+        set_reg(CPU.HL.L, 0);
+    }
+
+    @Opcode(value = 0xCBC6, length = 2, cycles = 2)
+    public static void set_0_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 0));
+    }
+
+    @Opcode(value = 0xCBC7, length = 2, cycles = 2)
+    public static void set_0_a() {
+        set_reg(CPU.AF.A, 0);
+    }
+
+    @Opcode(value = 0xCBC8, length = 2, cycles = 2)
+    public static void set_1_b() {
+        set_reg(CPU.BC.B, 1);
+    }
+
+    @Opcode(value = 0xCBC9, length = 2, cycles = 2)
+    public static void set_1_c() {
+        set_reg(CPU.BC.C, 1);
+    }
+
+    @Opcode(value = 0xCBCA, length = 2, cycles = 2)
+    public static void set_1_d() {
+        set_reg(CPU.DE.D, 1);
+    }
+
+    @Opcode(value = 0xCBCB, length = 2, cycles = 2)
+    public static void set_1_e() {
+        set_reg(CPU.DE.E, 1);
+    }
+
+    @Opcode(value = 0xCBCC, length = 2, cycles = 2)
+    public static void set_1_h() {
+        set_reg(CPU.HL.H, 1);
+    }
+
+    @Opcode(value = 0xCBCD, length = 2, cycles = 2)
+    public static void set_1_l() {
+        set_reg(CPU.HL.L, 1);
+    }
+
+    @Opcode(value = 0xCBCE, length = 2, cycles = 2)
+    public static void set_1_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 1));
     }
 
     @Opcode(value = 0xCBCF, length = 2, cycles = 2)
     public static void set_1_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value | 0x2));
+        set_reg(CPU.AF.A, 1);
     }
 
-    @Opcode(value = 0xCBD6, length = 2, cycles = 4)
-    public static void set_2_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 2)));
+    @Opcode(value = 0xCBD0, length = 2, cycles = 2)
+    public static void set_2_b() {
+        set_reg(CPU.BC.B, 2);
+    }
+
+    @Opcode(value = 0xCBD1, length = 2, cycles = 2)
+    public static void set_2_c() {
+        set_reg(CPU.BC.C, 2);
+    }
+
+    @Opcode(value = 0xCBD2, length = 2, cycles = 2)
+    public static void set_2_d() {
+        set_reg(CPU.DE.D, 2);
+    }
+
+    @Opcode(value = 0xCBD3, length = 2, cycles = 2)
+    public static void set_2_e() {
+        set_reg(CPU.DE.E, 2);
+    }
+
+    @Opcode(value = 0xCBD4, length = 2, cycles = 2)
+    public static void set_2_h() {
+        set_reg(CPU.HL.H, 2);
+    }
+
+    @Opcode(value = 0xCBD5, length = 2, cycles = 2)
+    public static void set_2_l() {
+        set_reg(CPU.HL.L, 2);
+    }
+
+    @Opcode(value = 0xCBD6, length = 2, cycles = 2)
+    public static void set_2_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 2));
+    }
+
+    @Opcode(value = 0xCBD7, length = 2, cycles = 2)
+    public static void set_2_a() {
+        set_reg(CPU.AF.A, 2);
     }
 
     @Opcode(value = 0xCBD8, length = 2, cycles = 2)
     public static void set_3_b() {
-        byte new_value = (byte) CPU.BC.B.getValue();
-        CPU.BC.B.setValue((byte) (new_value | 0x8));
+        set_reg(CPU.BC.B, 3);
     }
 
-    @Opcode(value = 0xCBDE, length = 2, cycles = 4)
-    public static void set_3_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 3)));
+    @Opcode(value = 0xCBD9, length = 2, cycles = 2)
+    public static void set_3_c() {
+        set_reg(CPU.BC.C, 3);
     }
 
-    @Opcode(value = 0xCBF6, length = 2, cycles = 4)
-    public static void set_6_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 6)));
+    @Opcode(value = 0xCBDA, length = 2, cycles = 2)
+    public static void set_3_d() {
+        set_reg(CPU.DE.D, 3);
+    }
+
+    @Opcode(value = 0xCBDB, length = 2, cycles = 2)
+    public static void set_3_e() {
+        set_reg(CPU.DE.E, 3);
+    }
+
+    @Opcode(value = 0xCBDC, length = 2, cycles = 2)
+    public static void set_3_h() {
+        set_reg(CPU.HL.H, 3);
+    }
+
+    @Opcode(value = 0xCBDD, length = 2, cycles = 2)
+    public static void set_3_l() {
+        set_reg(CPU.HL.L, 3);
+    }
+
+    @Opcode(value = 0xCBDE, length = 2, cycles = 2)
+    public static void set_3_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 3));
+    }
+
+    @Opcode(value = 0xCBDF, length = 2, cycles = 2)
+    public static void set_3_a() {
+        set_reg(CPU.AF.A, 3);
+    }
+
+    @Opcode(value = 0xCBE0, length = 2, cycles = 2)
+    public static void set_4_b() {
+        set_reg(CPU.BC.B, 4);
+    }
+
+    @Opcode(value = 0xCBE1, length = 2, cycles = 2)
+    public static void set_4_c() {
+        set_reg(CPU.BC.C, 4);
+    }
+
+    @Opcode(value = 0xCBE2, length = 2, cycles = 2)
+    public static void set_4_d() {
+        set_reg(CPU.DE.D, 4);
+    }
+
+    @Opcode(value = 0xCBE3, length = 2, cycles = 2)
+    public static void set_4_e() {
+        set_reg(CPU.DE.E, 4);
+    }
+
+    @Opcode(value = 0xCBE4, length = 2, cycles = 2)
+    public static void set_4_h() {
+        set_reg(CPU.HL.H, 4);
+    }
+
+    @Opcode(value = 0xCBE5, length = 2, cycles = 2)
+    public static void set_4_l() {
+        set_reg(CPU.HL.L, 4);
+    }
+
+    @Opcode(value = 0xCBE6, length = 2, cycles = 2)
+    public static void set_4_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 4));
+    }
+
+    @Opcode(value = 0xCBE7, length = 2, cycles = 2)
+    public static void set_4_a() {
+        set_reg(CPU.AF.A, 4);
+    }
+
+    @Opcode(value = 0xCBE8, length = 2, cycles = 2)
+    public static void set_5_b() {
+        set_reg(CPU.BC.B, 5);
+    }
+
+    @Opcode(value = 0xCBE9, length = 2, cycles = 2)
+    public static void set_5_c() {
+        set_reg(CPU.BC.C, 5);
+    }
+
+    @Opcode(value = 0xCBEA, length = 2, cycles = 2)
+    public static void set_5_d() {
+        set_reg(CPU.DE.D, 5);
+    }
+
+    @Opcode(value = 0xCBEB, length = 2, cycles = 2)
+    public static void set_5_e() {
+        set_reg(CPU.DE.E, 5);
+    }
+
+    @Opcode(value = 0xCBEC, length = 2, cycles = 2)
+    public static void set_5_h() {
+        set_reg(CPU.HL.H, 5);
+    }
+
+    @Opcode(value = 0xCBED, length = 2, cycles = 2)
+    public static void set_5_l() {
+        set_reg(CPU.HL.L, 5);
+    }
+
+    @Opcode(value = 0xCBEE, length = 2, cycles = 2)
+    public static void set_5_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 5));
+    }
+
+    @Opcode(value = 0xCBEF, length = 2, cycles = 2)
+    public static void set_5_a() {
+        set_reg(CPU.AF.A, 5);
+    }
+
+    @Opcode(value = 0xCBF0, length = 2, cycles = 2)
+    public static void set_6_b() {
+        set_reg(CPU.BC.B, 6);
+    }
+
+    @Opcode(value = 0xCBF1, length = 2, cycles = 2)
+    public static void set_6_c() {
+        set_reg(CPU.BC.C, 6);
+    }
+
+    @Opcode(value = 0xCBF2, length = 2, cycles = 2)
+    public static void set_6_d() {
+        set_reg(CPU.DE.D, 6);
+    }
+
+    @Opcode(value = 0xCBF3, length = 2, cycles = 2)
+    public static void set_6_e() {
+        set_reg(CPU.DE.E, 6);
+    }
+
+    @Opcode(value = 0xCBF4, length = 2, cycles = 2)
+    public static void set_6_h() {
+        set_reg(CPU.HL.H, 6);
+    }
+
+    @Opcode(value = 0xCBF5, length = 2, cycles = 2)
+    public static void set_6_l() {
+        set_reg(CPU.HL.L, 6);
+    }
+
+    @Opcode(value = 0xCBF6, length = 2, cycles = 2)
+    public static void set_6_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 6));
+    }
+
+    @Opcode(value = 0xCBF7, length = 2, cycles = 2)
+    public static void set_6_a() {
+        set_reg(CPU.AF.A, 6);
     }
 
     @Opcode(value = 0xCBF8, length = 2, cycles = 2)
     public static void set_7_b() {
-        byte new_value = (byte) CPU.BC.B.getValue();
-        CPU.BC.B.setValue((byte) (new_value | (1<<7)));
+        set_reg(CPU.BC.B, 7);
     }
 
-    @Opcode(value = 0xCBFE, length = 2, cycles = 4)
-    public static void set_7_into_hl() {
-        byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.memory.write(CPU.HL.getValue(), (byte) (new_value | (1 << 7)));
+    @Opcode(value = 0xCBF9, length = 2, cycles = 2)
+    public static void set_7_c() {
+        set_reg(CPU.BC.C, 7);
     }
+
+    @Opcode(value = 0xCBFA, length = 2, cycles = 2)
+    public static void set_7_d() {
+        set_reg(CPU.DE.D, 7);
+    }
+
+    @Opcode(value = 0xCBFB, length = 2, cycles = 2)
+    public static void set_7_e() {
+        set_reg(CPU.DE.E, 7);
+    }
+
+    @Opcode(value = 0xCBFC, length = 2, cycles = 2)
+    public static void set_7_h() {
+        set_reg(CPU.HL.H, 7);
+    }
+
+    @Opcode(value = 0xCBFD, length = 2, cycles = 2)
+    public static void set_7_l() {
+        set_reg(CPU.HL.L, 7);
+    }
+
+    @Opcode(value = 0xCBFE, length = 2, cycles = 2)
+    public static void set_7_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), set_reg(CPU.memory.read_byte(CPU.HL.getValue()), 7));
+    }
+
+    @Opcode(value = 0xCBFF, length = 2, cycles = 2)
+    public static void set_7_a() {
+        set_reg(CPU.AF.A, 7);
+    }
+    //endregion
+
 
     // TODO: Move this
     @Opcode(value = 0x27, length = 1, cycles = 1)
@@ -684,6 +1166,25 @@ public class ExtendedInstructions implements CPUInstructions {
         // todo: CARRY AND VERIFY CARRY OF RLC
         CPU.BC.C.setValue((byte) (((CPU.BC.C.getValue() << 1)) & 255));
         if(CPU.BC.C.getValue() == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+    }
+
+    @Opcode(value = 0xCB22, length = 2, cycles = 2)
+    public static void sla_d() {
+        byte new_lsb = 0;
+
+        if ((CPU.DE.D.getValue() & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        // todo: CARRY AND VERIFY CARRY OF RLC
+        CPU.DE.D.setValue((byte) (((CPU.DE.D.getValue() << 1)) & 255));
+        if(CPU.DE.D.getValue() == 0) {
             CPU.turnOnFlags(Flags.ZERO);
         } else {
             CPU.turnOffFlags(Flags.ZERO);
@@ -748,12 +1249,5 @@ public class ExtendedInstructions implements CPUInstructions {
             CPU.turnOffFlags(Flags.ZERO);
         }
         CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
-    }
-
-
-    @Opcode(value = 0xCBFF, length = 2, cycles = 2)
-    public static void set_7_a() {
-        byte new_value = (byte) CPU.AF.A.getValue();
-        CPU.AF.A.setValue((byte) (new_value | (1<<7)));
     }
 }

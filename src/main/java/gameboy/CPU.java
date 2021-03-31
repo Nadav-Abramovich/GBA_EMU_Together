@@ -89,7 +89,7 @@ public class CPU {
 ////                System.exit(1);
 //            }
             System.out.println("Starting ROM");
-            PRINT_DEBUG_MESSAGES = false;
+            PRINT_DEBUG_MESSAGES = true;
 
 //            AF.setValue((char) 0x01b0);
 //            BC.setValue((char) 0x0013);
@@ -120,7 +120,7 @@ public class CPU {
         try {
             if(PRINT_DEBUG_MESSAGES && CPU.PC.getValue() != 0xC7D2) {
                 writer.print(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
-                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
+//                System.out.printf(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName());
             }
 //            System.out.println(String.format(EXECUTED_OPCODE_MSG_FORMAT, Integer.toHexString(PC.getValue()).toUpperCase(), Integer.toHexString(opcode).toUpperCase(), action.getName()));
 //            System.out.println(Integer.toHexString(CPU.DE.getValue()).toUpperCase());

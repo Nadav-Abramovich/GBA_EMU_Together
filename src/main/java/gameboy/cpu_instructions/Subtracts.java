@@ -60,8 +60,39 @@ public class Subtracts implements CPUInstructions {
         add_register(CPU.AF.A, CPU.BC.C.getValue(), true, true, false);
     }
 
+    @Opcode(value = 0x9A, length = 1, cycles = 1)
+    public static void sbc_a_d() {
+        add_register(CPU.AF.A, CPU.DE.D.getValue(), true, true, false);
+    }
+
+    @Opcode(value = 0x9B, length = 1, cycles = 1)
+    public static void sbc_a_e() {
+        add_register(CPU.AF.A, CPU.DE.E.getValue(), true, true, false);
+    }
+
+    @Opcode(value = 0x9C, length = 1, cycles = 1)
+    public static void sbc_a_h() {
+        add_register(CPU.AF.A, CPU.HL.H.getValue(), true, true, false);
+    }
+
+    @Opcode(value = 0x9D, length = 1, cycles = 1)
+    public static void sbc_a_l() {
+        add_register(CPU.AF.A, CPU.HL.L.getValue(), true, true, false);
+    }
+
+    @Opcode(value = 0x9E, length = 1, cycles = 1)
+    public static void sbc_from_hl() {
+        byte target = CPU.memory.read_byte(CPU.HL.getValue());
+        add_register(CPU.AF.A, target, true, true, false);
+    }
+
+    @Opcode(value = 0x9F, length = 1, cycles = 1)
+    public static void sbc_a_a() {
+        add_register(CPU.AF.A, CPU.AF.A.getValue(), true, true, false);
+    }
+
     @Opcode(value = 0xDE, length = 2, cycles = 1)
     public static void sbc_a_d8() {
-        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1), true, true, false);
+        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1) & 0xFF, true, true, false);
     }
 }

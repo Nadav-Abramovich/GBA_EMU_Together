@@ -9,6 +9,7 @@ import gameboy.Flags;
 public class Ands implements CPUInstructions {
     @Opcode(value = 0xA7, length = 1, cycles = 1)
     public static void and_a() {
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & CPU.AF.A.getValue()));
         if (CPU.AF.A.getValue() == 0) {
             CPU.setFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
         } else {

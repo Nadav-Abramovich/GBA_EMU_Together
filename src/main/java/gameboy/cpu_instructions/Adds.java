@@ -23,16 +23,15 @@ public class Adds implements CPUInstructions {
     public static void add_hl_hl() {
         add_register(CPU.HL, CPU.HL.getValue(), false, false, false);
     }
-    static int count = 0;
+
     @Opcode(value = 0x39, length = 1, cycles = 2)
     public static void add_hl_sp() {
         int before = CPU.HL.getValue() + CPU.SP.getValue();
         add_register(CPU.HL, CPU.SP.getValue(), false, false, false);
-
     }
 
     @Opcode(value = 0xE8, length = 2, cycles = 4)
     public static void add_sp_s8() {
-        add_register(CPU.SP, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false);
+        add_register(CPU.SP, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false, true);
     }
 }

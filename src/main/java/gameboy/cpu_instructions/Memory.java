@@ -3,6 +3,8 @@ package gameboy.cpu_instructions;
 import gameboy.CPU;
 import gameboy.Flags;
 
+import java.util.Locale;
+
 import static gameboy.HelperFunctions.add_register;
 
 // We suppress this warning because this class and its methods are dynamically called
@@ -15,6 +17,9 @@ public class Memory implements CPUInstructions {
         byte higherByte = CPU.memory.read_byte(CPU.PC.getValue() + 2);
         CPU.BC.C.setValue(lowerByte);
         CPU.BC.B.setValue(higherByte);
+        if(CPU.BC.getValue() == 0x1200) {
+            System.out.println();
+        }
     }
 
     @Opcode(value = 0x11, length = 3, cycles = 3)
@@ -157,20 +162,20 @@ public class Memory implements CPUInstructions {
 
     @Opcode(value = 0xCE, length = 2, cycles = 2)
     public static void adc_a_d8() {
-        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1), true, false, false);
+        add_register(CPU.AF.A, CPU.memory.read_byte(CPU.PC.getValue() + 1) & 0xFF, true, false, false);
     }
 
 
     @Opcode(value = 0xD6, length = 2, cycles = 2)
     public static void sub_d8() {
-        int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1);
+        int d8_value = CPU.memory.read_byte(CPU.PC.getValue() + 1) & 0xFF;
         add_register(CPU.AF.A, d8_value, false, true, false);
     }
 
     @Opcode(value = 0xF8, length = 2, cycles = 3)
     public static void ld_hl_sp_plus_s8() {
         CPU.HL.setValue(CPU.SP.getValue());
-        add_register(CPU.HL, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false);
+        add_register(CPU.HL, CPU.memory.read_byte(CPU.PC.getValue() + 1), false, false, false, true);
         CPU.turnOffFlags(Flags.ZERO);
     }
 }

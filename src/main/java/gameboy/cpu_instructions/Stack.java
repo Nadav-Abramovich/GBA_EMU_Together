@@ -197,6 +197,9 @@ public class Stack implements CPUInstructions {
     @Opcode(value = 0xD1, length = 1, cycles = 3)
     public static void pop_de() {
         CPU.DE.setValue(pop_from_stack_d16());
+        if(CPU.DE.getValue() != CPU.BC.getValue()) {
+            System.out.println();
+        }
     }
 
     @Opcode(value = 0xD5, length = 1, cycles = 4)
