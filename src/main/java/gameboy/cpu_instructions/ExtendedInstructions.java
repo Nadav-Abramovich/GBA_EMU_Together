@@ -19,146 +19,163 @@ public class ExtendedInstructions implements CPUInstructions {
         CPU.IME = true;
     }
 
+    // region rlc
     @Opcode(value = 0xCB00, length = 2, cycles = 2)
-    public static void rlcb() {
-        byte new_lsb = 0;
-        if ((CPU.BC.B.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-            new_lsb = 1;
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.BC.B.setValue((byte) ((CPU.BC.B.getValue() << 1) | new_lsb));
-        if (CPU.BC.B.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-            CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
-        } else {
-            CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
-        }
+    public static void rlc_b() {
+        rlc_reg(CPU.BC.B);
+    }
+
+    @Opcode(value = 0xCB01, length = 2, cycles = 2)
+    public static void rlc_c() {
+        rlc_reg(CPU.BC.C);
+    }
+
+    @Opcode(value = 0xCB02, length = 2, cycles = 2)
+    public static void rlc_d() {
+        rlc_reg(CPU.DE.D);
+    }
+
+    @Opcode(value = 0xCB03, length = 2, cycles = 2)
+    public static void rlc_e() {
+        rlc_reg(CPU.DE.E);
     }
 
     @Opcode(value = 0xCB04, length = 2, cycles = 2)
-    public static void rlch() {
-        byte new_lsb = 0;
-        if ((CPU.HL.H.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-            new_lsb = 1;
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.HL.H.setValue((byte) ((CPU.HL.H.getValue() << 1) | new_lsb));
-        if (CPU.HL.H.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-            CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
-        } else {
-            CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
-        }
+    public static void rlc_h() {
+        rlc_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB05, length = 2, cycles = 2)
+    public static void rlc_l() {
+        rlc_reg(CPU.HL.L);
     }
 
     @Opcode(value = 0xCB06, length = 2, cycles = 2)
     public static void rlc_hl() {
-        byte value = CPU.memory.read_byte(CPU.HL.getValue());
-
-        byte new_lsb = 0;
-        if ((value & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-            new_lsb = 1;
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.memory.write(CPU.HL.getValue(), (byte) ((value<<1) | new_lsb));
-        if (CPU.HL.H.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-            CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
-        } else {
-            CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
-        }
+        CPU.memory.write(CPU.HL.getValue(), rlc_val(CPU.memory.read_byte(CPU.HL.getValue())));
     }
 
-    @Opcode(value = 0xCB16, length = 2, cycles = 2)
-    public static void rl_hl() {
-        byte value = CPU.memory.read_byte(CPU.HL.getValue());
+    @Opcode(value = 0xCB07, length = 2, cycles = 2)
+    public static void rlc_a() {
+        rlc_reg(CPU.AF.A);
+    }
+    // endregion
 
-        int prev_carry = CPU.AF.isCarryFlagOn() ? 1 : 0;
+    // region rrc
+    @Opcode(value = 0xCB08, length = 1, cycles = 1)
+    public static void rrc_b() {
+        rrc_reg(CPU.BC.B);
+    }
 
-        if ((value & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.memory.write(CPU.HL.getValue(), (byte) ((value << 1) | prev_carry));
-        if (CPU.memory.read_byte(CPU.HL.getValue()) == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+    @Opcode(value = 0xCB09, length = 1, cycles = 1)
+    public static void rrc_c() {
+        rrc_reg(CPU.BC.C);
+    }
+
+    @Opcode(value = 0xCB0A, length = 1, cycles = 1)
+    public static void rrc_d() {
+        rrc_reg(CPU.DE.D);
     }
 
     @Opcode(value = 0xCB0B, length = 1, cycles = 1)
     public static void rrc_e() {
-        char new_msb = 0;
-        if ((CPU.DE.E.getValue() & 1) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-            new_msb = 128;
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.DE.E.setValue((byte) ((CPU.DE.E.getValue() >> 1) | new_msb));
-        CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
+        rrc_reg(CPU.DE.E);
+    }
+
+    @Opcode(value = 0xCB0C, length = 1, cycles = 1)
+    public static void rrc_h() {
+        rrc_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB0D, length = 1, cycles = 1)
+    public static void rrc_l() {
+        rrc_reg(CPU.HL.L);
     }
 
     @Opcode(value = 0xCB0E, length = 1, cycles = 1)
     public static void rrc_from_hl() {
-        byte Byte = CPU.memory.read_byte(CPU.HL.getValue());
-        char new_msb = 0;
-        if ((CPU.AF.A.getValue() & 1) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-            new_msb = 128;
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        Byte = (byte) ((Byte>>1) | new_msb);
-        CPU.memory.write(CPU.HL.getValue(), Byte);
-        CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
+        CPU.memory.write(CPU.HL.getValue(), rrc_val(CPU.memory.read_byte(CPU.HL.getValue())));
     }
+    // endregion
 
+    // region rl
+    @Opcode(value = 0xCB10, length = 2, cycles = 2)
+    public static void rl_b() {
+        rl_reg(CPU.BC.B);
+    }
 
     @Opcode(value = 0xCB11, length = 2, cycles = 2)
     public static void rl_c() {
-        int prev_carry = CPU.AF.isCarryFlagOn() ? 1 : 0;
-
-        if ((CPU.BC.C.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.BC.C.setValue((byte) ((CPU.BC.C.getValue() << 1) | prev_carry));
-        if (CPU.BC.C.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        rl_reg(CPU.BC.C);
     }
 
     @Opcode(value = 0xCB12, length = 2, cycles = 2)
     public static void rl_d() {
-        int prev_carry = CPU.AF.isCarryFlagOn() ? 1 : 0;
-
-        if ((CPU.DE.D.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        CPU.DE.D.setValue((byte) ((CPU.DE.D.getValue() << 1) | prev_carry));
-        if (CPU.DE.D.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        rl_reg(CPU.DE.D);
     }
+
+    @Opcode(value = 0xCB13, length = 2, cycles = 2)
+    public static void rl_e() {
+        rl_reg(CPU.DE.E);
+    }
+
+    @Opcode(value = 0xCB14, length = 2, cycles = 2)
+    public static void rl_h() {
+        rl_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB15, length = 2, cycles = 2)
+    public static void rl_l() {
+        rl_reg(CPU.HL.L);
+    }
+
+    @Opcode(value = 0xCB16, length = 2, cycles = 2)
+    public static void rl_hl() {
+        CPU.memory.write(CPU.HL.getValue(), rl_val(CPU.memory.read_byte(CPU.HL.getValue())));
+    }
+    // endregion
+
+    // region RR
+    @Opcode(value = 0xCB18, length = 2, cycles = 2)
+    public static void rr_b() {
+        rr_reg(CPU.BC.B);
+    }
+
+    @Opcode(value = 0xCB19, length = 2, cycles = 2)
+    public static void rr_c() {
+        rr_reg(CPU.BC.C);
+    }
+
+    @Opcode(value = 0xCB1A, length = 2, cycles = 2)
+    public static void rr_d() {
+        rr_reg(CPU.DE.D);
+    }
+
+    @Opcode(value = 0xCB1B, length = 2, cycles = 2)
+    public static void rr_e() {
+        rr_reg(CPU.DE.E);
+    }
+
+    @Opcode(value = 0xCB1C, length = 2, cycles = 2)
+    public static void rr_h() {
+        rr_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB1D, length = 2, cycles = 2)
+    public static void rr_l() {
+        rr_reg(CPU.HL.L);
+    }
+
+    @Opcode(value = 0xCB1E, length = 2, cycles = 2)
+    public static void rr_hl() {
+        CPU.memory.write(CPU.HL.getValue(), (byte) rr_val((char) CPU.memory.read_byte(CPU.HL.getValue())));
+    }
+
+    @Opcode(value = 0xCB1F, length = 2, cycles = 2)
+    public static void rr_a() {
+        rr_reg(CPU.AF.A);
+    }
+    // endregion
 
     //region BIT OPS
     @Opcode(value = 0xCB40, length = 2, cycles = 2)
@@ -1154,100 +1171,87 @@ public class ExtendedInstructions implements CPUInstructions {
         CPU.turnOffFlags(Flags.HALF_CARRY);
     }
 
+    // region SLA
+    @Opcode(value = 0xCB20, length = 2, cycles = 2)
+    public static void sla_b() {
+        sla_reg(CPU.BC.B);
+    }
+
     @Opcode(value = 0xCB21, length = 2, cycles = 2)
     public static void sla_c() {
-        byte new_lsb = 0;
-
-        if ((CPU.BC.C.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        // todo: CARRY AND VERIFY CARRY OF RLC
-        CPU.BC.C.setValue((byte) (((CPU.BC.C.getValue() << 1)) & 255));
-        if(CPU.BC.C.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        sla_reg(CPU.BC.C);
     }
 
     @Opcode(value = 0xCB22, length = 2, cycles = 2)
     public static void sla_d() {
-        byte new_lsb = 0;
-
-        if ((CPU.DE.D.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        // todo: CARRY AND VERIFY CARRY OF RLC
-        CPU.DE.D.setValue((byte) (((CPU.DE.D.getValue() << 1)) & 255));
-        if(CPU.DE.D.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        sla_reg(CPU.DE.D);
     }
 
-    // TODO: implement these sla instrctions
     @Opcode(value = 0xCB23, length = 2, cycles = 2)
     public static void sla_e() {
-        byte new_lsb = 0;
+        sla_reg(CPU.DE.E);
+    }
 
-        if ((CPU.DE.E.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        // todo: CARRY AND VERIFY CARRY OF RLC
-        CPU.DE.E.setValue((byte) (((CPU.DE.E.getValue() << 1)) & 255));
-        if(CPU.DE.E.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+    @Opcode(value = 0xCB24, length = 2, cycles = 2)
+    public static void sla_h() {
+        sla_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB25, length = 2, cycles = 2)
+    public static void sla_l() {
+        sla_reg(CPU.HL.L);
+    }
+
+    @Opcode(value = 0xCB26, length = 2, cycles = 2)
+    public static void sla_hl() {
+        CPU.memory.write(CPU.HL.getValue(), (byte) sla_val((char) CPU.memory.read_byte(CPU.HL.getValue())));
     }
 
     @Opcode(value = 0xCB27, length = 2, cycles = 2)
     public static void sla_a() {
-        byte new_lsb = 0;
+        sla_reg(CPU.AF.A);
+    }
+    // endregion
 
-        if ((CPU.AF.A.getValue() & 128) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        // todo: CARRY AND VERIFY CARRY OF RLC
-        CPU.AF.A.setValue((byte) (((CPU.AF.A.getValue() << 1)) & 255));
-        if(CPU.AF.A.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+    @Opcode(value = 0xCB28, length = 2, cycles = 2)
+    public static void sra_b() {
+        sra_reg(CPU.BC.B);
     }
 
-    // TODO: implement these sra instrctions
+    @Opcode(value = 0xCB29, length = 2, cycles = 2)
+    public static void sra_c() {
+        sra_reg(CPU.BC.C);
+    }
+
     @Opcode(value = 0xCB2A, length = 2, cycles = 2)
     public static void sra_d() {
-        byte new_msb = (byte) (CPU.DE.getValue()>>7);
-
-        if ((CPU.DE.D.getValue() & 1) != 0) {
-            CPU.turnOnFlags(Flags.CARRY);
-        } else {
-            CPU.turnOffFlags(Flags.CARRY);
-        }
-        // todo: CARRY AND VERIFY CARRY OF RLC
-        CPU.DE.D.setValue((byte) ((byte) (((CPU.DE.D.getValue() >> 1)) & 255) | new_msb));
-        if(CPU.DE.D.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        } else {
-            CPU.turnOffFlags(Flags.ZERO);
-        }
-        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        sra_reg(CPU.DE.D);
     }
+
+    @Opcode(value = 0xCB2B, length = 2, cycles = 2)
+    public static void sra_e() {
+        sra_reg(CPU.DE.E);
+    }
+
+    @Opcode(value = 0xCB2C, length = 2, cycles = 2)
+    public static void sra_h() {
+        sra_reg(CPU.HL.H);
+    }
+
+    @Opcode(value = 0xCB2D, length = 2, cycles = 2)
+    public static void sra_l() {
+        sra_reg(CPU.HL.L);
+    }
+
+    @Opcode(value = 0xCB2E, length = 2, cycles = 2)
+    public static void sra_from_hl() {
+        CPU.memory.write(CPU.HL.getValue(), (byte) sra_val((char) CPU.memory.read_byte(CPU.HL.getValue())));
+    }
+
+    @Opcode(value = 0xCB2F, length = 2, cycles = 2)
+    public static void sra_a() {
+        sra_reg(CPU.AF.A);
+    }
+
+
 }

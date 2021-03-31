@@ -8,7 +8,7 @@ public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\cpu_instrs.gb";
+    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\Game.gb";
     public int bank_number = 1;
 
     private final byte[] _memory;

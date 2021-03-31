@@ -151,4 +151,168 @@ public class HelperFunctions {
     public static void set_reg(Register reg, int index) {
         reg.setValue((byte) (reg.getValue() | (1<<index)));
     }
+
+    public static void and_val(byte data) {
+        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & data));
+        if (CPU.AF.A.getValue() == 0) {
+            CPU.setFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
+        } else {
+            CPU.setFlags(Flags.HALF_CARRY);
+        }
+    }
+
+    public static byte rlc_val(byte data) {
+        byte new_lsb = 0;
+        if ((data & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+            new_lsb = 1;
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        data = (byte) ((data << 1) | new_lsb);
+
+        if (data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+            CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        } else {
+            CPU.turnOffFlags((byte) (Flags.ZERO | Flags.SUBTRACTION | Flags.HALF_CARRY));
+        }
+        return data;
+    }
+
+    public static void rlc_reg(Register reg) {
+        reg.setValue(rlc_val((byte) reg.getValue()));
+    }
+
+
+    public static void rrc_reg(Register reg) {
+        reg.setValue(rrc_val((byte) reg.getValue()));
+    }
+
+    public static byte rrc_val(byte data) {
+        char new_msb = 0;
+        if ((data & 1) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+            new_msb = 128;
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        byte new_data = (byte) (((data >> 1)&0x7F) | new_msb);
+        if(new_data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return new_data;
+    }
+
+    public static byte rl_val(byte data) {
+        int prev_carry = CPU.AF.isCarryFlagOn() ? 1 : 0;
+
+        if ((data & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        data = (byte) ((data << 1) | prev_carry);
+        if (data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return data;
+    }
+
+    public static void rl_reg(Register reg) {
+        reg.setValue(rl_val((byte) reg.getValue()));
+    }
+
+    public static char rr_val(char data) {
+        byte new_msb = 0;
+        if(CPU.AF.isCarryFlagOn()) {
+            new_msb = (byte) (1 << 7);
+        }
+        if ((data & 1) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        char new_val = (char) (((data >> 1)&0x7F) | new_msb);
+        if(new_val == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return new_val;
+    }
+
+    public static void rr_reg(Register reg) {
+        reg.setValue(rr_val(reg.getValue()));
+    }
+
+    public static char sla_val(char data) {
+        if ((data & 128) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+
+        char new_data = (char) (((data << 1)) & 255);
+        if(new_data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return new_data;
+    }
+
+    public static void sla_reg(Register reg) {
+        reg.setValue(sla_val(reg.getValue()));
+    }
+
+    public static char sra_val(char data) {
+        byte new_msb = (byte) (data&0x80);
+
+        if ((data & 1) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        char new_data = (char) ((byte) (((data >> 1)) & 0x7F) | new_msb);
+        if(new_data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return new_data;
+    }
+
+    public static void sra_reg(Register reg) {
+        reg.setValue(sra_val(reg.getValue()));
+    }
+
+    public static char srl_val(char data) {
+        if ((data & 1) != 0) {
+            CPU.turnOnFlags(Flags.CARRY);
+        } else {
+            CPU.turnOffFlags(Flags.CARRY);
+        }
+        char new_data = (char) ((char) (data >> 1) & 0x7F);
+        if (new_data == 0) {
+            CPU.turnOnFlags(Flags.ZERO);
+        } else {
+            CPU.turnOffFlags(Flags.ZERO);
+        }
+        CPU.turnOffFlags((byte) (Flags.SUBTRACTION | Flags.HALF_CARRY));
+        return new_data;
+    }
+
+    public static void srl_reg(Register reg) {
+        reg.setValue(srl_val(reg.getValue()));
+    }
 }

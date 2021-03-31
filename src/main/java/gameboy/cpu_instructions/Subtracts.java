@@ -42,7 +42,7 @@ public class Subtracts implements CPUInstructions {
     @Opcode(value = 0x96, length = 1, cycles = 1)
     public static void sub_from_hl() {
         byte target = CPU.memory.read_byte(CPU.HL.getValue());
-        add_register(CPU.AF.A, target, false, true, false);
+        add_register(CPU.AF.A, target & 255, false, true, false);
     }
 
     @Opcode(value = 0x97, length = 1, cycles = 1)
@@ -83,7 +83,7 @@ public class Subtracts implements CPUInstructions {
     @Opcode(value = 0x9E, length = 1, cycles = 1)
     public static void sbc_from_hl() {
         byte target = CPU.memory.read_byte(CPU.HL.getValue());
-        add_register(CPU.AF.A, target, true, true, false);
+        add_register(CPU.AF.A, target & 255, true, true, false);
     }
 
     @Opcode(value = 0x9F, length = 1, cycles = 1)

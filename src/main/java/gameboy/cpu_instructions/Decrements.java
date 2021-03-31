@@ -56,21 +56,19 @@ public class Decrements implements CPUInstructions {
 
     @Opcode(value = 0x35, length = 1, cycles = 3)
     public static void dec_from_hl() {
-        char current_value = (char) (CPU.memory.read_byte(CPU.HL.getValue()) & 255);
+        byte current_value = (byte) ((byte) ((byte) (CPU.memory.read_byte(CPU.HL.getValue()) & 0xFF) - 1) & 0xFF);
         if (current_value == 0) {
             CPU.turnOnFlags(Flags.ZERO);
         } else {
             CPU.turnOffFlags(Flags.ZERO);
         }
-        if((CPU.memory.read_byte(CPU.HL.getValue()) & 1<<4) != (CPU.memory.read_byte(CPU.HL.getValue()) - 1 & 1<<4))
+        if(((CPU.memory.read_byte(CPU.HL.getValue()) & 0xF) - (1 & 0xF)) < 0)
         {
             CPU.turnOnFlags(Flags.HALF_CARRY);
         } else {
             CPU.turnOffFlags(Flags.HALF_CARRY);
         }
-        current_value -= 1;
-        current_value &= 255;
-        CPU.memory.write(CPU.HL.getValue(), (byte) current_value);
+        CPU.memory.write(CPU.HL.getValue(), current_value);
         CPU.turnOnFlags(Flags.SUBTRACTION);
     }
 
