@@ -312,4 +312,17 @@ public class HelperFunctions {
     public static void srl_reg(Register reg) {
         reg.setValue(srl_val(reg.getValue()));
     }
+
+    public static byte swap_val(byte val) {
+        byte new_val = (byte) (((val &0x0F) << 4) | ((val &0xF0) >> 4));
+        if(new_val == 0) {
+            CPU.setFlags(Flags.ZERO);
+        } else {
+            CPU.setFlags((byte) 0);
+        }
+        return new_val;
+    }
+    public static void swap_reg(Register reg) {
+        reg.setValue(swap_val((byte) reg.getValue()));
+    }
 }

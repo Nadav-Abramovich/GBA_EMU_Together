@@ -17,7 +17,7 @@ public class Gameboy {
     public Gameboy() {
         CPU.init(_memory, this);
         Screen.init();
-        ScreenLow.init();
+//        ScreenLow.init();
 
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
@@ -32,7 +32,7 @@ public class Gameboy {
     }
     public void tick() {
         Screen.loop();
-        ScreenLow.loop();
+//        ScreenLow.loop();
         // Busy wait on main thread as lwjgl needs to be run / updated from the mainthread...
         long start = System.nanoTime();
         while(start + 114 * 1 >= System.nanoTime());

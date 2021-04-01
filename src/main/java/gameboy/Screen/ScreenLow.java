@@ -1,9 +1,7 @@
 package gameboy.Screen;
 
 import gameboy.CPU;
-import gameboy.Keys;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -42,7 +40,7 @@ public class ScreenLow {
 
         // Create the window
         System.out.println("CREATING");
-        window = glfwCreateWindow(160, 144, "GameBoy2!", NULL, Screen.window);
+        window = glfwCreateWindow(160, 144, "GameBoy2!", NULL, Screen.opengl_window);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 

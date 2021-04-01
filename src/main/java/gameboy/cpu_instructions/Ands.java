@@ -11,12 +11,7 @@ import static gameboy.HelperFunctions.and_val;
 public class Ands implements CPUInstructions {
     @Opcode(value = 0xA7, length = 1, cycles = 1)
     public static void and_a() {
-        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & CPU.AF.A.getValue()));
-        if (CPU.AF.A.getValue() == 0) {
-            CPU.setFlags((byte) (Flags.ZERO | Flags.HALF_CARRY));
-        } else {
-            CPU.setFlags(Flags.HALF_CARRY);
-        }
+        and_val((byte) CPU.AF.A.getValue());
     }
 
     @Opcode(value = 0xA0, length = 1, cycles = 1)
@@ -53,20 +48,12 @@ public class Ands implements CPUInstructions {
     @Opcode(value = 0xA6, length = 1, cycles = 2)
     public static void and_from_hl() {
         byte d8 = CPU.memory.read_byte(CPU.HL.getValue());
-        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & d8));
-        CPU.setFlags(Flags.HALF_CARRY);
-        if(CPU.AF.A.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        }
+        and_val(d8);
     }
 
     @Opcode(value = 0xE6, length = 2, cycles = 2)
     public static void and_d8() {
         byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        CPU.AF.A.setValue((byte) (CPU.AF.A.getValue() & d8));
-        CPU.setFlags(Flags.HALF_CARRY);
-        if(CPU.AF.A.getValue() == 0) {
-            CPU.turnOnFlags(Flags.ZERO);
-        }
+        and_val(d8);
     }
 }

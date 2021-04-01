@@ -9,6 +9,7 @@ import static gameboy.HelperFunctions.*;
 // and therefore IntelliJ doesn't recognize their usage.
 @SuppressWarnings("unused")
 public class ExtendedInstructions implements CPUInstructions {
+    // There is a bug causing the instruction following the stop instruction to be skipped
     @Opcode(value = 0x1000, length = 2, cycles = 1)
     public static void stop() {
     }
@@ -62,39 +63,44 @@ public class ExtendedInstructions implements CPUInstructions {
     // endregion
 
     // region rrc
-    @Opcode(value = 0xCB08, length = 1, cycles = 1)
+    @Opcode(value = 0xCB08, length = 2, cycles = 2)
     public static void rrc_b() {
         rrc_reg(CPU.BC.B);
     }
 
-    @Opcode(value = 0xCB09, length = 1, cycles = 1)
+    @Opcode(value = 0xCB09, length = 2, cycles = 2)
     public static void rrc_c() {
         rrc_reg(CPU.BC.C);
     }
 
-    @Opcode(value = 0xCB0A, length = 1, cycles = 1)
+    @Opcode(value = 0xCB0A, length = 2, cycles = 2)
     public static void rrc_d() {
         rrc_reg(CPU.DE.D);
     }
 
-    @Opcode(value = 0xCB0B, length = 1, cycles = 1)
+    @Opcode(value = 0xCB0B, length = 2, cycles = 2)
     public static void rrc_e() {
         rrc_reg(CPU.DE.E);
     }
 
-    @Opcode(value = 0xCB0C, length = 1, cycles = 1)
+    @Opcode(value = 0xCB0C, length = 2, cycles = 2)
     public static void rrc_h() {
         rrc_reg(CPU.HL.H);
     }
 
-    @Opcode(value = 0xCB0D, length = 1, cycles = 1)
+    @Opcode(value = 0xCB0D, length = 2, cycles = 2)
     public static void rrc_l() {
         rrc_reg(CPU.HL.L);
     }
 
-    @Opcode(value = 0xCB0E, length = 1, cycles = 1)
+    @Opcode(value = 0xCB0E, length = 2, cycles = 2)
     public static void rrc_from_hl() {
         CPU.memory.write(CPU.HL.getValue(), rrc_val(CPU.memory.read_byte(CPU.HL.getValue())));
+    }
+
+    @Opcode(value = 0xCB0F, length = 2, cycles = 2)
+    public static void rrc_a() {
+        rrc_reg(CPU.AF.A);
     }
     // endregion
 

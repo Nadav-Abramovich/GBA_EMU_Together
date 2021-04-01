@@ -3,8 +3,7 @@ package gameboy.cpu_instructions;
 import gameboy.CPU;
 import gameboy.Flags;
 
-import static gameboy.HelperFunctions.srl_reg;
-import static gameboy.HelperFunctions.srl_val;
+import static gameboy.HelperFunctions.*;
 
 // We suppress this warning because this class and its methods are dynamically imported
 // and therefore IntelliJ doesn't recognize their usage.
@@ -87,38 +86,51 @@ public class Rotates implements CPUInstructions {
     }
 
     // TODO: Find a better place
+    @Opcode(value = 0xCB30, length = 2, cycles = 2)
+    public static void swap_b() {
+        swap_reg(CPU.BC.B);
+    }
+    // TODO: Find a better place
+    @Opcode(value = 0xCB31, length = 2, cycles = 2)
+    public static void swap_c() {
+        swap_reg(CPU.BC.C);
+    }
+    // TODO: Find a better place
+    @Opcode(value = 0xCB32, length = 2, cycles = 2)
+    public static void swap_d() {
+        swap_reg(CPU.DE.D);
+    }
+
+    // TODO: Find a better place
     @Opcode(value = 0xCB33, length = 2, cycles = 2)
     public static void swap_e() {
-        CPU.DE.E.setValue((byte) ((CPU.DE.E.getValue() >> 4) | (CPU.DE.E.getValue() << 4)));
-        if (CPU.DE.E.getValue() == 0) {
-            CPU.setFlags(Flags.ZERO);
-        } else {
-            CPU.setFlags((byte) 0);
-        }
+        swap_reg(CPU.DE.E);
+    }
+
+    // TODO: Find a better place
+    @Opcode(value = 0xCB34, length = 2, cycles = 2)
+    public static void swap_h() {
+        swap_reg(CPU.HL.H);
+    }
+
+    // TODO: Find a better place
+    @Opcode(value = 0xCB35, length = 2, cycles = 2)
+    public static void swap_l() {
+        swap_reg(CPU.HL.L);
     }
 
     // TODO: Find a better place
     @Opcode(value = 0xCB36, length = 2, cycles = 2)
     public static void swap_from_hl() {
         byte new_value = CPU.memory.read_byte(CPU.HL.getValue());
-        new_value = (byte) (((new_value << 4)&0xF0) | ((new_value >> 4) & 0x0F));
+        new_value = swap_val(new_value);
         CPU.memory.write(CPU.HL.getValue(), new_value);
-        if (CPU.memory.read_byte(CPU.HL.getValue()) == 0) {
-            CPU.setFlags(Flags.ZERO);
-        } else {
-            CPU.setFlags((byte) 0);
-        }
     }
 
     // TODO: Find a better place
     @Opcode(value = 0xCB37, length = 2, cycles = 2)
     public static void swap_a() {
-        CPU.AF.A.setValue((byte) ((CPU.AF.A.getValue() >> 4) | (CPU.AF.A.getValue() << 4)));
-        if (CPU.AF.A.getValue() == 0) {
-            CPU.setFlags(Flags.ZERO);
-        } else {
-            CPU.setFlags((byte) 0);
-        }
+        swap_reg(CPU.AF.A);
     }
 
     // region SRL
@@ -129,7 +141,7 @@ public class Rotates implements CPUInstructions {
 
     @Opcode(value = 0xCB39, length = 2, cycles = 2)
     public static void srl_c() {
-        srl_reg(CPU.BC.B);
+        srl_reg(CPU.BC.C);
     }
 
     @Opcode(value = 0xCB3A, length = 2, cycles = 2)

@@ -409,17 +409,6 @@ public class Load implements CPUInstructions {
         CPU.memory.write((higher << 8) | lower, (byte) CPU.AF.A.getValue());
     }
 
-    @Opcode(value = 0xEE, length = 2, cycles = 2)
-    public static void xor_d8() {
-        byte d8 = CPU.memory.read_byte(CPU.PC.getValue() + 1);
-        CPU.AF.A.setValue((byte)((CPU.AF.A.getValue() ^ d8)));
-        if(CPU.AF.A.getValue() == 0) {
-            CPU.setFlags(Flags.ZERO);
-        } else {
-            CPU.setFlags((byte) 0);
-        }
-    }
-
     @Opcode(value = 0xF0, length = 2, cycles = 3)
     public static void ld_a_from_a8() {
         char a8 = (char) (CPU.memory.read_byte(CPU.PC.getValue() + 1) & 255);

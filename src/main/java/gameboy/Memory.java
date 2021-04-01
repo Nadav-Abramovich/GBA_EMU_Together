@@ -7,7 +7,7 @@ public class Memory {
     public static final String SUCCESSFULLY_LOADED_BOOT_ROM_MSG = "[INFO] Successfully loaded boot ROM!";
     public static final String FAILED_TO_LOAD_BOOT_ROM_EXCEPTION = "[CRITICAL] Failed to load Boot ROM!";
     public static final String BOOSTRAP_ROM_PATH = "ROMS/BootWorld.gb";
-    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\cpu_instrs.gb";
+    public static final String GAME_ROM_PATH = "D:\\projects\\New Gameboy\\GBA_EMU_Together\\ROMS\\Game.gb";
     public int rom_bank_number = 1;
     public int hram_bank_number = 0;
 
@@ -103,6 +103,10 @@ public class Memory {
 //            System.out.printf("bank: 0x%s\r\n", Integer.toHexString(bank_number).toUpperCase());
 //            System.out.printf("Address: 0x%s\r\n", Integer.toHexString(address).toUpperCase());
             return game_rom[address];
+        }
+        if(address == 0xFFB8) {
+//            System.out.println("");
+            return (byte)rom_bank_number;
         }
         if(address >= 0xA000 && address <= 0xBFFF) {
             return _hram_memory[(0x2000 * hram_bank_number) + (address-0xA000)];
